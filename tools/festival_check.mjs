@@ -9,6 +9,7 @@ const docs = fileURLToPath(new URL("../docs/", import.meta.url));
 const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
 const { festivalsFor } = await import(new URL("../docs/js/festivals.js", import.meta.url));
+const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 swe.setSidMode(swe.SE.SIDM_TRUE_CITRA);
 
@@ -74,4 +75,27 @@ for (const [label, place] of [["Chennai", CHENNAI], ["Delhi", DELHI]]) {
   }
 }
 console.log(bad ? `${bad} problem(s)` : "no repeated festivals in 2025-2026");
+
+// Shubha muhurtham: panchangams disagree on the finer rules, so require only
+// that most Valarpirai dates published by LiveChennai for Chennai are found,
+// and that no day breaks the weekday rule.
+const MUHURTHAM = {
+  2025: "02-02 02-03 02-12 03-02 03-05 03-06 03-07 03-12 04-30 05-01 05-08 05-09 05-28 06-02 06-04 06-05 06-08 06-29 06-30 07-02 07-03 07-04 07-06 07-07 11-02 11-03 11-23 11-30 12-01",
+  2026: "01-28 02-20 02-22 03-25 04-01 04-20 04-23 04-30 05-18 05-25 05-28 05-29 06-17 06-18 06-24 06-25 08-23 09-13 09-17 10-25 11-11 11-13 11-15 11-16 11-20 12-10 12-13 12-14",
+};
+for (const [year, list] of Object.entries(MUHURTHAM)) {
+  const ref = list.split(" ").map((d) => `${year}-${d}`);
+  let hit = 0, days = 0;
+  for (let t = Date.parse(`${year}-01-01T00:00:00Z`); t <= Date.parse(`${year}-12-31T00:00:00Z`); t += 86400e3) {
+    const m = muhurthaFor(t, ...CHENNAI, 5.5);
+    if (!m) continue;
+    days++;
+    if (ref.includes(new Date(t).toISOString().slice(0, 10))) hit++;
+    if ([2, 6].includes(new Date(t).getUTCDay()) || !m.windows.length) { bad++; console.log(`FAIL muhurtham on ${new Date(t).toISOString().slice(0, 10)}`); }
+  }
+  const ok = hit >= ref.length * 0.6;
+  if (!ok) bad++;
+  console.log(`${ok ? "ok  " : "FAIL"} muhurtham ${year}: ${days} days, ${hit}/${ref.length} published Valarpirai dates found`);
+}
+console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

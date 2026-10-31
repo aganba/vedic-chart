@@ -3,6 +3,7 @@
 import { initSwe } from "./js/swe.js";
 import { AYANAMSAS, BHAVA_METHODS, computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { festivalsFor } from "./js/festivals.js";
+import { muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 
@@ -385,7 +386,8 @@ function renderPanchanga(c) {
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
 // banner at the top of the Panchanga tab, and festivals for the year from the
-// entered date in the Festivals tab. The year is computed in small chunks after
+// entered date in the Festivals tab, along with the year's shubha muhurtham
+// days and their time windows. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
@@ -428,10 +430,12 @@ function renderFestivals(c) {
   const place = $("place").value.trim();
   $("festivalPlace").textContent = place ? `· ${place}` : "";
   $("festivalYear").innerHTML = `<p class="hint" id="festivalStatus">Calculating…</p>`;
+  $("muhurthaYear").innerHTML = `<p class="hint">Calculating…</p>`;
 
   const seq = ++festivalSeq;
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
   const found = []; // [{ date, festivals }] for days 0..done-1
+  const muhurthas = []; // [{ date, m }] for days 0..done-1
   let done = 0, bannerDone = false;
   // With a detected timezone each day gets the offset in force then (DST);
   // a manually entered offset is used for every day.
@@ -465,6 +469,27 @@ function renderFestivals(c) {
     if (month) html += "</ul>";
     if (status) html += `<p class="hint">${esc(status)}</p>`;
     $("festivalYear").innerHTML = html;
+    showMuhurthas(status);
+  };
+
+  const showMuhurthas = (status) => {
+    let html = "", month = "";
+    for (const { date, m } of muhurthas) {
+      const fd = festivalDate(date);
+      const key = `${fd.y}-${fd.m}`;
+      if (key !== month) {
+        html += `${month ? "</ul>" : ""}<h3 class="year-month">${MONTH_NAMES[fd.m - 1]} ${fd.y}</h3><ul class="upcoming-list muhurtha-list">`;
+        month = key;
+      }
+      const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join(" · ");
+      html += `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${fd.label}</span><div>
+        <div>${esc(m.paksha)} · ${esc(m.tithi)} · ${esc(m.nakshatra)}</div>
+        <div class="upcoming-times">${wins}</div></div></li>`;
+    }
+    if (month) html += "</ul>";
+    if (status) html += `<p class="hint">${esc(status)}</p>`;
+    else if (!muhurthas.length) html += `<p class="hint">No shubha muhurtham days found.</p>`;
+    $("muhurthaYear").innerHTML = html;
   };
 
   const step = () => {
@@ -475,6 +500,8 @@ function renderFestivals(c) {
         const w = midnight + done * 86400e3;
         const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset);
         if (festivals.length) found.push({ date: isoFromWall(w).slice(0, 10), festivals });
+        const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
+        if (m) muhurthas.push({ date: isoFromWall(w).slice(0, 10), m });
       }
     } catch {
       if (!bannerDone) showUpcoming(true);

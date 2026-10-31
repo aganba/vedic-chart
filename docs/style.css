@@ -201,6 +201,10 @@ td.weak { color: var(--lagna); }
 .year-month { margin: 16px 0 6px; font-size: 14px; color: var(--accent); }
 .year-month:first-child { margin-top: 0; }
 #festivalYear .upcoming-list li.today { font-weight: 700; }
+.muhurtha-list { gap: 8px; }
+.muhurtha-list li { display: flex; gap: 6px; }
+.muhurtha-list .win { white-space: nowrap; }
+.muhurtha-list li.today > div > div:first-child { font-weight: 700; }
 #upcoming .upcoming-list { gap: 8px; }
 #upcoming .upcoming-list li { display: flex; gap: 6px; }
 .upcoming-festival + .upcoming-festival { margin-top: 4px; }
