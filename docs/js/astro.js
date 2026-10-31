@@ -9,6 +9,7 @@ import * as swe from "./swe.js";
 import { SE } from "./swe.js";
 import * as shadbala from "./shadbala.js";
 import { vimshottari } from "./dasha.js";
+import { festivalsFor } from "./festivals.js";
 
 export const AYANAMSAS = {
   true_chitra: ["True Chitrapaksha", SE.SIDM_TRUE_CITRA],
@@ -328,6 +329,8 @@ export function computeChart(dt, offsetHours, lat, lon, ayanamsa = "true_chitra"
       nextSunrise: raw.next_sunrise, weekday: raw.weekday });
   }
   const dashas = vimshottari(jd, lons.moon, offsetHours);
+  // Festivals on the entered civil date (local midnight of dt).
+  panch.festivals = festivalsFor(Math.floor(dt / 86400e3) * 86400e3, lat, lon, offsetHours);
 
   const row = (key, name, abbr, x, speed = null) => ({
     key, name, abbr, lon: x, sign: Math.floor(x / 30), sign_name: SIGNS[Math.floor(x / 30)],

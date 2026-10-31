@@ -372,6 +372,25 @@ function renderPanchanga(c) {
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
 }
 
+// Festivals on the entered date, as a banner at the top of the Panchanga tab.
+function renderFestivals(c) {
+  const list = c.panchanga.festivals || [];
+  const ref = c.input.local_time.slice(0, 10);
+  const hm = (iso) => {
+    const [d, t] = iso.split("T");
+    if (d === ref) return t.slice(0, 5);
+    const [, mo, day] = d.split("-");
+    return `${t.slice(0, 5)} (${Number(day)} ${MONTHS[Number(mo) - 1]})`;
+  };
+  $("festivals").innerHTML = list.map((f) => `
+    <div class="festival">
+      <div class="festival-name">${esc(f.name)}${f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : ""}</div>
+      ${f.times.map((t) => `<div class="festival-time">${esc(t.label)}: <strong>${t.at ? hm(t.at) : `${hm(t.start)} – ${hm(t.end)}`}</strong></div>`).join("")}
+      ${f.note ? `<div class="festival-note">${esc(f.note)}</div>` : ""}
+    </div>`).join("");
+  $("festivals").hidden = !list.length;
+}
+
 function renderPositions(c) {
   const signs = c.constants.signs, abbr = c.constants.sign_abbr;
   const rows = c.bodies.map((b) => `
@@ -575,6 +594,7 @@ async function calculate(e) {
     }
     renderSummary(c);
     renderPanchanga(c);
+    renderFestivals(c);
     renderCharts(c);
     renderPositions(c);
     renderBhavaTable(c);

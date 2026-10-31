@@ -3,6 +3,7 @@
 A web app for Vedic astrology. Enter a place, date and time to get:
 
 - **Panchanga**: vara, tithi, nakshatra, yoga, karana (with end times), lunar month, samvatsara, sunrise/sunset, Rahu Kalam, Yamaganda and Gulika Kalam
+- **Festivals** on the entered date and place (Diwali, Ugadi, Pongal, Tamil New Year, Vishu, Onam, Janmashtami, Ganesh Chaturthi, Navaratri, Maha Shivaratri, Holi and more), with puja timings such as pradosha, madhyahna and nishita windows
 - **Charts**: South Indian Rasi (D1) and Navamsa (D9), planetary degrees, nakshatras, chara karakas, Shadbala, and a bhava (house) table
 - **Vimshottari dasha**: mahadashas and antardashas with dates
 
@@ -19,6 +20,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
 - Chara karakas: the 8-karaka scheme, including Rahu
 - Vimshottari dasha: dasha years measured by the Sun's sidereal motion (t years = the Sun moving t × 360°)
 - Sunrise: upper limb of the Sun with standard refraction
+- Festivals: tithi festivals fall on the first day whose kaala (sunrise, madhyahna, aparahna, pradosha or nishita) lies in the tithi, in the amanta lunar month, never in an adhika month; Raksha Bandhan and Holika Dahan avoid Bhadra. Tamil and Malayalam months start on the day of the sankranti if it falls before 3/5 of the daytime; Makara Sankranti uses sunset. `tools/festival_check.mjs` checks 46 published 2025–2026 dates.
 - Shadbala: Brihat Parashara Hora Shastra rules. Cheshta bala uses Surya Siddhanta mean motions with bija corrections. Planetary war (yuddha bala) is not applied.
 
 ## Layout
@@ -27,6 +29,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
   - `js/astro.js`, `js/shadbala.js`, `js/dasha.js`: calculations
   - `js/tz.js`: time zone and historical UTC offset for a place
   - `js/places.js`: offline place autocomplete and OpenStreetMap search
+  - `js/festivals.js`: festival rules
   - `swe/`: Swiss Ephemeris WebAssembly build; `ephe/`: ephemeris data (1800–2400 CE)
   - `data/places.tsv`: [GeoNames](https://www.geonames.org/) towns with population ≥ 1000 (CC BY 4.0)
   - `vendor/tz-lookup.js`: [@photostructure/tz-lookup](https://github.com/photostructure/tz-lookup) (CC0)

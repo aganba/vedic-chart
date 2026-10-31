@@ -176,3 +176,14 @@ td.weak { color: var(--lagna); }
   width: 64px; height: 72px; background-color: var(--accent);
   -webkit-mask: url(ganesha.svg) center / contain no-repeat; mask: url(ganesha.svg) center / contain no-repeat;
 }
+
+/* festival banner (Panchanga tab) */
+.festival-banner {
+  display: grid; gap: 10px; margin-bottom: 16px; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card));
+}
+.festival + .festival { border-top: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); padding-top: 10px; }
+.festival-name { font-size: 17px; font-weight: 700; color: var(--accent); }
+.festival-region { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+.festival-time { font-size: 14px; margin-top: 2px; }
+.festival-note { font-size: 13px; color: var(--muted); margin-top: 2px; }

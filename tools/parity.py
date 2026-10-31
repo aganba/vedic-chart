@@ -15,6 +15,7 @@ sys.path.insert(0, str(ROOT))
 from app import astro  # noqa: E402
 
 TOL = 1e-6
+JS_ONLY = {"festivals"}  # browser-only features, checked by tools/festival_check.mjs
 CASES = [  # public places and dates only
     {"date": "2000-01-01", "time": "06:30:00", "offset": 5.5, "lat": 13.0878, "lon": 80.2785, "ayanamsa": "true_chitra", "bhava": "equal_mid"},
     {"date": "1947-08-15", "time": "00:00:00", "offset": 5.5, "lat": 28.6139, "lon": 77.2090, "ayanamsa": "lahiri", "bhava": "sripati"},
@@ -46,7 +47,7 @@ def js_results():
 def diff(a, b, path="", out=None):
     out = [] if out is None else out
     if isinstance(a, dict) and isinstance(b, dict):
-        for k in sorted(set(a) | set(b)):
+        for k in sorted((set(a) | set(b)) - JS_ONLY):
             if k not in a or k not in b:
                 out.append(f"{path}.{k}: missing on {'python' if k not in a else 'js'} side")
             else:
