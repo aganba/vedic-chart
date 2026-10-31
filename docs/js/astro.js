@@ -278,6 +278,16 @@ export function panchanga(jd, lat, lon, offset) {
   }
 
   const nak = nakshatraOf(moonLon(jd));
+
+  // Nakshatra at sunrise on the entered civil date.
+  const midnight = Math.floor(wallFromJul(jd, offset) / 86400e3) * 86400e3;
+  const daySunrise = sunEvent(julFromWall(midnight, offset), lat, lon, SE.CALC_RISE);
+  let sunriseNak = null;
+  if (daySunrise !== null) {
+    const [, snEnd] = endOf(moonLon, NAK_SPAN, daySunrise, 13.2);
+    sunriseNak = { ...nakshatraOf(moonLon(daySunrise)), at: loc(daySunrise), end: loc(snEnd) };
+  }
+
   return {
     samvatsara: SAMVATSARAS[(((lunarYear - 1987) % 60) + 60) % 60],
     masa: (sPrev === sNext ? "Adhika " : "") + MASAS[masa],
@@ -286,6 +296,7 @@ export function panchanga(jd, lat, lon, offset) {
       name: ti === 14 ? "Purnima" : ti === 29 ? "Amavasya" : TITHIS[ti % 15],
       number: ti + 1, end: loc(tiEnd), pct_left: round2(tiLeft * 100) },
     nakshatra: { ...nak, end: loc(nkEnd), pct_left: round2(nkLeft * 100) },
+    sunrise_nakshatra: sunriseNak,
     yoga: { name: YOGAS[yg], end: loc(ygEnd), pct_left: round2(ygLeft * 100) },
     karana: { name: karanaName(kr), end: loc(krEnd), pct_left: round2(krLeft * 100) },
     sunrise: loc(sunrise), sunset: loc(sunset), next_sunrise: loc(nextSunrise),

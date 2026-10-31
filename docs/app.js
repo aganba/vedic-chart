@@ -358,6 +358,8 @@ function renderPanchanga(c) {
     ["Vara", p.vara.name, p.vara.sanskrit + " (from sunrise)"],
     ["Tithi", `${p.tithi.paksha} ${p.tithi.name}`, `${p.tithi.pct_left}% left · ends ${fmtTime(p.tithi.end, ref)}`],
     ["Nakshatra", `${p.nakshatra.name} pada ${p.nakshatra.pada}`, `${p.nakshatra.pct_left}% left · ends ${fmtTime(p.nakshatra.end, ref)} · lord ${p.nakshatra.lord}`],
+    ...(p.sunrise_nakshatra ? [["Nakshatra at sunrise", `${p.sunrise_nakshatra.name} pada ${p.sunrise_nakshatra.pada}`,
+      `at sunrise ${fmtTime(p.sunrise_nakshatra.at, ref)} · until ${fmtTime(p.sunrise_nakshatra.end, ref)} · lord ${p.sunrise_nakshatra.lord}`]] : []),
     ["Yoga", p.yoga.name, `ends ${fmtTime(p.yoga.end, ref)}`],
     ["Karana", p.karana.name, `ends ${fmtTime(p.karana.end, ref)}`],
     ["Lunar month / year", `${p.masa}`, `${p.samvatsara} samvatsara (amanta)`],

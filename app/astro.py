@@ -289,6 +289,15 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
             kalams[name] = {"start": loc(sunrise + part * eighth), "end": loc(sunrise + (part + 1) * eighth)}
 
     nak = nakshatra_of(_moon(jd))
+
+    # Nakshatra at sunrise on the entered civil date.
+    midnight = local_dt.replace(hour=0, minute=0, second=0)
+    day_sunrise = _sun_event(julday_from_local(midnight, offset), lat, lon, swe.CALC_RISE)
+    sunrise_nak = None
+    if day_sunrise is not None:
+        _, sn_end, _ = _end_of(_moon, NAK_SPAN, day_sunrise, 13.2)
+        sunrise_nak = {**nakshatra_of(_moon(day_sunrise)), "at": loc(day_sunrise), "end": loc(sn_end)}
+
     return {
         "samvatsara": SAMVATSARAS[(lunar_year - 1987) % 60],
         "masa": ("Adhika " if s_prev == s_next else "") + MASAS[masa],
@@ -297,6 +306,7 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
                   "name": "Purnima" if ti == 14 else "Amavasya" if ti == 29 else TITHIS[ti % 15],
                   "number": ti + 1, "end": loc(ti_end), "pct_left": round(ti_left * 100, 2)},
         "nakshatra": {**nak, "end": loc(nk_end), "pct_left": round(nk_left * 100, 2)},
+        "sunrise_nakshatra": sunrise_nak,
         "yoga": {"name": YOGAS[yg], "end": loc(yg_end), "pct_left": round(yg_left * 100, 2)},
         "karana": {"name": _karana_name(kr), "end": loc(kr_end), "pct_left": round(kr_left * 100, 2)},
         "sunrise": loc(sunrise), "sunset": loc(sunset), "next_sunrise": loc(next_sunrise),

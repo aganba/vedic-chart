@@ -2,7 +2,7 @@
 
 A web app for Vedic astrology. Enter a place, date and time to get:
 
-- **Panchanga**: vara, tithi, nakshatra, yoga, karana (with end times), lunar month, samvatsara, sunrise/sunset, Rahu Kalam, Yamaganda and Gulika Kalam
+- **Panchanga**: vara, tithi, nakshatra (at the entered time and at sunrise), yoga, karana (with end times), lunar month, samvatsara, sunrise/sunset, Rahu Kalam, Yamaganda and Gulika Kalam
 - **Festivals** on the entered date and place (Diwali, Ugadi, Pongal, Tamil New Year, Vishu, Onam, Janmashtami, Ganesh Chaturthi, Navaratri, Maha Shivaratri, Holi and more), with puja timings such as pradosha, madhyahna and nishita windows
 - **Charts**: South Indian Rasi (D1) and Navamsa (D9), planetary degrees, nakshatras, chara karakas, Shadbala, and a bhava (house) table
 - **Vimshottari dasha**: mahadashas and antardashas with dates
