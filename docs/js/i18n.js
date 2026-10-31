@@ -22,7 +22,7 @@ const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars && k in vars ?
 
 const UI = {
   "Vedic Chart": "வேத ஜாதகம்",
-  "Panchanga · Charts · Vimshottari Dasha": "பஞ்சாங்கம் · ஜாதகக் கட்டங்கள் · விம்சோத்தரி தசை",
+  "Panchanga · Charts": "பஞ்சாங்கம் · ஜாதகக் கட்டங்கள்",
   "Place": "இடம்",
   "Start typing a city or town": "ஊர் அல்லது நகரத்தின் பெயரை உள்ளிடவும்",
   "Search": "தேடு",
