@@ -1,6 +1,20 @@
 """Shadbala (six-fold planetary strength) per Brihat Parashara Hora Shastra,
 following Jagannatha Hora's conventions. All values are in virupas
 (shashtiamsas); 60 virupas = 1 rupa.
+
+Conventions (fitted to Jagannatha Hora's component totals):
+- Saptavargaja uses the cyclic (parivritti) hora for D2.
+- Dig bala measures from the lagna and the points 90/180/270 degrees from it.
+- Ayana bala uses the declination of the planet's tropical ecliptic longitude
+  and the true obliquity: (e +/- dec) / 2e x 60; doubled for the Sun.
+- Mercury is malefic when combust (within 14 degrees of the Sun) or in the same
+  sign as the Sun, Mars or Saturn; the Moon is benefic while waxing. This sets
+  Paksha and Drik bala. The Moon's Paksha bala is doubled in Kala bala.
+- Hora lord: equal hours from 6:00 local mean time. Abda and masa lords: the
+  weekday lords of the days (from 6:00 local mean time) on which the Sun last
+  entered tropical Aries and its current tropical sign.
+- Special aspects (Mars 4/8, Jupiter 5/9, Saturn 3/10) count in full by sign.
+- The Sun's and Moon's cheshta bala are shown but left out of the total.
 """
 from __future__ import annotations
 
@@ -50,7 +64,6 @@ SS_DAYS = 1577917828
 SS_REV = {"sun": 4320000, "mars": 2296832, "mercury": 17937060 + 16, "jupiter": 364220 - 8,
           "venus": 7022376 - 12, "saturn": 146568 + 8}
 KALI_EPOCH_JD = 588465.5 - 75.77 / 360  # midnight at Ujjain, 18 Feb 3102 BCE
-KALI_EPOCH_JDN = 588466                 # a Friday
 
 
 def _w180(x: float) -> float:
@@ -66,7 +79,7 @@ def _sign(lon: float) -> int:
 def _varga_signs(lon: float) -> dict[str, int]:
     s, d = _sign(lon), lon % 30
     odd = s % 2 == 0  # Aries (index 0) is an odd sign
-    hora = (4 if d < 15 else 3) if odd else (3 if d < 15 else 4)  # Leo / Cancer
+    hora = (2 * s + int(d // 15)) % 12  # parivritti (cyclic) hora
     drekkana = (s + 4 * int(d // 10)) % 12
     saptamsa = ((s if odd else s + 6) + int(d * 7 // 30)) % 12
     navamsa = int(lon * 9 // 30) % 12
@@ -127,8 +140,8 @@ def drekkana_bala(p: str, lon: float) -> float:
     return 15.0 if p in group else 0.0
 
 
-def dig_bala(p: str, lon: float, asc: float, mc: float) -> float:
-    strong = {1: asc, 4: mc + 180, 7: asc + 180, 10: mc}[DIG_STRONG[p]]
+def dig_bala(p: str, lon: float, asc: float) -> float:
+    strong = asc + {1: 0, 4: 90, 7: 180, 10: 270}[DIG_STRONG[p]]
     return abs(_w180(lon - (strong + 180))) / 3
 
 
@@ -146,15 +159,20 @@ def cheshta_kendra_bala(p: str, jd: float, true_lon: float) -> float:
     return abs(_w180(sighrocca - avg)) / 3
 
 
-def _drishti(d: float, aspecting: str) -> float:
-    """Aspect strength (virupas) cast across angular distance d (0-360)."""
-    d %= 360
-    if aspecting == "mars" and (90 <= d < 120 or 210 <= d < 240):
+SPECIAL_ASPECTS = {"mars": (4, 8), "jupiter": (5, 9), "saturn": (3, 10)}
+
+
+def _aspect(target: float, source: float, aspecting: str) -> float:
+    """Aspect strength (virupas) cast from source onto target longitude;
+    special aspects count in full by sign."""
+    house = (_sign(target) - _sign(source)) % 12 + 1
+    if house in SPECIAL_ASPECTS.get(aspecting, ()):
         return 60.0
-    if aspecting == "jupiter" and (120 <= d < 150 or 240 <= d < 270):
-        return 60.0
-    if aspecting == "saturn" and (60 <= d < 90 or 270 <= d < 300):
-        return 60.0
+    return _drishti_deg((target - source) % 360)
+
+
+def _drishti_deg(d: float) -> float:
+    """Aspect strength (virupas) across angular distance d (0-360)."""
     if 30 <= d < 60:
         return (d - 30) / 2
     if 60 <= d < 90:
@@ -170,14 +188,36 @@ def _drishti(d: float, aspecting: str) -> float:
     return 0.0
 
 
-def _ayana(p: str, dec: float) -> float:
+def _ayana(p: str, dec: float, eps: float) -> float:
     """Ayana bala from declination: Moon/Saturn gain in south declination,
     Mercury in either, the rest in north."""
     if p in ("moon", "saturn"):
-        return (24 - dec) * 60 / 48
+        return (eps - dec) * 30 / eps
     if p == "mercury":
-        return (24 + abs(dec)) * 60 / 48
-    return (24 + dec) * 60 / 48
+        return (eps + abs(dec)) * 30 / eps
+    return (eps + dec) * 30 / eps
+
+
+def _lmt_day(jd: float, lon: float) -> tuple[int, float]:
+    """Day number and hours elapsed, for days starting at 6:00 local mean time."""
+    t = jd + lon / 360 + 0.25  # JD days start at noon; shift to 6:00
+    day = math.floor(t)
+    return day, (t - day) * 24
+
+
+def _weekday_lord(day: int) -> str:
+    return WEEKDAY_LORD[(day + 1) % 7]  # JD day 0 is a Monday
+
+
+def _last_ingress(jd: float, target: float) -> float:
+    """Most recent moment before jd at which the Sun's tropical longitude was target."""
+    t = jd - ((swe.calc_ut(jd, swe.SUN, swe.FLG_SWIEPH)[0][0] - target) % 360) / 0.9856
+    for _ in range(20):
+        d = _w180(swe.calc_ut(t, swe.SUN, swe.FLG_SWIEPH)[0][0] - target)
+        if abs(d) < 1e-7:
+            break
+        t -= d / 0.9856
+    return t
 
 
 def compute(*, jd: float, lat: float, lon: float, lons: dict[str, float], lagna: float, mc: float,
@@ -189,7 +229,12 @@ def compute(*, jd: float, lat: float, lon: float, lons: dict[str, float], lagna:
     """
     elong = (lons["moon"] - lons["sun"]) % 360
     angle = min(elong, 360 - elong)
-    benefic = {"jupiter", "venus", "mercury"} | ({"moon"} if elong < 180 else set())
+    benefic = {"jupiter", "venus"} | ({"moon"} if elong < 180 else set())
+    merc_malefic = (abs(_w180(lons["mercury"] - lons["sun"])) < 14
+                    or any(_sign(lons["mercury"]) == _sign(lons[q]) for q in ("sun", "mars", "saturn")))
+    if not merc_malefic:
+        benefic.add("mercury")
+    eps = swe.calc_ut(jd, swe.ECL_NUT)[0][0]
 
     # Nathonnatha: hour angle of the Sun (0 at local noon, 180 at midnight).
     armc = swe.houses_ex(jd, lat, lon, b"E")[1][2]
@@ -199,30 +244,28 @@ def compute(*, jd: float, lat: float, lon: float, lons: dict[str, float], lagna:
     is_day = sunrise <= jd < sunset
     if is_day:
         frac, thirds = (jd - sunrise) / (sunset - sunrise), ["mercury", "sun", "saturn"]
-        hora_index = int(frac * 12)
     else:
         frac, thirds = (jd - sunset) / (next_sunrise - sunset), ["moon", "venus", "mars"]
-        hora_index = 12 + int(frac * 12)
     tribhaga_lord = thirds[min(int(frac * 3), 2)]
     vara_lord = WEEKDAY_LORD[weekday]
-    hora_lord = CHALDEAN[(CHALDEAN.index(vara_lord) + hora_index) % 7]
+    day, hours = _lmt_day(jd, lon)
+    hora_lord = CHALDEAN[(CHALDEAN.index(_weekday_lord(day)) + int(hours)) % 7]
 
-    # Year (360-day) and month (30-day) lords from the Kali ahargana.
-    day_jdn = int(math.floor(sunrise + 0.5))
-    ahargana = day_jdn - KALI_EPOCH_JDN
-    abda_lord = WEEKDAY_LORD[(KALI_EPOCH_JDN + 360 * (ahargana // 360) + 1) % 7]
-    masa_lord = WEEKDAY_LORD[(KALI_EPOCH_JDN + 30 * (ahargana // 30) + 1) % 7]
+    sun_trop = swe.calc_ut(jd, swe.SUN, swe.FLG_SWIEPH)[0][0]
+    abda_lord = _weekday_lord(_lmt_day(_last_ingress(jd, 0.0), lon)[0])
+    masa_lord = _weekday_lord(_lmt_day(_last_ingress(jd, 30.0 * (sun_trop // 30)), lon)[0])
 
     out = {}
     for p in PLANETS7:
         lon_p = lons[p]
-        dec = swe.calc_ut(jd, PID[p], swe.FLG_SWIEPH | swe.FLG_EQUATORIAL)[0][1]
-        ayana = _ayana(p, dec)
+        trop = swe.calc_ut(jd, PID[p], swe.FLG_SWIEPH)[0][0]
+        dec = math.degrees(math.asin(math.sin(math.radians(eps)) * math.sin(math.radians(trop))))
+        ayana = _ayana(p, dec, eps)
         paksha = angle / 3 if p in benefic else 60 - angle / 3
 
         sthana = (uchcha(p, lon_p) + saptavargaja(p, lons) + ojayugma(p, lon_p)
                   + kendradi(lon_p, lagna) + drekkana_bala(p, lon_p))
-        dig = dig_bala(p, lon_p, lagna, mc)
+        dig = dig_bala(p, lon_p, lagna)
         if p == "mercury":
             nathonnatha = 60.0
         elif p in ("moon", "mars", "saturn"):
@@ -232,7 +275,8 @@ def compute(*, jd: float, lat: float, lon: float, lons: dict[str, float], lagna:
         tribhaga = 60.0 if p in ("jupiter", tribhaga_lord) else 0.0
         lords = ((15.0 if p == abda_lord else 0.0) + (30.0 if p == masa_lord else 0.0)
                  + (45.0 if p == vara_lord else 0.0) + (60.0 if p == hora_lord else 0.0))
-        kala = nathonnatha + paksha + tribhaga + lords + (2 * ayana if p == "sun" else ayana)
+        kala = (nathonnatha + (2 * paksha if p == "moon" else paksha) + tribhaga + lords
+                + (2 * ayana if p == "sun" else ayana))
 
         if p == "sun":
             cheshta = ayana
@@ -244,12 +288,14 @@ def compute(*, jd: float, lat: float, lon: float, lons: dict[str, float], lagna:
         drik = 0.0
         for a in PLANETS7:
             if a != p:
-                v = _drishti(lon_p - lons[a], a)
+                v = _aspect(lon_p, lons[a], a)
                 drik += v if a in benefic else -v
         drik /= 4
 
         naisargika = NAISARGIKA[p]
-        total = sthana + dig + kala + cheshta + naisargika + drik
+        # The Sun's and Moon's cheshta repeat their ayana and paksha bala, which
+        # Kala bala already counts twice, so they are shown but not added again.
+        total = sthana + dig + kala + naisargika + drik + (0.0 if p in ("sun", "moon") else cheshta)
         out[p] = {"sthana": sthana, "dig": dig, "kala": kala, "cheshta": cheshta,
                   "naisargika": naisargika, "drik": drik, "total": total,
                   "rupas": total / 60, "required": REQUIRED[p],
