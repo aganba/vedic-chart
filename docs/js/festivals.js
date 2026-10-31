@@ -306,6 +306,21 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     out.push({ name: f.name, region: f.region || null, note: null, times });
   }
 
+  // Karadaiyan Nonbu: the moment the Sun enters Meena (Maasi ends, Panguni
+  // begins); observed on the Vedic day (sunrise to sunrise) containing it, with
+  // the nonbu thread tied at that moment.
+  {
+    const d = day(0);
+    const off = ((sunLon(d.sr) - 330 + 540) % 360) - 180;
+    if (Math.abs(off) < 3) {
+      const at = solve(sunLon, 330, d.sr - off / 0.9856);
+      if (at >= d.sr && at < d.nsr) {
+        out.push({ name: "Karadaiyan Nonbu", region: "Tamil Nadu", note: "The nonbu kayiru (sacred thread) is tied at the moment Maasi ends and Panguni begins.",
+          times: [{ label: "Nonbu time (Sun enters Meena)", at: fmt(at) }] });
+      }
+    }
+  }
+
   // Varalakshmi Vratam: the last Friday of Shravana Shukla paksha, i.e. the
   // Friday on or just before Purnima (the next Friday is in Krishna paksha).
   {

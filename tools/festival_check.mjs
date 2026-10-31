@@ -18,7 +18,7 @@ const EXPECTED = [
   ["Vaikuntha Ekadashi", "2025-01-10", CHENNAI], ["Arudra Darshan", "2025-01-13", CHENNAI],
   ["Vasant Panchami", "2025-02-02", DELHI], ["Ratha Saptami", "2025-02-04", CHENNAI],
   ["Thai Poosam", "2025-02-11", CHENNAI], ["Maha Shivaratri", "2025-02-26", DELHI],
-  ["Holika Dahan", "2025-03-13", DELHI], ["Holi", "2025-03-14", DELHI],
+  ["Holika Dahan", "2025-03-13", DELHI], ["Karadaiyan Nonbu", "2025-03-14", CHENNAI], ["Holi", "2025-03-14", DELHI],
   ["Ugadi", "2025-03-30", CHENNAI], ["Rama Navami", "2025-04-06", DELHI],
   ["Panguni Uttiram", "2025-04-11", CHENNAI], ["Puthandu", "2025-04-14", CHENNAI], ["Vishu", "2025-04-14", KOCHI],
   ["Akshaya Tritiya", "2025-04-30", DELHI], ["Buddha Purnima", "2025-05-12", DELHI],
