@@ -2,6 +2,7 @@
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
 import { AYANAMSAS, BHAVA_METHODS, computeChart, wallMs } from "./js/astro.js";
+import { upcomingFestivals } from "./js/festivals.js";
 import { zoneAt, offsetFor } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 
@@ -381,7 +382,12 @@ function renderPanchanga(c) {
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
 }
 
-// Festivals on the entered date, as a banner at the top of the Panchanga tab.
+// Festivals on the entered date (with timings) and in the next 30 days, as a
+// banner at the top of the Panchanga tab. The upcoming list is computed just
+// after the main render so the page appears without waiting for it.
+const UPCOMING_DAYS = 30;
+let festivalSeq = 0;
+
 function renderFestivals(c) {
   const list = c.panchanga.festivals || [];
   const ref = c.input.local_time.slice(0, 10);
@@ -391,13 +397,39 @@ function renderFestivals(c) {
     const [, mo, day] = d.split("-");
     return `${t.slice(0, 5)} (${Number(day)} ${MONTHS[Number(mo) - 1]})`;
   };
-  $("festivals").innerHTML = list.map((f) => `
+  const today = list.map((f) => `
     <div class="festival">
       <div class="festival-name">${esc(f.name)}${f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : ""}</div>
       ${f.times.map((t) => `<div class="festival-time">${esc(t.label)}: <strong>${t.at ? hm(t.at) : `${hm(t.start)} – ${hm(t.end)}`}</strong></div>`).join("")}
       ${f.note ? `<div class="festival-note">${esc(f.note)}</div>` : ""}
     </div>`).join("");
-  $("festivals").hidden = !list.length;
+  $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">
+      <div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div>
+      <div class="festival-note">Checking…</div></div>`;
+  $("festivals").hidden = false;
+
+  const seq = ++festivalSeq;
+  const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
+  setTimeout(() => {
+    if (seq !== festivalSeq) return; // a newer chart replaced this one
+    let upcoming;
+    try {
+      upcoming = upcomingFestivals(midnight, c.input.lat, c.input.lon, c.input.utc_offset, UPCOMING_DAYS);
+    } catch {
+      upcoming = null;
+    }
+    if (seq !== festivalSeq) return;
+    const rows = (upcoming || []).map((u) => {
+      const [y, m, d] = u.date.split("-").map(Number);
+      const wd = WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()].slice(0, 3);
+      const names = u.festivals.map((f) => esc(f.name) + (f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : "")).join(" · ");
+      return `<li><span class="upcoming-date">${wd} ${d} ${MONTHS[m - 1]}</span> ${names}</li>`;
+    });
+    const box = $("upcoming");
+    if (upcoming === null) box.querySelector(".festival-note").textContent = "Couldn't calculate upcoming festivals.";
+    else if (!rows.length) box.querySelector(".festival-note").textContent = `No festivals in the next ${UPCOMING_DAYS} days.`;
+    else box.innerHTML = `<div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div><ul class="upcoming-list">${rows.join("")}</ul>`;
+  }, 30);
 }
 
 function renderPositions(c) {
