@@ -55,4 +55,22 @@ for (const [fest, date, place] of EXPECTED) {
   console.log(`${ok ? "ok  " : "FAIL"} ${fest.padEnd(22)} ${date}${ok ? "" : `  (on=${on} dayBefore=${early} dayAfter=${late})`}`);
 }
 console.log(`${EXPECTED.length - bad}/${EXPECTED.length} festival dates match`);
+
+// Every festival must occur at most once per lunar/solar year: scan each day of
+// 2025-2026 (Chennai and Delhi) and flag repeats less than 300 days apart.
+for (const [label, place] of [["Chennai", CHENNAI], ["Delhi", DELHI]]) {
+  const seen = new Map();
+  for (let t = Date.parse("2025-01-01T00:00:00Z"); t <= Date.parse("2026-12-31T00:00:00Z"); t += 86400e3) {
+    const date = new Date(t).toISOString().slice(0, 10);
+    for (const name of names(date, place)) {
+      const prev = seen.get(name);
+      if (prev && (t - Date.parse(prev + "T00:00:00Z")) / 86400e3 < 300) {
+        bad++;
+        console.log(`FAIL ${label}: ${name} on both ${prev} and ${date}`);
+      }
+      seen.set(name, date);
+    }
+  }
+}
+console.log(bad ? `${bad} problem(s)` : "no repeated festivals in 2025-2026");
 process.exit(bad ? 1 : 0);

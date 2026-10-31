@@ -20,7 +20,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
 - Chara karakas: the 8-karaka scheme, including Rahu
 - Vimshottari dasha: dasha years measured by the Sun's sidereal motion (t years = the Sun moving t × 360°)
 - Sunrise: upper limb of the Sun with standard refraction
-- Festivals: tithi festivals fall on the first day whose kaala (sunrise, madhyahna, aparahna, pradosha or nishita) lies in the tithi, in the amanta lunar month, never in an adhika month; Raksha Bandhan and Holika Dahan avoid Bhadra. Tamil and Malayalam months start on the day of the sankranti if it falls before 3/5 of the daytime; Makara Sankranti uses sunset. `tools/festival_check.mjs` checks 46 published 2025–2026 dates.
+- Festivals: tithi festivals fall on the first day whose kaala (sunrise, madhyahna, aparahna, pradosha or nishita) lies in the tithi, in the amanta lunar month, never in an adhika month; Raksha Bandhan and Holika Dahan avoid Bhadra. Tamil and Malayalam months start on the day of the sankranti if it falls before 3/5 of the daytime; Makara Sankranti uses sunset. `tools/festival_check.mjs` checks 46 published 2025–2026 dates and scans both years to make sure no festival is reported twice.
 - Shadbala: Brihat Parashara Hora Shastra rules. Cheshta bala uses Surya Siddhanta mean motions with bija corrections. Planetary war (yuddha bala) is not applied.
 
 ## Layout

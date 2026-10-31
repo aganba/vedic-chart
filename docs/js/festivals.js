@@ -8,7 +8,9 @@
 //  - solar rules: a solar month beginning. Tamil and Malayalam calendars start
 //    the month that day if the sankranti falls before 3/5 of the daytime,
 //    otherwise the next day; the pan-Indian Makara Sankranti uses sunset.
-//  - nakshatra rules: a nakshatra in a Tamil (or Kerala) solar month.
+//  - nakshatra rules: a nakshatra in a Tamil (or Kerala) solar month. For the
+//    full-moon festivals (Thai Poosam, Karthigai Deepam, ...) the nakshatra day
+//    must belong to that month's Purnima, since the nakshatra can recur twice.
 // Festivals are not observed in an adhika (leap) lunar month.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
@@ -58,11 +60,11 @@ const SOLAR_FESTIVALS = [
 ];
 
 const NAKSHATRA_FESTIVALS = [
-  { name: "Thai Poosam", calendar: "tamil", sign: 9, nak: 7, kaala: "sunrise", region: "Tamil Nadu" },
-  { name: "Panguni Uttiram", calendar: "tamil", sign: 11, nak: 11, kaala: "sunrise", region: "Tamil Nadu" },
-  { name: "Vaikasi Visakam", calendar: "tamil", sign: 1, nak: 15, kaala: "sunrise", region: "Tamil Nadu" },
-  { name: "Arudra Darshan", calendar: "tamil", sign: 8, nak: 5, kaala: "sunrise", region: "Tamil Nadu" },
-  { name: "Karthigai Deepam", calendar: "tamil", sign: 7, nak: 2, kaala: "sunrise", lamp: true, region: "Tamil Nadu" },
+  { name: "Thai Poosam", purnima: true, calendar: "tamil", sign: 9, nak: 7, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Panguni Uttiram", purnima: true, calendar: "tamil", sign: 11, nak: 11, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Vaikasi Visakam", purnima: true, calendar: "tamil", sign: 1, nak: 15, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Arudra Darshan", purnima: true, calendar: "tamil", sign: 8, nak: 5, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Karthigai Deepam", purnima: true, calendar: "tamil", sign: 7, nak: 2, kaala: "sunrise", lamp: true, region: "Tamil Nadu" },
   { name: "Onam (Thiruvonam)", calendar: "kerala", sign: 4, nak: 21, kaala: "sunrise", region: "Kerala" },
 ];
 
@@ -241,8 +243,16 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     }
   }
 
+  // The Sun's sign at the moment of the full moon nearest to jd: the solar
+  // month whose Purnima this is.
+  function purnimaSign(jd) {
+    const fm = solve(elong, 180, jd - (((elong(jd) - 180) % 360 + 540) % 360 - 180) / 12.19);
+    return signAt(fm);
+  }
+
   for (const f of NAKSHATRA_FESTIVALS) {
-    const holds = (n, jd) => nakAt(jd) === f.nak && solarMonth(n, f.calendar) === f.sign;
+    const holds = (n, jd) => nakAt(jd) === f.nak && solarMonth(n, f.calendar) === f.sign
+      && (!f.purnima || purnimaSign(jd) === f.sign);
     if (!observedOn(0, f, holds, moonLon, NAK_SPAN, 13.2)) continue;
     const w = kaala(0, f.kaala);
     const [ns, ne] = spanOf(moonLon, NAK_SPAN, mid(w), 13.2);
@@ -271,12 +281,14 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     out.push({ name: f.name, region: f.region || null, note: null, times });
   }
 
-  // Varalakshmi Vratam: the Friday before Shravana Purnima (Shukla paksha).
+  // Varalakshmi Vratam: the last Friday of Shravana Shukla paksha, i.e. the
+  // Friday on or just before Purnima (the next Friday is in Krishna paksha).
   {
     const d = day(0);
     const weekday = new Date(dateWall).getUTCDay();
     const t = tithiAt(d.sr), m = masaAt(d.sr);
-    if (weekday === 5 && m.masa === 4 && !m.adhika && t >= 7 && t <= 14) {
+    const nextFri = day(7);
+    if (weekday === 5 && m.masa === 4 && !m.adhika && t <= 14 && nextFri && tithiAt(nextFri.sr) >= 15) {
       out.push({ name: "Varalakshmi Vratam", region: "Karnataka, Andhra Pradesh, Tamil Nadu", note: null,
         times: [{ label: `${tithiLabel(t)} at sunrise`, at: fmt(d.sr) }] });
     }
