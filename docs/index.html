@@ -73,16 +73,17 @@
 
       <div class="tabs" role="tablist" aria-label="Chart sections">
         <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true">Panchanga</button>
-        <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false">Chart</button>
-        <button type="button" role="tab" id="tab-dasha" aria-controls="panel-dasha" aria-selected="false">Vimshottari Dasha</button>
+        <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false">Birth Chart</button>
         <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false">Festivals</button>
       </div>
 
       <div role="tabpanel" id="panel-panchanga" aria-labelledby="tab-panchanga">
-        <div class="festival-banner" id="festivals" hidden></div>
-        <div class="card">
-          <h2>Panchanga</h2>
-          <dl class="panchanga" id="panchanga"></dl>
+        <div class="panchanga-layout">
+          <div class="card">
+            <h2>Panchanga</h2>
+            <dl class="panchanga" id="panchanga"></dl>
+          </div>
+          <div class="festival-banner" id="festivals" hidden></div>
         </div>
       </div>
 
@@ -107,9 +108,7 @@
           <h2>Bhavas <span class="muted" id="bhavaLabel"></span></h2>
           <div class="table-wrap"><table id="bhavaTable"></table></div>
         </div>
-      </div>
 
-      <div role="tabpanel" id="panel-dasha" aria-labelledby="tab-dasha" hidden>
         <div class="card">
           <h2>Vimshottari Dasha <span class="muted" id="dashaBalance"></span></h2>
           <p class="hint">Select a mahadasha to see its antardashas (bhuktis).</p>

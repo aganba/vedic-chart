@@ -10,7 +10,7 @@ export function zoneAt(lat, lon) {
 const formatters = new Map();
 
 // UTC offset (hours) in force in `zone` at the instant utcMs.
-function offsetAtUtc(zone, utcMs) {
+export function offsetAtUtc(zone, utcMs) {
   let f = formatters.get(zone);
   if (!f) {
     f = new Intl.DateTimeFormat("en-US", { timeZone: zone, hourCycle: "h23", year: "numeric",

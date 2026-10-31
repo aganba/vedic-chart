@@ -3,7 +3,7 @@
 import { initSwe } from "./js/swe.js";
 import { AYANAMSAS, BHAVA_METHODS, computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { festivalsFor } from "./js/festivals.js";
-import { zoneAt, offsetFor } from "./js/tz.js";
+import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 
 const PLACES_URL = "data/places.tsv";
@@ -433,6 +433,10 @@ function renderFestivals(c) {
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
   const found = []; // [{ date, festivals }] for days 0..done-1
   let done = 0, bannerDone = false;
+  // With a detected timezone each day gets the offset in force then (DST);
+  // a manually entered offset is used for every day.
+  const zone = c.input.timezone;
+  const offset = zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset;
 
   const cut = isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10);
   const showUpcoming = (failed) => {
@@ -469,7 +473,7 @@ function renderFestivals(c) {
       const end = Math.min(done + CHUNK_DAYS, YEAR_DAYS);
       for (; done < end; done++) {
         const w = midnight + done * 86400e3;
-        const festivals = festivalsFor(w, c.input.lat, c.input.lon, c.input.utc_offset);
+        const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset);
         if (festivals.length) found.push({ date: isoFromWall(w).slice(0, 10), festivals });
       }
     } catch {
@@ -539,16 +543,17 @@ function renderBhavaTable(c) {
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "chart", "dasha", "festivals"];
+const TABS = ["panchanga", "chart", "festivals"];
 
 function selectTab(name) {
+  if (name === "dasha") name = "chart"; // the dasha now sits on the Birth Chart tab
   if (!TABS.includes(name)) name = "panchanga";
   for (const t of TABS) {
     $(`tab-${t}`).setAttribute("aria-selected", String(t === name));
     $(`panel-${t}`).hidden = t !== name;
   }
   try { localStorage.setItem(TAB_KEY, name); } catch {}
-  if (name === "dasha") drawDashaLinks();
+  if (name === "chart") drawDashaLinks();
 }
 
 // ---------- vimshottari dasha ----------
@@ -632,7 +637,7 @@ function selectMahadasha(i) {
 // Curves fanning out from the selected mahadasha to each of its antardashas.
 function drawDashaLinks() {
   const svg = $("dashaLinks");
-  if (!dashaData || $("panel-dasha").hidden) return;
+  if (!dashaData || $("panel-chart").hidden) return;
   const box = svg.getBoundingClientRect();
   const from = $("mdList").querySelectorAll(".md-row")[selectedMd]?.getBoundingClientRect();
   if (!from || !box.width) return;

@@ -100,14 +100,19 @@ function tithiLabel(t) {
   return `${t < 15 ? "Shukla" : "Krishna"} ${TITHI_NAMES[t % 15]}`;
 }
 
+// `offset` is the UTC offset in hours, or a function giving the offset in force
+// at a UTC instant (ms) so days across a daylight-saving change use their own.
 export function festivalsFor(dateWall, lat, lon, offset) {
+  const offsetAt = typeof offset === "function" ? offset : () => offset;
+  const wallOffset = (ms) => offsetAt(ms - offsetAt(ms) * 3600e3);
   const dayCache = new Map();
   const masaCache = new Map();
 
   // Sunrise/sunset frame of the civil day starting at local midnight + n days.
   function day(n) {
     if (dayCache.has(n)) return dayCache.get(n);
-    const jd0 = julFromWall(dateWall + n * 86400e3, offset);
+    const wall = dateWall + n * 86400e3;
+    const jd0 = julFromWall(wall, wallOffset(wall));
     const sr = swe.riseTrans(jd0, SE.SUN, SE.CALC_RISE, lon, lat);
     const ss = sr && swe.riseTrans(sr, SE.SUN, SE.CALC_SET, lon, lat);
     const nsr = ss && swe.riseTrans(ss, SE.SUN, SE.CALC_RISE, lon, lat);
@@ -153,7 +158,7 @@ export function festivalsFor(dateWall, lat, lon, offset) {
   }
   const monthStarts = (n, cal) => solarMonth(n, cal) !== solarMonth(n - 1, cal);
 
-  const fmt = (jd) => localFromJul(jd, offset);
+  const fmt = (jd) => localFromJul(jd, offsetAt((jd - 2440587.5) * 86400e3));
   const window = (label, w) => (w[0] === w[1] ? { label, at: fmt(w[0]) } : { label, start: fmt(w[0]), end: fmt(w[1]) });
 
   // Start and end of the tithi/nakshatra containing jd.
