@@ -627,7 +627,14 @@ async function init() {
   selectTab(new URLSearchParams(location.search).get("tab") || savedTab);
 
   if ("serviceWorker" in navigator && window.isSecureContext) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
+    // When a new version's service worker takes over, reload once so the page
+    // shows the new files straight away (not on first install).
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hadController && !reloaded) { reloaded = true; location.reload(); }
+    });
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => reg.update()).catch(() => {});
   }
 
   if (fromUrl) calculate();
