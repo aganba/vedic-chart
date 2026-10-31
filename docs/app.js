@@ -386,7 +386,7 @@ function renderPanchanga(c) {
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
 // banner at the top of the Panchanga tab, and festivals for the year from the
-// entered date in the Festivals tab, along with the year's shubha muhurtham
+// entered date in the Special Days tab, along with the year's shubha muhurtham
 // days and their time windows. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
 // first 7 days are done.
@@ -570,7 +570,7 @@ function renderBhavaTable(c) {
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "chart", "festivals"];
+const TABS = ["panchanga", "festivals", "chart"];
 
 function selectTab(name) {
   if (name === "dasha") name = "chart"; // the dasha now sits on the Birth Chart tab
