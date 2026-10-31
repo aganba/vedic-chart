@@ -1,8 +1,8 @@
 // Browser app: all calculations run locally (Swiss Ephemeris compiled to
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
-import { AYANAMSAS, BHAVA_METHODS, computeChart, wallMs } from "./js/astro.js";
-import { upcomingFestivals } from "./js/festivals.js";
+import { AYANAMSAS, BHAVA_METHODS, computeChart, isoFromWall, wallMs } from "./js/astro.js";
+import { festivalsFor } from "./js/festivals.js";
 import { zoneAt, offsetFor } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 
@@ -24,6 +24,7 @@ const SOUTH_POS = [
   [3, 2], [3, 1], [3, 0], [2, 0], [1, 0], [0, 0],
 ];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 let offsetManual = false;
@@ -383,10 +384,24 @@ function renderPanchanga(c) {
 }
 
 // Festivals on the entered date (with timings) and in the next 30 days, as a
-// banner at the top of the Panchanga tab. The upcoming list is computed just
-// after the main render so the page appears without waiting for it.
+// banner at the top of the Panchanga tab, and festivals for the year from the
+// entered date in the Festivals tab. The year is computed in small chunks after
+// the main render so the page stays responsive; the banner fills in once the
+// first 30 days are done.
 const UPCOMING_DAYS = 30;
+const YEAR_DAYS = 366; // the entered date and the 365 days after it
+const CHUNK_DAYS = 8;
 let festivalSeq = 0;
+
+function festivalNames(festivals) {
+  return festivals.map((f) => esc(f.name) + (f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : "")).join(" · ");
+}
+
+function festivalDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const wd = WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()].slice(0, 3);
+  return { y, m, d, label: `${wd} ${d} ${MONTHS[m - 1]}` };
+}
 
 function renderFestivals(c) {
   const list = c.panchanga.festivals || [];
@@ -407,29 +422,64 @@ function renderFestivals(c) {
       <div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div>
       <div class="festival-note">Checking…</div></div>`;
   $("festivals").hidden = false;
+  const place = $("place").value.trim();
+  $("festivalPlace").textContent = place ? `· ${place}` : "";
+  $("festivalYear").innerHTML = `<p class="hint" id="festivalStatus">Calculating…</p>`;
 
   const seq = ++festivalSeq;
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
-  setTimeout(() => {
-    if (seq !== festivalSeq) return; // a newer chart replaced this one
-    let upcoming;
-    try {
-      upcoming = upcomingFestivals(midnight, c.input.lat, c.input.lon, c.input.utc_offset, UPCOMING_DAYS);
-    } catch {
-      upcoming = null;
-    }
-    if (seq !== festivalSeq) return;
-    const rows = (upcoming || []).map((u) => {
-      const [y, m, d] = u.date.split("-").map(Number);
-      const wd = WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()].slice(0, 3);
-      const names = u.festivals.map((f) => esc(f.name) + (f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : "")).join(" · ");
-      return `<li><span class="upcoming-date">${wd} ${d} ${MONTHS[m - 1]}</span> ${names}</li>`;
-    });
+  const found = []; // [{ date, festivals }] for days 0..done-1
+  let done = 0, bannerDone = false;
+
+  const cut = isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10);
+  const showUpcoming = (failed) => {
     const box = $("upcoming");
-    if (upcoming === null) box.querySelector(".festival-note").textContent = "Couldn't calculate upcoming festivals.";
+    const rows = found.filter((u) => u.date !== ref && u.date < cut).map((u) =>
+      `<li><span class="upcoming-date">${festivalDate(u.date).label}</span> ${festivalNames(u.festivals)}</li>`);
+    if (failed) box.querySelector(".festival-note").textContent = "Couldn't calculate upcoming festivals.";
     else if (!rows.length) box.querySelector(".festival-note").textContent = `No festivals in the next ${UPCOMING_DAYS} days.`;
     else box.innerHTML = `<div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div><ul class="upcoming-list">${rows.join("")}</ul>`;
-  }, 30);
+  };
+
+  const showYear = (status) => {
+    let html = "", month = "";
+    for (const u of found) {
+      const fd = festivalDate(u.date);
+      const key = `${fd.y}-${fd.m}`;
+      if (key !== month) {
+        html += `${month ? "</ul>" : ""}<h3 class="year-month">${MONTH_NAMES[fd.m - 1]} ${fd.y}</h3><ul class="upcoming-list">`;
+        month = key;
+      }
+      html += `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${fd.label}</span> ${festivalNames(u.festivals)}</li>`;
+    }
+    if (month) html += "</ul>";
+    if (status) html += `<p class="hint">${esc(status)}</p>`;
+    $("festivalYear").innerHTML = html;
+  };
+
+  const step = () => {
+    if (seq !== festivalSeq) return; // a newer chart replaced this one
+    try {
+      const end = Math.min(done + CHUNK_DAYS, YEAR_DAYS);
+      for (; done < end; done++) {
+        const w = midnight + done * 86400e3;
+        const festivals = festivalsFor(w, c.input.lat, c.input.lon, c.input.utc_offset);
+        if (festivals.length) found.push({ date: isoFromWall(w).slice(0, 10), festivals });
+      }
+    } catch {
+      if (!bannerDone) showUpcoming(true);
+      showYear("Couldn't calculate the remaining festivals.");
+      return;
+    }
+    if (!bannerDone && done > UPCOMING_DAYS) { bannerDone = true; showUpcoming(false); }
+    if (done < YEAR_DAYS) {
+      showYear("Calculating…");
+      setTimeout(step, 0);
+    } else {
+      showYear(found.length ? "" : "No festivals found.");
+    }
+  };
+  setTimeout(step, 30);
 }
 
 function renderPositions(c) {
@@ -483,7 +533,7 @@ function renderBhavaTable(c) {
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "chart", "dasha"];
+const TABS = ["panchanga", "chart", "dasha", "festivals"];
 
 function selectTab(name) {
   if (!TABS.includes(name)) name = "panchanga";

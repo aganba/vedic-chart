@@ -14,7 +14,7 @@
 // Festivals are not observed in an adhika (leap) lunar month.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
-import { NAK_SPAN, isoFromWall, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
+import { NAK_SPAN, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
 
 // amanta months: 0 Chaitra ... 11 Phalguna; tithis: 0 Shukla Pratipada ... 14 Purnima,
 // 15 Krishna Pratipada ... 29 Amavasya; signs: 0 Mesha ... 11 Meena.
@@ -336,13 +336,3 @@ export function festivalsFor(dateWall, lat, lon, offset) {
   return out;
 }
 
-// Festivals on each of the `days` days after dateWall: [{ date, festivals }].
-export function upcomingFestivals(dateWall, lat, lon, offset, days = 30) {
-  const out = [];
-  for (let i = 1; i <= days; i++) {
-    const w = dateWall + i * 86400e3;
-    const festivals = festivalsFor(w, lat, lon, offset);
-    if (festivals.length) out.push({ date: isoFromWall(w).slice(0, 10), festivals });
-  }
-  return out;
-}

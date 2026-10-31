@@ -75,6 +75,7 @@
         <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true">Panchanga</button>
         <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false">Chart</button>
         <button type="button" role="tab" id="tab-dasha" aria-controls="panel-dasha" aria-selected="false">Vimshottari Dasha</button>
+        <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false">Festivals</button>
       </div>
 
       <div role="tabpanel" id="panel-panchanga" aria-labelledby="tab-panchanga">
@@ -120,6 +121,13 @@
               <ol class="ad-list" id="adList"></ol>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-festivals" aria-labelledby="tab-festivals" hidden>
+        <div class="card">
+          <h2>Festivals <span class="muted" id="festivalPlace"></span></h2>
+          <div id="festivalYear"></div>
         </div>
       </div>
     </section>
