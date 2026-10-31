@@ -30,13 +30,13 @@ const EXPECTED = [
   ["Ganesh Chaturthi", "2025-08-27", MUMBAI], ["Onam", "2025-09-05", KOCHI],
   ["Mahalaya Amavasya", "2025-09-21", DELHI], ["Navaratri begins", "2025-09-22", DELHI],
   ["Vijayadashami", "2025-10-02", DELHI], ["Dhanteras", "2025-10-18", DELHI],
-  ["Naraka Chaturdashi", "2025-10-20", CHENNAI], ["Diwali", "2025-10-20", DELHI],
+  ["Naraka Chaturdashi", "2025-10-20", CHENNAI], ["Lakshmi Puja", "2025-10-20", DELHI],
   ["Govardhan Puja", "2025-10-22", DELHI], ["Bhai Dooj", "2025-10-23", DELHI],
   ["Kartika Purnima", "2025-11-05", DELHI], ["Karthigai Deepam", "2025-12-04", CHENNAI],
   ["Makara Sankranti", "2026-01-14", DELHI], ["Thai Pongal", "2026-01-15", CHENNAI], ["Maha Shivaratri", "2026-02-15", DELHI],
   ["Maasi Magam", "2026-03-03", CHENNAI], ["Holi", "2026-03-04", DELHI], ["Ugadi", "2026-03-19", CHENNAI], ["Puthandu", "2026-04-14", CHENNAI],
   ["Krishna Janmashtami", "2026-09-04", DELHI], ["Ganesh Chaturthi", "2026-09-14", MUMBAI],
-  ["Vijayadashami", "2026-10-20", DELHI], ["Diwali", "2026-11-08", DELHI],
+  ["Vijayadashami", "2026-10-20", DELHI], ["Lakshmi Puja", "2026-11-08", DELHI],
 ];
 
 const names = (date, [lat, lon]) => {

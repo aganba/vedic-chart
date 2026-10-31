@@ -289,7 +289,7 @@ const NS = {
     "Makara Sankranti": "மகர சங்கராந்தி",
     "Mattu Pongal": "மாட்டுப் பொங்கல்",
     "Nag Panchami": "நாக பஞ்சமி",
-    "Naraka Chaturdashi": "நரக சதுர்த்தசி",
+    "Diwali (Naraka Chaturdashi)": "தீபாவளி (நரக சதுர்த்தசி)",
     "Navaratri begins (Ghatasthapana)": "நவராத்திரி ஆரம்பம் (கலச ஸ்தாபனம்)",
     "Onam (Thiruvonam)": "ஓணம் (திருவோணம்)",
     "Panguni Uttiram": "பங்குனி உத்திரம்",

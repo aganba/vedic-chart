@@ -36,7 +36,7 @@ const TITHI_FESTIVALS = [
   { name: "Maha Navami / Ayudha Puja", masa: 6, tithi: 8, kaala: "sunrise" },
   { name: "Vijayadashami / Dussehra", masa: 6, tithi: 9, kaala: "aparahna", label: "Aparahna puja" },
   { name: "Dhanteras", masa: 6, tithi: 27, kaala: "pradosha", label: "Pradosha (puja)" },
-  { name: "Naraka Chaturdashi", masa: 6, tithi: 28, kaala: "sunrise",
+  { name: "Diwali (Naraka Chaturdashi)", masa: 6, tithi: 28, kaala: "sunrise",
     note: "Deepavali in South India; abhyanga snanam before sunrise." },
   { name: "Diwali (Lakshmi Puja)", masa: 6, tithi: 29, kaala: "pradosha", label: "Lakshmi puja (pradosha)" },
   { name: "Govardhan Puja / Bali Pratipada", masa: 7, tithi: 0, kaala: "sunrise" },
