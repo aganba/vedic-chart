@@ -385,7 +385,7 @@ function renderPanchanga(c) {
 }
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
-// banner at the top of the Panchanga tab, and festivals for the year from the
+// banner at the top of the Panchanga tab with the muhurtham days below it, and festivals for the year from the
 // entered date in the Special Days tab, along with the year's shubha muhurtham
 // days and their time windows. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
@@ -427,6 +427,9 @@ function renderFestivals(c) {
       <div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div>
       <div class="festival-note">Checking…</div></div>`;
   $("festivals").hidden = false;
+  $("muhurthaBanner").innerHTML = `<div class="upcoming-title">Shubha Muhurtham (next ${UPCOMING_DAYS} days)</div>
+      <div class="festival-note">Checking…</div>`;
+  $("muhurthaBanner").hidden = false;
   const place = $("place").value.trim();
   $("festivalPlace").textContent = place ? `· ${place}` : "";
   $("festivalYear").innerHTML = `<p class="hint" id="festivalStatus">Calculating…</p>`;
@@ -472,19 +475,33 @@ function renderFestivals(c) {
     showMuhurthas(status);
   };
 
+  const muhurthaRow = ({ date, m }) => {
+    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join(" · ");
+    return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
+        <div>${esc(m.paksha)} · ${esc(m.tithi)} · ${esc(m.nakshatra)}</div>
+        <div class="upcoming-times">${wins}</div></div></li>`;
+  };
+
+  // Muhurtham days from the entered date through the next UPCOMING_DAYS days.
+  const showMuhurthaBanner = (failed) => {
+    const box = $("muhurthaBanner");
+    const title = `<div class="upcoming-title">Shubha Muhurtham (next ${UPCOMING_DAYS} days)</div>`;
+    const rows = muhurthas.filter((u) => u.date < cut).map(muhurthaRow);
+    if (failed) box.innerHTML = title + `<div class="festival-note">Couldn't calculate muhurtham days.</div>`;
+    else if (!rows.length) box.innerHTML = title + `<div class="festival-note">No muhurtham days in the next ${UPCOMING_DAYS} days.</div>`;
+    else box.innerHTML = title + `<ul class="upcoming-list muhurtha-list">${rows.join("")}</ul>`;
+  };
+
   const showMuhurthas = (status) => {
     let html = "", month = "";
-    for (const { date, m } of muhurthas) {
-      const fd = festivalDate(date);
+    for (const u of muhurthas) {
+      const fd = festivalDate(u.date);
       const key = `${fd.y}-${fd.m}`;
       if (key !== month) {
         html += `${month ? "</ul>" : ""}<h3 class="year-month">${MONTH_NAMES[fd.m - 1]} ${fd.y}</h3><ul class="upcoming-list muhurtha-list">`;
         month = key;
       }
-      const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join(" · ");
-      html += `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${fd.label}</span><div>
-        <div>${esc(m.paksha)} · ${esc(m.tithi)} · ${esc(m.nakshatra)}</div>
-        <div class="upcoming-times">${wins}</div></div></li>`;
+      html += muhurthaRow(u);
     }
     if (month) html += "</ul>";
     if (status) html += `<p class="hint">${esc(status)}</p>`;
@@ -504,11 +521,11 @@ function renderFestivals(c) {
         if (m) muhurthas.push({ date: isoFromWall(w).slice(0, 10), m });
       }
     } catch {
-      if (!bannerDone) showUpcoming(true);
+      if (!bannerDone) { showUpcoming(true); showMuhurthaBanner(true); }
       showYear("Couldn't calculate the remaining festivals.");
       return;
     }
-    if (!bannerDone && done > UPCOMING_DAYS) { bannerDone = true; showUpcoming(false); }
+    if (!bannerDone && done > UPCOMING_DAYS) { bannerDone = true; showUpcoming(false); showMuhurthaBanner(false); }
     if (done < YEAR_DAYS) {
       showYear("Calculating…");
       setTimeout(step, 0);

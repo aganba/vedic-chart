@@ -11,6 +11,7 @@
   --retro: #7a4fa0;
   --sign: #a8957f;
   --input: #fff;
+  --good: #2e7d32;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -26,6 +27,7 @@
     --retro: #c9a2ef;
     --sign: #7f6f60;
     --input: #1b1612;
+    --good: #72c47a;
   }
 }
 
@@ -182,10 +184,12 @@ td.weak { color: var(--lagna); }
 .panchanga-layout > * { margin-bottom: 0; }
 @media (max-width: 760px) {
   .panchanga-layout { grid-template-columns: minmax(0, 1fr); }
-  .panchanga-layout .festival-banner { order: -1; }
+  .panchanga-layout .banner-col { order: -1; }
 }
 
-/* festival banner (Panchanga tab) */
+/* festival and muhurtham banners (Panchanga tab) */
+.banner-col { display: grid; gap: 16px; }
+.banner-col > .festival-banner { margin-bottom: 0; }
 .festival-banner {
   display: grid; gap: 10px; margin-bottom: 16px; padding: 14px 16px; border-radius: 12px;
   border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--card));
@@ -204,6 +208,12 @@ td.weak { color: var(--lagna); }
 .muhurtha-list { gap: 8px; }
 .muhurtha-list li { display: flex; gap: 6px; }
 .muhurtha-list .win { white-space: nowrap; }
+/* muhurtham days are colour-coded green */
+.muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
+.muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
+.muhurtha-card { border-left: 4px solid var(--good); }
+.muhurtha-list .upcoming-date { color: var(--good); }
+.muhurtha-list li.today .upcoming-date::after { content: "today"; display: block; font-size: 12px; font-weight: 600; }
 .muhurtha-list li.today > div > div:first-child { font-weight: 700; }
 #upcoming .upcoming-list { gap: 8px; }
 #upcoming .upcoming-list li { display: flex; gap: 6px; }
