@@ -1,0 +1,17 @@
+# Allowlist: only the paths below are ever committed. Everything else in this
+# folder (personal chart files, test data with birth details, books, logs,
+# certificates, raw downloads, local service files) stays private.
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/requirements.txt
+!/run.sh
+!/app/
+!/docs/
+!/tests/
+!/tools/
+
+__pycache__/
+.DS_Store
+*.pdf

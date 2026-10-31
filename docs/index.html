@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Vedic Chart">
+  <meta name="theme-color" content="#7a2e12">
+  <title>Vedic Chart</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Vedic Chart</h1>
+    <span class="sub">Panchanga · Charts · Vimshottari Dasha</span>
+  </header>
+
+  <main>
+    <form id="form" class="card form" autocomplete="off">
+      <div class="field wide place">
+        <label for="place">Place</label>
+        <div class="row">
+          <input id="place" type="text" placeholder="Start typing a city or town">
+          <button type="button" id="search" class="secondary">Search</button>
+        </div>
+        <ul id="results" class="results" hidden></ul>
+      </div>
+      <div class="field">
+        <label for="date">Date <span class="muted" id="datefmt"></span></label>
+        <input id="date" type="date" required>
+      </div>
+      <div class="field">
+        <label for="time">Time <span class="muted">(local)</span></label>
+        <input id="time" type="time" step="1" required>
+      </div>
+      <div class="field">
+        <label for="lat">Latitude <span class="muted">(N +)</span></label>
+        <input id="lat" type="number" step="any" min="-90" max="90" required>
+      </div>
+      <div class="field">
+        <label for="lon">Longitude <span class="muted">(E +)</span></label>
+        <input id="lon" type="number" step="any" min="-180" max="180" required>
+      </div>
+      <div class="field">
+        <label for="offset">UTC offset <span class="muted" id="tzname"></span></label>
+        <input id="offset" type="text" placeholder="auto, e.g. +05:30" pattern="[+-]?\d{1,2}(:\d{2})?">
+      </div>
+      <div class="field">
+        <label for="ayanamsa">Ayanamsa</label>
+        <select id="ayanamsa"></select>
+      </div>
+      <div class="field">
+        <label for="bhava">Bhava method</label>
+        <select id="bhava"></select>
+      </div>
+      <div class="field actions">
+        <div class="row">
+          <button type="button" id="now" class="secondary" title="Current date, time and location">Now</button>
+          <button type="submit" id="go">Calculate</button>
+        </div>
+      </div>
+      <p id="tznote" class="warn" hidden></p>
+      <p id="error" class="error" hidden></p>
+    </form>
+
+    <section id="output" hidden>
+      <div class="card summary" id="summary"></div>
+
+      <div class="tabs" role="tablist" aria-label="Chart sections">
+        <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true">Panchanga</button>
+        <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false">Chart</button>
+        <button type="button" role="tab" id="tab-dasha" aria-controls="panel-dasha" aria-selected="false">Vimshottari Dasha</button>
+      </div>
+
+      <div role="tabpanel" id="panel-panchanga" aria-labelledby="tab-panchanga">
+        <div class="card">
+          <h2>Panchanga</h2>
+          <dl class="panchanga" id="panchanga"></dl>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-chart" aria-labelledby="tab-chart" hidden>
+        <div class="charts">
+          <div class="card chart-card">
+            <h2>Rasi chart (D1)</h2>
+            <svg id="rasi" viewBox="0 0 400 400" role="img" aria-label="Rasi chart"></svg>
+          </div>
+          <div class="card chart-card">
+            <h2>Navamsa chart (D9)</h2>
+            <svg id="navamsa" viewBox="0 0 400 400" role="img" aria-label="Navamsa chart"></svg>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Planetary positions</h2>
+          <div class="table-wrap"><table id="positions"></table></div>
+        </div>
+
+        <div class="card">
+          <h2>Bhavas <span class="muted" id="bhavaLabel"></span></h2>
+          <div class="table-wrap"><table id="bhavaTable"></table></div>
+        </div>
+      </div>
+
+      <div role="tabpanel" id="panel-dasha" aria-labelledby="tab-dasha" hidden>
+        <div class="card">
+          <h2>Vimshottari Dasha <span class="muted" id="dashaBalance"></span></h2>
+          <p class="hint">Select a mahadasha to see its antardashas (bhuktis).</p>
+          <div class="dasha" id="dasha">
+            <ol class="md-list" id="mdList"></ol>
+            <svg class="dasha-links" id="dashaLinks" aria-hidden="true"></svg>
+            <div class="ad-col">
+              <h3 id="adTitle"></h3>
+              <ol class="ad-list" id="adList"></ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    Calculations run on your device using the <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0).
+    Place names from <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0) and
+    <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
+    <a href="https://github.com/aganba/vedic-chart">Source code</a>.
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

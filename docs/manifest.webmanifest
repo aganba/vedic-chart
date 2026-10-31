@@ -1,0 +1,14 @@
+{
+  "name": "Vedic Chart",
+  "short_name": "Vedic Chart",
+  "description": "Panchanga, South Indian charts, Shadbala and Vimshottari dasha, calculated on your device.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#17130f",
+  "theme_color": "#7a2e12",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
