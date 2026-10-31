@@ -383,12 +383,12 @@ function renderPanchanga(c) {
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
 }
 
-// Festivals on the entered date (with timings) and in the next 30 days, as a
+// Festivals on the entered date (with timings) and in the next 7 days, as a
 // banner at the top of the Panchanga tab, and festivals for the year from the
 // entered date in the Festivals tab. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
-// first 30 days are done.
-const UPCOMING_DAYS = 30;
+// first 7 days are done.
+const UPCOMING_DAYS = 7;
 const YEAR_DAYS = 366; // the entered date and the 365 days after it
 const CHUNK_DAYS = 8;
 let festivalSeq = 0;

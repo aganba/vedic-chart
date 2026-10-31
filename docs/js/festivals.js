@@ -9,7 +9,7 @@
 //    the month that day if the sankranti falls before 3/5 of the daytime,
 //    otherwise the next day; the pan-Indian Makara Sankranti uses sunset.
 //  - nakshatra rules: a nakshatra in a Tamil (or Kerala) solar month. For the
-//    full-moon festivals (Thai Poosam, Karthigai Deepam, ...) the nakshatra day
+//    full-moon festivals (Thai Poosam, Maasi Magam, Karthigai Deepam, ...) the nakshatra day
 //    must belong to that month's Purnima, since the nakshatra can recur twice.
 // Festivals are not observed in an adhika (leap) lunar month.
 import * as swe from "./swe.js";
@@ -70,6 +70,7 @@ const SOLAR_FESTIVALS = [
 
 const NAKSHATRA_FESTIVALS = [
   { name: "Thai Poosam", purnima: true, calendar: "tamil", sign: 9, nak: 7, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Maasi Magam", purnima: true, calendar: "tamil", sign: 10, nak: 9, kaala: "sunrise", region: "Tamil Nadu" },
   { name: "Panguni Uttiram", purnima: true, calendar: "tamil", sign: 11, nak: 11, kaala: "sunrise", region: "Tamil Nadu" },
   { name: "Vaikasi Visakam", purnima: true, calendar: "tamil", sign: 1, nak: 15, kaala: "sunrise", region: "Tamil Nadu" },
   { name: "Arudra Darshan", purnima: true, calendar: "tamil", sign: 8, nak: 5, kaala: "sunrise", region: "Tamil Nadu" },

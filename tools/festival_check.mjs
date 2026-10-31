@@ -18,7 +18,7 @@ const EXPECTED = [
   ["Vaikuntha Ekadashi", "2025-01-10", CHENNAI], ["Arudra Darshan", "2025-01-13", CHENNAI],
   ["Vasant Panchami", "2025-02-02", DELHI], ["Ratha Saptami", "2025-02-04", CHENNAI],
   ["Thai Poosam", "2025-02-11", CHENNAI], ["Maha Shivaratri", "2025-02-26", DELHI],
-  ["Holika Dahan", "2025-03-13", DELHI], ["Karadaiyan Nonbu", "2025-03-14", CHENNAI], ["Holi", "2025-03-14", DELHI],
+  ["Maasi Magam", "2025-03-12", CHENNAI], ["Holika Dahan", "2025-03-13", DELHI], ["Karadaiyan Nonbu", "2025-03-14", CHENNAI], ["Holi", "2025-03-14", DELHI],
   ["Ugadi", "2025-03-30", CHENNAI], ["Rama Navami", "2025-04-06", DELHI],
   ["Panguni Uttiram", "2025-04-11", CHENNAI], ["Puthandu", "2025-04-14", CHENNAI], ["Vishu", "2025-04-14", KOCHI],
   ["Akshaya Tritiya", "2025-04-30", DELHI], ["Buddha Purnima", "2025-05-12", DELHI],
@@ -33,7 +33,7 @@ const EXPECTED = [
   ["Govardhan Puja", "2025-10-22", DELHI], ["Bhai Dooj", "2025-10-23", DELHI],
   ["Kartika Purnima", "2025-11-05", DELHI], ["Karthigai Deepam", "2025-12-04", CHENNAI],
   ["Makara Sankranti", "2026-01-14", DELHI], ["Thai Pongal", "2026-01-15", CHENNAI], ["Maha Shivaratri", "2026-02-15", DELHI],
-  ["Holi", "2026-03-04", DELHI], ["Ugadi", "2026-03-19", CHENNAI], ["Puthandu", "2026-04-14", CHENNAI],
+  ["Maasi Magam", "2026-03-03", CHENNAI], ["Holi", "2026-03-04", DELHI], ["Ugadi", "2026-03-19", CHENNAI], ["Puthandu", "2026-04-14", CHENNAI],
   ["Krishna Janmashtami", "2026-09-04", DELHI], ["Ganesh Chaturthi", "2026-09-14", MUMBAI],
   ["Vijayadashami", "2026-10-20", DELHI], ["Diwali", "2026-11-08", DELHI],
 ];
