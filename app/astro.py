@@ -281,18 +281,24 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
     local_dt = local_from_julday(jd, offset)
     lunar_year = local_dt.year - 1 if (masa >= 9 and local_dt.month <= 6) else local_dt.year
 
+    # Sunrise, sunset and the daytime periods are shown for the entered civil
+    # date, whatever the time entered (the Vedic day above can start the day before).
+    midnight = local_dt.replace(hour=0, minute=0, second=0)
+    day_sunrise = _sun_event(julday_from_local(midnight, offset), lat, lon, swe.CALC_RISE)
+    day_sunset = _sun_event(day_sunrise, lat, lon, swe.CALC_SET) if day_sunrise else None
+    day_next_sunrise = _sun_event(day_sunset, lat, lon, swe.CALC_RISE) if day_sunset else None
+    civil_weekday = (midnight.weekday() + 1) % 7
+
     kalams = {}
-    if sunrise and sunset:
-        eighth = (sunset - sunrise) / 8
+    if day_sunrise and day_sunset:
+        eighth = (day_sunset - day_sunrise) / 8
         for name, table in (("rahu_kalam", RAHU_KALAM), ("yamaganda", YAMAGANDA), ("gulika_kalam", GULIKA_KALAM)):
-            part = table[weekday] - 1
-            kalams[name] = {"start": loc(sunrise + part * eighth), "end": loc(sunrise + (part + 1) * eighth)}
+            part = table[civil_weekday] - 1
+            kalams[name] = {"start": loc(day_sunrise + part * eighth), "end": loc(day_sunrise + (part + 1) * eighth)}
 
     nak = nakshatra_of(_moon(jd))
 
     # Nakshatra at sunrise on the entered civil date.
-    midnight = local_dt.replace(hour=0, minute=0, second=0)
-    day_sunrise = _sun_event(julday_from_local(midnight, offset), lat, lon, swe.CALC_RISE)
     sunrise_nak = None
     if day_sunrise is not None:
         _, sn_end, _ = _end_of(_moon, NAK_SPAN, day_sunrise, 13.2)
@@ -309,7 +315,7 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
         "sunrise_nakshatra": sunrise_nak,
         "yoga": {"name": YOGAS[yg], "end": loc(yg_end), "pct_left": round(yg_left * 100, 2)},
         "karana": {"name": _karana_name(kr), "end": loc(kr_end), "pct_left": round(kr_left * 100, 2)},
-        "sunrise": loc(sunrise), "sunset": loc(sunset), "next_sunrise": loc(next_sunrise),
+        "sunrise": loc(day_sunrise), "sunset": loc(day_sunset), "next_sunrise": loc(day_next_sunrise),
         **kalams,
         "_raw": {"sunrise": sunrise, "sunset": sunset, "next_sunrise": next_sunrise, "weekday": weekday},
     }

@@ -268,20 +268,26 @@ export function panchanga(jd, lat, lon, offset) {
   const year = local.getUTCFullYear(), month = local.getUTCMonth() + 1;
   const lunarYear = masa >= 9 && month <= 6 ? year - 1 : year;
 
+  // Sunrise, sunset and the daytime periods are shown for the entered civil
+  // date, whatever the time entered (the Vedic day above can start the day before).
+  const midnight = Math.floor(wallFromJul(jd, offset) / 86400e3) * 86400e3;
+  const daySunrise = sunEvent(julFromWall(midnight, offset), lat, lon, SE.CALC_RISE);
+  const daySunset = daySunrise ? sunEvent(daySunrise, lat, lon, SE.CALC_SET) : null;
+  const dayNextSunrise = daySunset ? sunEvent(daySunset, lat, lon, SE.CALC_RISE) : null;
+  const civilWeekday = new Date(midnight).getUTCDay();
+
   const kalams = {};
-  if (sunrise && sunset) {
-    const eighth = (sunset - sunrise) / 8;
+  if (daySunrise && daySunset) {
+    const eighth = (daySunset - daySunrise) / 8;
     for (const [name, table] of [["rahu_kalam", RAHU_KALAM], ["yamaganda", YAMAGANDA], ["gulika_kalam", GULIKA_KALAM]]) {
-      const part = table[weekday] - 1;
-      kalams[name] = { start: loc(sunrise + part * eighth), end: loc(sunrise + (part + 1) * eighth) };
+      const part = table[civilWeekday] - 1;
+      kalams[name] = { start: loc(daySunrise + part * eighth), end: loc(daySunrise + (part + 1) * eighth) };
     }
   }
 
   const nak = nakshatraOf(moonLon(jd));
 
   // Nakshatra at sunrise on the entered civil date.
-  const midnight = Math.floor(wallFromJul(jd, offset) / 86400e3) * 86400e3;
-  const daySunrise = sunEvent(julFromWall(midnight, offset), lat, lon, SE.CALC_RISE);
   let sunriseNak = null;
   if (daySunrise !== null) {
     const [, snEnd] = endOf(moonLon, NAK_SPAN, daySunrise, 13.2);
@@ -299,7 +305,7 @@ export function panchanga(jd, lat, lon, offset) {
     sunrise_nakshatra: sunriseNak,
     yoga: { name: YOGAS[yg], end: loc(ygEnd), pct_left: round2(ygLeft * 100) },
     karana: { name: karanaName(kr), end: loc(krEnd), pct_left: round2(krLeft * 100) },
-    sunrise: loc(sunrise), sunset: loc(sunset), next_sunrise: loc(nextSunrise),
+    sunrise: loc(daySunrise), sunset: loc(daySunset), next_sunrise: loc(dayNextSunrise),
     ...kalams,
     _raw: { sunrise, sunset, next_sunrise: nextSunrise, weekday },
   };
