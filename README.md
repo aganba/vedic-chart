@@ -31,7 +31,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
   - `data/places.tsv`: [GeoNames](https://www.geonames.org/) towns with population ≥ 1000 (CC BY 4.0)
   - `vendor/tz-lookup.js`: [@photostructure/tz-lookup](https://github.com/photostructure/tz-lookup) (CC0)
 - `app/`: the Python reference implementation (FastAPI + pyswisseph) that the JavaScript is checked against
-- `tools/`: build scripts (`build_wasm.sh`, `build_places.py`, `make_icons.py`) and `parity.py`, which runs both implementations on a set of test charts and compares every value
+- `tools/`: build scripts (`build_wasm.sh`, `build_places.py`, `make_emblem.py`, `make_icons.sh`) and `parity.py`, which runs both implementations on a set of test charts and compares every value
 - `tests/`: pytest suite, including the JavaScript/Python parity check
 
 ## Running locally

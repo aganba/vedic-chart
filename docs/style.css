@@ -171,5 +171,4 @@ td.weak { color: var(--lagna); }
 .site-footer a { color: var(--muted); }
 
 .invocation { display: flex; justify-content: center; padding: max(10px, env(safe-area-inset-top)) 16px 0; color: var(--accent); }
-.invocation svg { width: 52px; height: 52px; }
-.invocation .ear { opacity: 0.7; }
+.invocation img { width: 76px; height: 76px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,.25); }

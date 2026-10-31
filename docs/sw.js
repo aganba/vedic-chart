@@ -1,12 +1,12 @@
 // Offline support: serve app files from the cache and refresh them in the
 // background (stale-while-revalidate), so the app opens without a connection
 // and picks up new versions on the next visit after a deploy.
-const CACHE = "vedic-chart-v1";
+const CACHE = "vedic-chart-v2";
 const CORE = [
   "./", "index.html", "style.css", "app.js", "manifest.webmanifest",
   "js/swe.js", "js/astro.js", "js/shadbala.js", "js/dasha.js", "js/tz.js", "js/places.js",
   "vendor/tz-lookup.js", "swe/swisseph.mjs", "swe/swisseph.wasm",
-  "ephe/sepl_18.se1", "ephe/semo_18.se1", "ephe/sefstars.txt", "icons/icon-180.png",
+  "ephe/sepl_18.se1", "ephe/semo_18.se1", "ephe/sefstars.txt", "icons/icon-180.png", "ganesha.svg",
 ];
 
 self.addEventListener("install", (e) => {
