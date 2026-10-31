@@ -65,7 +65,7 @@ const VARA_SKT = ["Ravivara", "Somavara", "Mangalavara", "Budhavara", "Guruvara"
   "Shukravara", "Shanivara"];
 const MASAS = ["Chaitra", "Vaishakha", "Jyeshtha", "Ashadha", "Shravana", "Bhadrapada",
   "Ashvayuja", "Kartika", "Margashirsha", "Pausha", "Magha", "Phalguna"];
-const SAMVATSARAS = [
+export const SAMVATSARAS = [
   "Prabhava", "Vibhava", "Shukla", "Pramoda", "Prajapati", "Angirasa", "Shrimukha",
   "Bhava", "Yuva", "Dhatu", "Ishvara", "Bahudhanya", "Pramathi", "Vikrama", "Vrisha",
   "Chitrabhanu", "Subhanu", "Tarana", "Parthiva", "Vyaya", "Sarvajit", "Sarvadhari",

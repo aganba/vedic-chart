@@ -34,7 +34,7 @@ for (const k of new Set(keys)) if (!ui.includes(JSON.stringify(k) + ":")) missin
 const docs = fileURLToPath(new URL("../docs/", import.meta.url));
 const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
-const { festivalsFor } = await import(new URL("../docs/js/festivals.js", import.meta.url));
+const { festivalsFor, tamilDate } = await import(new URL("../docs/js/festivals.js", import.meta.url));
 const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 setLang("ta");
@@ -52,6 +52,10 @@ for (const [lat, lon] of [[13.0827, 80.2707], [28.6139, 77.209], [9.9312, 76.267
     const m = muhurthaFor(w, lat, lon, 5.5);
     if (m) { check(m.paksha, "paksha"); check(m.tithi, "tithi"); check(m.nakshatra, "nakshatra");
       for (const x of m.windows) check(x.lagna, "sign"); }
+    if (d % 15 === 0) {
+      const td = tamilDate(w, lat, lon, 5.5);
+      check(td.month, "tamilMonth"); check(td.year, "samvatsara");
+    }
     if (d % 3 === 0) {
       const c = astro.computeChart(w + 6 * 3600e3, 5.5, lat, lon);
       const p = c.panchanga;

@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 const docs = fileURLToPath(new URL("../docs/", import.meta.url));
 const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
-const { festivalsFor } = await import(new URL("../docs/js/festivals.js", import.meta.url));
+const { festivalsFor, tamilDate } = await import(new URL("../docs/js/festivals.js", import.meta.url));
 const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 swe.setSidMode(swe.SE.SIDM_TRUE_CITRA);
@@ -75,6 +75,19 @@ for (const [label, place] of [["Chennai", CHENNAI], ["Delhi", DELHI]]) {
   }
 }
 console.log(bad ? `${bad} problem(s)` : "no repeated festivals in 2025-2026");
+
+// Tamil calendar dates on festival days whose dates are checked above.
+const TAMIL_DATES = [
+  ["2025-01-14", "Thai", 1, "Krodhi"], ["2025-04-14", "Chithirai", 1, "Vishvavasu"],
+  ["2025-08-03", "Aadi", 18, "Vishvavasu"], ["2026-04-14", "Chithirai", 1, "Parabhava"],
+];
+for (const [date, month, day, year] of TAMIL_DATES) {
+  const [y, m, d] = date.split("-").map(Number);
+  const td = tamilDate(astro.wallMs(y, m, d), ...CHENNAI, 5.5);
+  const ok = td && td.month === month && td.day === day && td.year === year;
+  if (!ok) bad++;
+  console.log(`${ok ? "ok  " : "FAIL"} Tamil date ${date}: ${td ? `${td.month} ${td.day}, ${td.year}` : "none"}`);
+}
 
 // Shubha muhurtham: panchangams disagree on the finer rules, so require only
 // that most Valarpirai dates published by LiveChennai for Chennai are found,

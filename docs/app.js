@@ -2,7 +2,7 @@
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
 import { AYANAMSAS, BHAVA_METHODS, computeChart, isoFromWall, wallMs } from "./js/astro.js";
-import { festivalsFor } from "./js/festivals.js";
+import { festivalsFor, tamilDate } from "./js/festivals.js";
 import { muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
@@ -366,8 +366,13 @@ function renderPanchanga(c) {
   const [cy, cm, cd] = ref.split("-").map(Number);
   const civilDay = new Date(Date.UTC(cy, cm - 1, cd)).getUTCDay();
   const nak = (n) => t("{nak} pada {pada}", { nak: tr(n.name, "nakshatra"), pada: n.pada });
+  const zone = c.input.timezone;
+  const td = tamilDate(wallFromInputs(ref, "00:00"), c.input.lat, c.input.lon,
+    zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset);
   const items = [
     [t("Day"), weekday(civilDay), t("{date} (calendar date)", { date: `${cd} ${monthShort(cm - 1)} ${cy}` })],
+    ...(td ? [[t("Tamil date"), `${tr(td.month, "tamilMonth")} ${td.day}`,
+      t("{year} year (Tamil calendar, from Chithirai)", { year: tr(td.year, "samvatsara") })]] : []),
     [t("Vara (Vedic day)"), `${tr(p.vara.sanskrit, "vara")} · ${tr(p.vara.name, "weekday")}`,
       p.sunrise ? t("Vedic day runs sunrise to sunrise; this date's sunrise is {t}", { t: fmtTime(p.sunrise, ref) })
         : t("Vedic day runs sunrise to sunrise")],

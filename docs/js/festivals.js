@@ -14,7 +14,7 @@
 // Festivals are not observed in an adhika (leap) lunar month.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
-import { NAK_SPAN, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
+import { NAK_SPAN, SAMVATSARAS, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
 
 // amanta months: 0 Chaitra ... 11 Phalguna; tithis: 0 Shukla Pratipada ... 14 Purnima,
 // 15 Krishna Pratipada ... 29 Amavasya; signs: 0 Mesha ... 11 Meena.
@@ -342,3 +342,29 @@ export function festivalsFor(dateWall, lat, lon, offset) {
   return out;
 }
 
+
+const TAMIL_MONTHS = ["Chithirai", "Vaikasi", "Aani", "Aadi", "Avani", "Purattasi",
+  "Aippasi", "Karthigai", "Margazhi", "Thai", "Maasi", "Panguni"];
+
+// Tamil solar calendar date of the civil day starting at dateWall (local
+// midnight): { month, day, year }. The month follows the Sun's sidereal sign at
+// 3/5 of the daytime, as for the Tamil festivals, so a month starts on the day
+// of the sankranti when it falls before then. The 60-year cycle name turns over
+// at Chithirai 1 (1987 was Prabhava). Null where the Sun doesn't rise or set.
+export function tamilDate(dateWall, lat, lon, offset) {
+  const offsetAt = typeof offset === "function" ? offset : () => offset;
+  const wallOffset = (ms) => offsetAt(ms - offsetAt(ms) * 3600e3);
+  const monthOf = (n) => {
+    const wall = dateWall + n * 86400e3;
+    const sr = swe.riseTrans(julFromWall(wall, wallOffset(wall)), SE.SUN, SE.CALC_RISE, lon, lat);
+    const ss = sr && swe.riseTrans(sr, SE.SUN, SE.CALC_SET, lon, lat);
+    return sr && ss ? signAt(sr + (ss - sr) * 3 / 5) : null;
+  };
+  const m = monthOf(0);
+  if (m == null) return null;
+  let n = 0;
+  while (n > -33 && monthOf(n - 1) === m) n--;
+  const date = new Date(dateWall);
+  const startYear = date.getUTCFullYear() - (m >= 9 || date.getUTCMonth() === 0 ? 1 : 0);
+  return { month: TAMIL_MONTHS[m], day: 1 - n, year: SAMVATSARAS[(((startYear - 1987) % 60) + 60) % 60] };
+}
