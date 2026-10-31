@@ -548,26 +548,11 @@ function renderPositions(c) {
       <td>${esc(b.nakshatra.lord)}</td>
       <td>${esc(abbr[b.navamsa])}</td>
       <td>${esc(b.karaka || "")}</td>
-      ${shadbalaCells(b.shadbala)}
     </tr>`).join("");
   $("positions").innerHTML = `
     <thead><tr><th>Body</th><th>Rasi</th><th>Longitude</th><th>Nakshatra</th><th>Pada</th>
-    <th>Nak. lord</th><th>Navamsa</th><th>Karaka</th>
-    <th title="Total Shadbala in rupas (60 virupas = 1 rupa)">Shadbala</th>
-    <th title="Shadbala as a percentage of the planet's required minimum">Strength</th></tr></thead>
+    <th>Nak. lord</th><th>Navamsa</th><th>Karaka</th></tr></thead>
     <tbody>${rows}</tbody>`;
-}
-
-// Rupas plus % of required minimum; hover shows the six components in virupas.
-function shadbalaCells(s) {
-  if (!s) return "<td></td><td></td>";
-  const parts = [["Sthana", s.sthana], ["Dig", s.dig], ["Kala", s.kala], ["Cheshta", s.cheshta],
-    ["Naisargika", s.naisargika], ["Drik", s.drik]];
-  const tip = parts.map(([k, v]) => `${k}: ${v.toFixed(2)}`).join("\n")
-    + `\nTotal: ${s.total.toFixed(2)} virupas\nRequired: ${s.required} rupas`;
-  const pct = Math.round(s.ratio * 100);
-  return `<td class="num" title="${esc(tip)}">${s.rupas.toFixed(2)}</td>
-    <td class="num ${pct < 100 ? "weak" : ""}" title="${esc(tip)}">${pct}%</td>`;
 }
 
 function renderBhavaTable(c) {

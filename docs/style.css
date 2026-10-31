@@ -125,7 +125,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
   .actions #go { flex: 1; }
   .charts { grid-template-columns: minmax(0, 1fr); }
 }
-td.weak { color: var(--lagna); }
 
 /* tabs */
 .tabs { display: flex; gap: 4px; margin: 0 0 16px; border-bottom: 1px solid var(--line); overflow-x: auto; }
