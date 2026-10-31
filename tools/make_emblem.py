@@ -1,5 +1,5 @@
-"""Generate docs/ganesha.svg: an abstract Ganesha built from Om, drawn as white
-calligraphic brush strokes on a painted colour-block background.
+"""Generate docs/ganesha.svg: an abstract seated Ganesha built from Om, drawn as
+calligraphic brush strokes in the page's accent colour (currentColor).
 
 Each stroke is a centre line (cubic Béziers) plus a width profile; the outline
 is computed by offsetting the centre line along its normals, so strokes swell
@@ -12,34 +12,37 @@ from pathlib import Path
 OUT = Path(__file__).resolve().parent.parent / "docs" / "ganesha.svg"
 rng = random.Random(108)
 
-# Centre lines in a 100x100 design space: lists of cubic segments (p0, c1, c2, p1).
+# Centre lines in a 100x112 design space: lists of cubic segments (p0, c1, c2, p1),
+# each with a width profile [(t, width), ...] along its length.
+VIEW_W, VIEW_H = 100, 112
 STROKES = [
-    # ears
-    ("ear", [((27, 31), (10, 22), (-1, 48), (10, 61)), ((10, 61), (15, 67), (23, 66), (27, 61))], [(0, .8), (.45, 5.2), (1, .8)]),
-    ("ear", [((73, 31), (90, 22), (101, 48), (90, 61)), ((90, 61), (86, 65.5), (80, 65.5), (76.5, 62))], [(0, .8), (.45, 5.2), (1, .8)]),
-    # Om upper bowl (forehead)
-    ("om", [((30, 31), (37, 21), (55, 22), (54, 35)), ((54, 35), (53, 44), (44, 47), (38, 47))], [(0, 1), (.35, 6.5), (.8, 4), (1, 2.2)]),
-    # Om lower bowl (cheek)
-    ("om", [((38, 47), (57, 46), (63, 61), (54, 70)), ((54, 70), (46, 78), (31, 75), (27, 65))], [(0, 2.2), (.4, 7.5), (1, .9)]),
-    # Om tail as the trunk, ending in a curl
-    ("om", [((49, 47.5), (62, 45), (73, 51), (71, 63)), ((71, 63), (69.5, 72), (61, 77), (63, 84)),
-            ((63, 84), (64.5, 89), (71, 89), (71.5, 84))], [(0, 3), (.3, 6.5), (.75, 3.5), (1, .9)]),
-    # tusk
-    ("om", [((57.5, 55.5), (59.5, 57), (61.5, 58.5), (64, 60.5))], [(0, 3.4), (1, .6)]),
-    # chandrabindu crescent (crown)
-    ("om", [((55, 17.5), (61, 24.5), (71, 24.5), (78, 15.5))], [(0, .8), (.5, 4.6), (1, .8)]),
+    # crown: three tiered arches and a flame finial
+    [((36, 26), (43, 18), (57, 18), (64, 26))], [(0, .8), (.5, 4.2), (1, .8)],
+    [((40.5, 19), (45.5, 13), (54.5, 13), (59.5, 19))], [(0, .7), (.5, 3.4), (1, .7)],
+    [((44.5, 12.5), (47.5, 9), (52.5, 9), (55.5, 12.5))], [(0, .6), (.5, 2.6), (1, .6)],
+    [((50, 8.5), (49, 6), (51, 4), (50, 1.5))], [(0, 2.2), (1, .4)],
+    # ears (front-facing, symmetrical)
+    [((36, 26), (20, 20), (12, 37), (21, 47)), ((21, 47), (25, 52), (31, 50), (33, 45)), ((33, 45), (34, 41.5), (30, 39.5), (29, 42.5))], [(0, .8), (.38, 5.5), (.8, 2.2), (1, .6)],
+    [((64, 26), (80, 20), (88, 37), (79, 47)), ((79, 47), (75, 52), (69, 50), (67, 45)), ((67, 45), (66, 41.5), (70, 39.5), (71, 42.5))], [(0, .8), (.38, 5.5), (.8, 2.2), (1, .6)],
+    # tilak and eyes
+    [((50, 26.5), (50, 28), (50, 30), (50, 32))], [(0, .5), (.5, 2.2), (1, .5)],
+    [((42, 37), (43.5, 35.5), (45.5, 35.5), (47, 37))], [(0, .4), (.5, 1.9), (1, .4)],
+    [((58, 37), (56.5, 35.5), (54.5, 35.5), (53, 37))], [(0, .4), (.5, 1.9), (1, .4)],
+    # trunk, flowing down through the Om and ending as its curling tail
+    [((50, 38), (50, 46), (51, 52), (54, 57)), ((54, 57), (60, 64), (70, 66), (69, 78)),
+     ((69, 78), (68, 88), (58, 92), (60, 99)), ((60, 99), (61.5, 104), (68, 104), (68, 99))],
+    [(0, 3), (.3, 5.2), (.72, 3), (1, .8)],
+    # Om "3" forming the body: upper bowl, lower bowl, and the stroke joining the trunk
+    [((26, 52), (32, 43), (48, 45), (46, 56)), ((46, 56), (45, 63), (38, 65), (33, 65))], [(0, 1), (.35, 6), (.85, 3.5), (1, 2.2)],
+    [((33, 65), (52, 64), (58, 80), (48, 90)), ((48, 90), (40, 98), (26, 95), (22, 86))], [(0, 2.2), (.4, 7), (1, .9)],
+    [((40, 64.5), (46, 63), (51, 62), (55, 59.5))], [(0, 2.6), (1, 4)],
+    # chandrabindu as a raised hand with a modak
+    [((77, 66), (80.5, 72), (88, 72), (92, 65))], [(0, .8), (.5, 3.6), (1, .8)],
+    # lotus seat
+    [((20, 105), (40, 110.5), (64, 110.5), (84, 104.5))], [(0, .8), (.5, 3.4), (1, .8)],
 ]
-DOTS = [(66.5, 9.2, 3.3), (44, 33, 2.6)]  # chandrabindu dot, eye
-
-# Painted background: (x, y, w, h, colour, opacity), my own arrangement.
-BLOCKS = [
-    (0, 0, 100, 100, "#3b1020", 1),
-    (0, 0, 46, 38, "#a2311c", .95), (40, 0, 34, 30, "#d06a1f", .9), (70, 0, 30, 46, "#2c2b6e", .95),
-    (0, 34, 30, 40, "#1f5a4a", .9), (26, 30, 48, 34, "#7a1830", .9), (68, 42, 32, 30, "#c9452a", .9),
-    (0, 70, 42, 30, "#e0a33a", .85), (38, 62, 34, 38, "#4a2a6a", .9), (66, 68, 34, 32, "#a8571f", .9),
-    (18, 18, 20, 22, "#e08a2c", .45), (56, 48, 22, 26, "#e0b040", .35), (8, 52, 26, 16, "#b8302a", .4),
-]
-
+STROKES = list(zip(STROKES[::2], STROKES[1::2]))
+DOTS = [(84.5, 60, 2.7)]  # modak
 
 def bezier(seg, t):
     (x0, y0), (x1, y1), (x2, y2), (x3, y3) = seg
@@ -74,7 +77,7 @@ def outline(segments, profile):
         lengths.append(lengths[-1] + math.dist(a, b))
     total = lengths[-1]
     left, right = [], []
-    jitter = [rng.uniform(-.18, .18) for _ in pts]
+    jitter = [rng.uniform(-.06, .06) for _ in pts]
     for i, (x, y) in enumerate(pts):
         a, b = pts[max(i - 1, 0)], pts[min(i + 1, len(pts) - 1)]
         dx, dy = b[0] - a[0], b[1] - a[1]
@@ -88,29 +91,13 @@ def outline(segments, profile):
 
 
 def main() -> None:
-    parts = [
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Om Ganesha">',
-        '<defs><clipPath id="c"><rect width="100" height="100" rx="16"/></clipPath>',
-        '<radialGradient id="v" cx="50%" cy="48%" r="62%"><stop offset="55%" stop-color="#000" stop-opacity="0"/>'
-        '<stop offset="100%" stop-color="#000" stop-opacity=".45"/></radialGradient>',
-        # streaky noise suggesting brushwork on canvas
-        '<filter id="t" x="0" y="0" width="100%" height="100%">'
-        '<feTurbulence type="fractalNoise" baseFrequency=".035 .6" numOctaves="3" seed="7"/>'
-        '<feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.05"/></filter></defs>',
-        '<g clip-path="url(#c)">',
-    ]
-    for x, y, w, h, colour, op in BLOCKS:
-        parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{colour}" opacity="{op}"/>')
-    parts.append('<rect width="100" height="100" filter="url(#t)" opacity=".38"/>')
-    parts.append('<rect width="100" height="100" fill="url(#v)"/></g>')
-    # artwork scaled into the frame with a margin
-    parts.append('<g transform="translate(9 9) scale(.82)" fill="#fbf4e8" stroke="#fbf4e8" stroke-width=".5" stroke-linejoin="round">')
-    for kind, segs, profile in STROKES:
-        op = ' opacity=".92"' if kind == "ear" else ""
-        parts.append(f'<path d="{outline(segs, profile)}"{op}/>')
+    parts = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {VIEW_W} {VIEW_H}" role="img" '
+             'aria-label="Om Ganesha" fill="currentColor">']
+    for segs, profile in STROKES:
+        parts.append(f'<path d="{outline(segs, profile)}"/>')
     for cx, cy, r in DOTS:
         parts.append(f'<circle cx="{cx}" cy="{cy}" r="{r}"/>')
-    parts.append("</g></svg>")
+    parts.append("</svg>")
     OUT.write_text("\n".join(parts) + "\n")
     print(f"wrote {OUT} ({OUT.stat().st_size / 1024:.1f} KB)")
 
