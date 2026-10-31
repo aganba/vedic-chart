@@ -27,6 +27,7 @@ const TITHI_FESTIVALS = [
   { name: "Buddha Purnima", masa: 1, tithi: 14, kaala: "sunrise" },
   { name: "Guru Purnima", masa: 3, tithi: 14, kaala: "sunrise" },
   { name: "Nag Panchami", masa: 4, tithi: 4, kaala: "sunrise" },
+  { name: "Yajur Upakarma (Avani Avittam)", masa: 4, tithi: 14, kaala: "sunrise", region: "South India" },
   { name: "Krishna Janmashtami", masa: 4, tithi: 22, kaala: "sunrise", show: "nishita", label: "Nishita puja" },
   { name: "Ganesh Chaturthi", masa: 5, tithi: 3, kaala: "madhyahna", label: "Madhyahna Ganesha puja" },
   { name: "Mahalaya Amavasya", masa: 5, tithi: 29, kaala: "aparahna", label: "Aparahna (tarpanam)" },
@@ -46,6 +47,14 @@ const TITHI_FESTIVALS = [
   { name: "Maha Shivaratri", masa: 10, tithi: 28, kaala: "nishita", label: "Nishita kaal puja" },
   // Tithi within a Tamil solar month rather than a lunar month.
   { name: "Vaikuntha Ekadashi", solar: 8, tithi: 10, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Soora Samharam (Skanda Sashti)", solar: 6, tithi: 5, kaala: "sunset", label: "Soora Samharam (evening, from sunset)",
+    region: "Tamil Nadu" },
+];
+
+// Nakshatra in an amanta lunar month, Shukla paksha, at sunrise (Upakarmas).
+const LUNAR_NAKSHATRA_FESTIVALS = [
+  { name: "Rig Upakarma", masa: 4, nak: 21, kaala: "sunrise", region: "South India" },
+  { name: "Sama Upakarma", masa: 5, nak: 12, kaala: "sunrise", region: "South India" },
 ];
 
 const SOLAR_FESTIVALS = [
@@ -194,6 +203,22 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     const times = [{ label: tithiLabel(f.tithi), start: fmt(ts), end: fmt(te) }];
     if (f.label) times.unshift(window(f.label, kaala(0, f.show || f.kaala)));
     out.push({ name: f.name, region: f.region || null, note: f.note || null, times });
+  }
+
+  // Gayatri Japam: the day after Yajur Upakarma.
+  const yajur = TITHI_FESTIVALS.find((f) => f.name.startsWith("Yajur Upakarma"));
+  if (tithiObserved(yajur, -1)) out.push({ name: "Gayatri Japam", region: "South India", note: null, times: [] });
+
+  for (const f of LUNAR_NAKSHATRA_FESTIVALS) {
+    const holds = (n, jd) => {
+      if (nakAt(jd) !== f.nak || tithiAt(jd) > 14) return false;
+      const m = masaAt(jd);
+      return m.masa === f.masa && !m.adhika;
+    };
+    if (!observedOn(0, f, holds, moonLon, NAK_SPAN, 13.2)) continue;
+    const [ns, ne] = spanOf(moonLon, NAK_SPAN, kaala(0, f.kaala)[0], 13.2);
+    out.push({ name: f.name, region: f.region, note: null,
+      times: [{ label: `${NAK_NAMES[f.nak]} nakshatra`, start: fmt(ns), end: fmt(ne) }] });
   }
 
   // Bhadra = Vishti karana (the first half of Purnima among others).
