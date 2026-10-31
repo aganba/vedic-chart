@@ -189,7 +189,12 @@ td.weak { color: var(--lagna); }
 .festival-note { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .upcoming-title { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
 .upcoming-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
-.upcoming-date { display: inline-block; min-width: 92px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.upcoming-date { display: inline-block; min-width: 92px; flex: none; font-weight: 600; font-variant-numeric: tabular-nums; }
 .year-month { margin: 16px 0 6px; font-size: 14px; color: var(--accent); }
 .year-month:first-child { margin-top: 0; }
 #festivalYear .upcoming-list li.today { font-weight: 700; }
+#upcoming .upcoming-list { gap: 8px; }
+#upcoming .upcoming-list li { display: flex; gap: 6px; }
+.upcoming-festival + .upcoming-festival { margin-top: 4px; }
+.upcoming-times { font-size: 13px; color: var(--muted); }
+.upcoming-times strong { color: var(--ink); font-weight: 600; }

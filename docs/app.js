@@ -406,16 +406,19 @@ function festivalDate(iso) {
 function renderFestivals(c) {
   const list = c.panchanga.festivals || [];
   const ref = c.input.local_time.slice(0, 10);
-  const hm = (iso) => {
+  // HH:MM, with the date added when it isn't on `on`.
+  const hm = (iso, on = ref) => {
     const [d, t] = iso.split("T");
-    if (d === ref) return t.slice(0, 5);
+    if (d === on) return t.slice(0, 5);
     const [, mo, day] = d.split("-");
     return `${t.slice(0, 5)} (${Number(day)} ${MONTHS[Number(mo) - 1]})`;
   };
+  const timeText = (t, day = ref) =>
+    `${esc(t.label)}: <strong>${t.at ? hm(t.at, day) : `${hm(t.start, day)} – ${hm(t.end, day)}`}</strong>`;
   const today = list.map((f) => `
     <div class="festival">
       <div class="festival-name">${esc(f.name)}${f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : ""}</div>
-      ${f.times.map((t) => `<div class="festival-time">${esc(t.label)}: <strong>${t.at ? hm(t.at) : `${hm(t.start)} – ${hm(t.end)}`}</strong></div>`).join("")}
+      ${f.times.map((t) => `<div class="festival-time">${timeText(t)}</div>`).join("")}
       ${f.note ? `<div class="festival-note">${esc(f.note)}</div>` : ""}
     </div>`).join("");
   $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">
@@ -434,8 +437,11 @@ function renderFestivals(c) {
   const cut = isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10);
   const showUpcoming = (failed) => {
     const box = $("upcoming");
-    const rows = found.filter((u) => u.date !== ref && u.date < cut).map((u) =>
-      `<li><span class="upcoming-date">${festivalDate(u.date).label}</span> ${festivalNames(u.festivals)}</li>`);
+    const rows = found.filter((u) => u.date !== ref && u.date < cut).map((u) => {
+      const items = u.festivals.map((f) => `<div class="upcoming-festival">${festivalNames([f])}${f.times.length
+        ? `<div class="upcoming-times">${f.times.map((t) => timeText(t, u.date)).join(" · ")}</div>` : ""}</div>`).join("");
+      return `<li><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${items}</div></li>`;
+    });
     if (failed) box.querySelector(".festival-note").textContent = "Couldn't calculate upcoming festivals.";
     else if (!rows.length) box.querySelector(".festival-note").textContent = `No festivals in the next ${UPCOMING_DAYS} days.`;
     else box.innerHTML = `<div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div><ul class="upcoming-list">${rows.join("")}</ul>`;
