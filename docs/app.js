@@ -6,6 +6,8 @@ import { festivalsFor } from "./js/festivals.js";
 import { muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
+import { FOOTER, compass, getLang, monthLong, monthShort, savedLang, setLang, spanUnits, t, tr, tzNote,
+  weekday, weekdayShort } from "./js/i18n.js";
 
 const PLACES_URL = "data/places.tsv";
 const sweReady = initSwe(async (f) => {
@@ -24,9 +26,6 @@ const SOUTH_POS = [
   [0, 1], [0, 2], [0, 3], [1, 3], [2, 3], [3, 3],
   [3, 2], [3, 1], [3, 0], [2, 0], [1, 0], [0, 0],
 ];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 let offsetManual = false;
 let lastChart = null;
@@ -63,7 +62,7 @@ function parseOffset(s) {
   if (m) return (m[1] === "-" ? -1 : 1) * (Number(m[2]) + Number(m[3]) / 60);
   m = s.match(/^[+-]?\d{1,2}(\.\d+)?$/);
   if (m) return Number(s);
-  throw new Error("UTC offset should look like +05:30 or -4");
+  throw new Error(t("UTC offset should look like +05:30 or -4"));
 }
 
 // "2000-01-02T02:39:06" -> "02:39:06 (2 Jan)" when the date differs from refDate.
@@ -72,7 +71,7 @@ function fmtTime(iso, refDate) {
   const [d, t] = iso.split("T");
   if (d === refDate) return t;
   const [, mo, day] = d.split("-");
-  return `${t} (${Number(day)} ${MONTHS[Number(mo) - 1]})`;
+  return `${t} (${Number(day)} ${monthShort(Number(mo) - 1)})`;
 }
 
 // "YYYY-MM-DD" + "HH:MM[:SS]" -> local wall-clock ms (see astro.wallMs).
@@ -84,12 +83,14 @@ function wallFromInputs(date, time) {
 
 function timezoneFor(lat, lon, date, time) {
   const zone = zoneAt(lat, lon);
-  if (!zone) throw new Error("No timezone found for these coordinates; enter the UTC offset manually");
+  if (!zone) throw new Error(t("No timezone found for these coordinates; enter the UTC offset manually"));
   return { timezone: zone, ...offsetFor(zone, wallFromInputs(date, time)) };
 }
 
+let tzNoteText = "";
 function showTzNote(msg) {
-  $("tznote").textContent = msg || "";
+  tzNoteText = msg || "";
+  $("tznote").textContent = tzNote(msg) || "";
   $("tznote").hidden = !msg;
 }
 
@@ -121,9 +122,10 @@ function dateFormatHint() {
     const parts = new Intl.DateTimeFormat(undefined, { year: "numeric", month: "2-digit", day: "2-digit" })
       .formatToParts(new Date(2001, 10, 22));
     const names = { day: "dd", month: "mm", year: "yyyy" };
+    if (getLang() === "ta") Object.assign(names, { day: "நாள்", month: "மாதம்", year: "ஆண்டு" });
     return parts.map((p) => names[p.type] || p.value).join("");
   } catch {
-    return "yyyy-mm-dd";
+    return t("yyyy-mm-dd");
   }
 }
 
@@ -146,7 +148,7 @@ async function useDevicePlace() {
   const coords = await devicePosition();
   if (coords) {
     const lat = Number(coords.latitude.toFixed(5)), lon = Number(coords.longitude.toFixed(5));
-    let name = "Current location";
+    let name = t("Current location");
     try { name = (await reverseOnline(lat, lon)) || name; } catch {}
     return { name, lat, lon };
   }
@@ -156,17 +158,17 @@ async function useDevicePlace() {
   try {
     await loadPlaces(PLACES_URL);
     const [r] = searchPlaces(city);
-    return r ? { name: `${city} (from device time zone)`, lat: r.lat, lon: r.lon } : null;
+    return r ? { name: t("{city} (from device time zone)", { city }), lat: r.lat, lon: r.lon } : null;
   } catch { return null; }
 }
 
 async function resetToNow() {
   setNow();
-  $("place").value = "Locating…";
+  $("place").value = t("Locating…");
   const place = await useDevicePlace();
   if (!place) {
     $("place").value = "";
-    return showError("Couldn't determine this device's location. Search for a place.");
+    return showError(t("Couldn't determine this device's location. Search for a place."));
   }
   $("place").value = place.name;
   $("lat").value = place.lat;
@@ -262,7 +264,7 @@ async function searchPlace() {
   try {
     const results = await geocodeOnline(q);
     showResults(results.map((r) => ({ ...r, name: r.name.split(",").slice(0, 3).join(",") })),
-      "No matches. Try “City, Country”.");
+      t("No matches. Try “City, Country”."));
   } catch (e) {
     showError(e.message);
   } finally {
@@ -296,7 +298,7 @@ function drawSouthChart(svg, boxes, lagnaSign, centerLines) {
     const x = c * S, y = r * S;
     svg.appendChild(el("rect", { x, y, width: S, height: S, class: "cell" }));
     svg.appendChild(el("text", { x: x + S - 5, y: y + S - 6, "text-anchor": "end", class: "signlbl" },
-      lastChart.constants.sign_abbr[sign]));
+      tr(lastChart.constants.sign_abbr[sign], "signAbbr")));
     if (sign === lagnaSign) {
       svg.appendChild(el("line", { x1: x, y1: y + 14, x2: x + 14, y2: y, class: "lagna-mark" }));
     }
@@ -323,7 +325,7 @@ function drawSouthChart(svg, boxes, lagnaSign, centerLines) {
 
 function chartItem(b) {
   return {
-    label: b.key === "lagna" ? "Asc" : b.abbr + (b.retro ? "(R)" : ""),
+    label: tr(b.key === "lagna" ? "Asc" : b.abbr, "planetAbbr") + (b.retro ? `(${t("R")})` : ""),
     deg: shortDeg(b),
     cls: b.key === "lagna" ? "lagna" : b.retro ? "retro" : "",
   };
@@ -334,25 +336,26 @@ function renderCharts(c) {
 
   const rasiBoxes = {};
   for (const b of c.bodies) (rasiBoxes[b.sign] ||= []).push(chartItem(b));
-  drawSouthChart($("rasi"), rasiBoxes, c.lagna_sign, ["Rasi", when]);
+  drawSouthChart($("rasi"), rasiBoxes, c.lagna_sign, [t("Rasi"), when]);
 
   // Navamsa: degrees within D1 don't carry over, so show names only.
   const navBoxes = {};
   for (const b of c.bodies) (navBoxes[b.navamsa] ||= []).push({ ...chartItem(b), deg: "" });
   const lagnaNav = c.bodies.find((b) => b.key === "lagna").navamsa;
-  drawSouthChart($("navamsa"), navBoxes, lagnaNav, ["Navamsa", when]);
+  drawSouthChart($("navamsa"), navBoxes, lagnaNav, [t("Navamsa"), when]);
 }
 
 // ---------- tables & panchanga ----------
 
 function renderSummary(c) {
   const lat = c.input.lat, lon = c.input.lon;
-  const coord = `${Math.abs(lat).toFixed(4)}°${lat >= 0 ? "N" : "S"}, ${Math.abs(lon).toFixed(4)}°${lon >= 0 ? "E" : "W"}`;
+  const coord = `${Math.abs(lat).toFixed(4)}°${compass(lat >= 0 ? "N" : "S")}, ${Math.abs(lon).toFixed(4)}°${compass(lon >= 0 ? "E" : "W")}`;
   $("summary").innerHTML = `
-    <strong>${esc($("place").value || "Chart")}</strong>
+    <strong>${esc($("place").value || t("Chart"))}</strong>
     <span>${esc(c.input.local_time.replace("T", " "))} · UTC${fmtOffset(c.input.utc_offset)}${c.input.timezone ? " · " + esc(c.input.timezone) : ""}</span>
     <span>${coord}</span>
-    <span>Ayanamsa: ${esc(c.settings.ayanamsa_label)} = ${c.settings.ayanamsa_deg}° ${esc(c.settings.ayanamsa_dms.replace(/^\d+° /, ""))}</span>`;
+    <span>${esc(t("Ayanamsa: {name} = {value}", { name: tr(c.settings.ayanamsa_label, "ayanamsa"),
+      value: `${c.settings.ayanamsa_deg}° ${c.settings.ayanamsa_dms.replace(/^\d+° /, "")}` }))}</span>`;
 }
 
 function renderPanchanga(c) {
@@ -362,23 +365,28 @@ function renderPanchanga(c) {
   // which runs sunrise to sunrise and so differs before sunrise.
   const [cy, cm, cd] = ref.split("-").map(Number);
   const civilDay = new Date(Date.UTC(cy, cm - 1, cd)).getUTCDay();
+  const nak = (n) => t("{nak} pada {pada}", { nak: tr(n.name, "nakshatra"), pada: n.pada });
   const items = [
-    ["Day", WEEKDAYS[civilDay], `${cd} ${MONTHS[cm - 1]} ${cy} (calendar date)`],
-    ["Vara (Vedic day)", `${p.vara.sanskrit} · ${p.vara.name}`,
-      p.sunrise ? `Vedic day runs sunrise to sunrise; this date's sunrise is ${fmtTime(p.sunrise, ref)}` : "Vedic day runs sunrise to sunrise"],
-    ["Tithi", `${p.tithi.paksha} ${p.tithi.name}`, `${p.tithi.pct_left}% left · ends ${fmtTime(p.tithi.end, ref)}`],
-    ["Nakshatra", `${p.nakshatra.name} pada ${p.nakshatra.pada}`, `${p.nakshatra.pct_left}% left · ends ${fmtTime(p.nakshatra.end, ref)} · lord ${p.nakshatra.lord}`],
-    ...(p.sunrise_nakshatra ? [["Nakshatra at sunrise", `${p.sunrise_nakshatra.name} pada ${p.sunrise_nakshatra.pada}`,
-      `at sunrise ${fmtTime(p.sunrise_nakshatra.at, ref)} · until ${fmtTime(p.sunrise_nakshatra.end, ref)} · lord ${p.sunrise_nakshatra.lord}`]] : []),
-    ["Yoga", p.yoga.name, `ends ${fmtTime(p.yoga.end, ref)}`],
-    ["Karana", p.karana.name, `ends ${fmtTime(p.karana.end, ref)}`],
-    ["Lunar month / year", `${p.masa}`, `${p.samvatsara} samvatsara (amanta)`],
-    ["Sunrise / Sunset", `${fmtTime(p.sunrise, ref)} / ${fmtTime(p.sunset, ref)}`, `next sunrise ${fmtTime(p.next_sunrise, ref)}`],
+    [t("Day"), weekday(civilDay), t("{date} (calendar date)", { date: `${cd} ${monthShort(cm - 1)} ${cy}` })],
+    [t("Vara (Vedic day)"), `${tr(p.vara.sanskrit, "vara")} · ${tr(p.vara.name, "weekday")}`,
+      p.sunrise ? t("Vedic day runs sunrise to sunrise; this date's sunrise is {t}", { t: fmtTime(p.sunrise, ref) })
+        : t("Vedic day runs sunrise to sunrise")],
+    [t("Tithi"), `${tr(p.tithi.paksha, "paksha")} ${tr(p.tithi.name, "tithi")}`,
+      t("{pct}% left · ends {t}", { pct: p.tithi.pct_left, t: fmtTime(p.tithi.end, ref) })],
+    [t("Nakshatra"), nak(p.nakshatra), t("{pct}% left · ends {t} · lord {lord}",
+      { pct: p.nakshatra.pct_left, t: fmtTime(p.nakshatra.end, ref), lord: tr(p.nakshatra.lord, "planet") })],
+    ...(p.sunrise_nakshatra ? [[t("Nakshatra at sunrise"), nak(p.sunrise_nakshatra),
+      t("at sunrise {t} · until {u} · lord {lord}", { t: fmtTime(p.sunrise_nakshatra.at, ref),
+        u: fmtTime(p.sunrise_nakshatra.end, ref), lord: tr(p.sunrise_nakshatra.lord, "planet") })]] : []),
+    [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
+    [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
+    [t("Lunar month / year"), tr(p.masa, "masa"), t("{year} samvatsara (amanta)", { year: tr(p.samvatsara, "samvatsara") })],
+    [t("Sunrise / Sunset"), `${fmtTime(p.sunrise, ref)} / ${fmtTime(p.sunset, ref)}`, t("next sunrise {t}", { t: fmtTime(p.next_sunrise, ref) })],
   ];
   if (p.rahu_kalam) {
-    items.push(["Rahu Kalam", `${fmtTime(p.rahu_kalam.start, ref)} – ${fmtTime(p.rahu_kalam.end, ref)}`, ""]);
-    items.push(["Yamaganda", `${fmtTime(p.yamaganda.start, ref)} – ${fmtTime(p.yamaganda.end, ref)}`, ""]);
-    items.push(["Gulika Kalam", `${fmtTime(p.gulika_kalam.start, ref)} – ${fmtTime(p.gulika_kalam.end, ref)}`, ""]);
+    items.push([t("Rahu Kalam"), `${fmtTime(p.rahu_kalam.start, ref)} – ${fmtTime(p.rahu_kalam.end, ref)}`, ""]);
+    items.push([t("Yamaganda"), `${fmtTime(p.yamaganda.start, ref)} – ${fmtTime(p.yamaganda.end, ref)}`, ""]);
+    items.push([t("Gulika Kalam"), `${fmtTime(p.gulika_kalam.start, ref)} – ${fmtTime(p.gulika_kalam.end, ref)}`, ""]);
   }
   $("panchanga").innerHTML = items.map(([k, v, s]) =>
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
@@ -393,180 +401,171 @@ function renderPanchanga(c) {
 const UPCOMING_DAYS = 7;
 const YEAR_DAYS = 366; // the entered date and the 365 days after it
 const CHUNK_DAYS = 8;
-let festivalSeq = 0;
+// Results so far for the current chart; kept so a language switch can redraw
+// them without recalculating.
+let fest = null;
 
 function festivalNames(festivals) {
-  return festivals.map((f) => esc(f.name) + (f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : "")).join(" · ");
+  return festivals.map((f) => esc(tr(f.name, "festival"))
+    + (f.region ? ` <span class="festival-region">${esc(tr(f.region, "region"))}</span>` : "")).join(" · ");
 }
 
 function festivalDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
-  const wd = WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()].slice(0, 3);
-  return { y, m, d, label: `${wd} ${d} ${MONTHS[m - 1]}` };
+  const wd = weekdayShort(new Date(Date.UTC(y, m - 1, d)).getUTCDay());
+  return { y, m, d, label: `${wd} ${d} ${monthShort(m - 1)}` };
 }
 
 function renderFestivals(c) {
-  const list = c.panchanga.festivals || [];
   const ref = c.input.local_time.slice(0, 10);
-  // HH:MM, with the date added when it isn't on `on`.
-  const hm = (iso, on = ref) => {
-    const [d, t] = iso.split("T");
-    if (d === on) return t.slice(0, 5);
-    const [, mo, day] = d.split("-");
-    return `${t.slice(0, 5)} (${Number(day)} ${MONTHS[Number(mo) - 1]})`;
-  };
-  const timeText = (t, day = ref) =>
-    `${esc(t.label)}: <strong>${t.at ? hm(t.at, day) : `${hm(t.start, day)} – ${hm(t.end, day)}`}</strong>`;
-  const today = list.map((f) => `
-    <div class="festival">
-      <div class="festival-name">${esc(f.name)}${f.region ? ` <span class="festival-region">${esc(f.region)}</span>` : ""}</div>
-      ${f.times.map((t) => `<div class="festival-time">${timeText(t)}</div>`).join("")}
-      ${f.note ? `<div class="festival-note">${esc(f.note)}</div>` : ""}
-    </div>`).join("");
-  $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">
-      <div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div>
-      <div class="festival-note">Checking…</div></div>`;
-  $("festivals").hidden = false;
-  $("muhurthaBanner").innerHTML = `<div class="upcoming-title">Shubha Muhurtham (next ${UPCOMING_DAYS} days)</div>
-      <div class="festival-note">Checking…</div>`;
-  $("muhurthaBanner").hidden = false;
-  const place = $("place").value.trim();
-  $("festivalPlace").textContent = place ? `· ${place}` : "";
-  $("festivalYear").innerHTML = `<p class="hint" id="festivalStatus">Calculating…</p>`;
-  $("muhurthaYear").innerHTML = `<p class="hint">Calculating…</p>`;
-
-  const seq = ++festivalSeq;
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
-  const found = []; // [{ date, festivals }] for days 0..done-1
-  const muhurthas = []; // [{ date, m }] for days 0..done-1
-  let done = 0, bannerDone = false;
+  fest = {
+    c, ref, midnight, found: [], muhurthas: [], done: 0, failed: false,
+    cut: isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10),
+  };
+  const state = fest;
   // With a detected timezone each day gets the offset in force then (DST);
   // a manually entered offset is used for every day.
   const zone = c.input.timezone;
   const offset = zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset;
+  drawFestivals();
 
-  const cut = isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10);
-  const showUpcoming = (failed) => {
-    const box = $("upcoming");
+  const step = () => {
+    if (state !== fest) return; // a newer chart replaced this one
+    try {
+      const end = Math.min(state.done + CHUNK_DAYS, YEAR_DAYS);
+      for (; state.done < end; state.done++) {
+        const w = midnight + state.done * 86400e3;
+        const date = isoFromWall(w).slice(0, 10);
+        const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset);
+        if (festivals.length) state.found.push({ date, festivals });
+        const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
+        if (m) state.muhurthas.push({ date, m });
+      }
+    } catch {
+      state.failed = true;
+    }
+    drawFestivals();
+    if (!state.failed && state.done < YEAR_DAYS) setTimeout(step, 0);
+  };
+  setTimeout(step, 30);
+}
+
+// Draws the Panchanga-tab banners and the Special Days lists from `fest`.
+function drawFestivals() {
+  if (!fest) return;
+  const { c, ref, found, muhurthas, done, failed, cut } = fest;
+  const list = c.panchanga.festivals || [];
+  const bannerReady = done > UPCOMING_DAYS;
+  // HH:MM, with the date added when it isn't on `on`.
+  const hm = (iso, on = ref) => {
+    const [d, tm] = iso.split("T");
+    if (d === on) return tm.slice(0, 5);
+    const [, mo, day] = d.split("-");
+    return `${tm.slice(0, 5)} (${Number(day)} ${monthShort(Number(mo) - 1)})`;
+  };
+  const timeText = (tt, day = ref) =>
+    `${esc(tr(tt.label, "label"))}: <strong>${tt.at ? hm(tt.at, day) : `${hm(tt.start, day)} – ${hm(tt.end, day)}`}</strong>`;
+  const note = (msg) => `<div class="festival-note">${esc(msg)}</div>`;
+
+  // Today's festivals, then the next 7 days.
+  const today = list.map((f) => `
+    <div class="festival">
+      <div class="festival-name">${esc(tr(f.name, "festival"))}${f.region ? ` <span class="festival-region">${esc(tr(f.region, "region"))}</span>` : ""}</div>
+      ${f.times.map((tt) => `<div class="festival-time">${timeText(tt)}</div>`).join("")}
+      ${f.note ? `<div class="festival-note">${esc(tr(f.note, "note"))}</div>` : ""}
+    </div>`).join("");
+  const upTitle = `<div class="upcoming-title">${esc(t("Coming up (next {n} days)", { n: UPCOMING_DAYS }))}</div>`;
+  let upcoming;
+  if (!bannerReady) upcoming = failed ? note(t("Couldn't calculate upcoming festivals.")) : note(t("Checking…"));
+  else {
     const rows = found.filter((u) => u.date !== ref && u.date < cut).map((u) => {
       const items = u.festivals.map((f) => `<div class="upcoming-festival">${festivalNames([f])}${f.times.length
-        ? `<div class="upcoming-times">${f.times.map((t) => timeText(t, u.date)).join(" · ")}</div>` : ""}</div>`).join("");
+        ? `<div class="upcoming-times">${f.times.map((tt) => timeText(tt, u.date)).join(" · ")}</div>` : ""}</div>`).join("");
       return `<li><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${items}</div></li>`;
     });
-    if (failed) box.querySelector(".festival-note").textContent = "Couldn't calculate upcoming festivals.";
-    else if (!rows.length) box.querySelector(".festival-note").textContent = `No festivals in the next ${UPCOMING_DAYS} days.`;
-    else box.innerHTML = `<div class="upcoming-title">Coming up (next ${UPCOMING_DAYS} days)</div><ul class="upcoming-list">${rows.join("")}</ul>`;
-  };
-
-  const showYear = (status) => {
-    let html = "", month = "";
-    for (const u of found) {
-      const fd = festivalDate(u.date);
-      const key = `${fd.y}-${fd.m}`;
-      if (key !== month) {
-        html += `${month ? "</ul>" : ""}<h3 class="year-month">${MONTH_NAMES[fd.m - 1]} ${fd.y}</h3><ul class="upcoming-list">`;
-        month = key;
-      }
-      html += `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${fd.label}</span> ${festivalNames(u.festivals)}</li>`;
-    }
-    if (month) html += "</ul>";
-    if (status) html += `<p class="hint">${esc(status)}</p>`;
-    $("festivalYear").innerHTML = html;
-    showMuhurthas(status);
-  };
+    upcoming = rows.length ? `<ul class="upcoming-list">${rows.join("")}</ul>`
+      : note(t("No festivals in the next {n} days.", { n: UPCOMING_DAYS }));
+  }
+  $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">${upTitle}${upcoming}</div>`;
+  $("festivals").hidden = false;
 
   const muhurthaRow = ({ date, m }) => {
-    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join("");
+    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span>`).join("");
     return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
-        <div>${esc(m.paksha)} · ${esc(m.tithi)} · ${esc(m.nakshatra)}</div>
+        <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))}</div>
         <div class="upcoming-times">${wins}</div></div></li>`;
   };
 
   // Muhurtham days from the entered date through the next UPCOMING_DAYS days.
-  const showMuhurthaBanner = (failed) => {
-    const box = $("muhurthaBanner");
-    const title = `<div class="upcoming-title">Shubha Muhurtham (next ${UPCOMING_DAYS} days)</div>`;
+  const mTitle = `<div class="upcoming-title">${esc(t("Shubha Muhurtham (next {n} days)", { n: UPCOMING_DAYS }))}</div>`;
+  let mBody;
+  if (!bannerReady) mBody = failed ? note(t("Couldn't calculate muhurtham days.")) : note(t("Checking…"));
+  else {
     const rows = muhurthas.filter((u) => u.date < cut).map(muhurthaRow);
-    if (failed) box.innerHTML = title + `<div class="festival-note">Couldn't calculate muhurtham days.</div>`;
-    else if (!rows.length) box.innerHTML = title + `<div class="festival-note">No muhurtham days in the next ${UPCOMING_DAYS} days.</div>`;
-    else box.innerHTML = title + `<ul class="upcoming-list muhurtha-list">${rows.join("")}</ul>`;
-  };
+    mBody = rows.length ? `<ul class="upcoming-list muhurtha-list">${rows.join("")}</ul>`
+      : note(t("No muhurtham days in the next {n} days.", { n: UPCOMING_DAYS }));
+  }
+  $("muhurthaBanner").innerHTML = mTitle + mBody;
+  $("muhurthaBanner").hidden = false;
 
-  const showMuhurthas = (status) => {
+  // Special Days tab: the year, month by month.
+  const status = failed ? t("Couldn't calculate the remaining festivals.")
+    : done < YEAR_DAYS ? t("Calculating…") : "";
+  const byMonth = (items, ulClass, row) => {
     let html = "", month = "";
-    for (const u of muhurthas) {
+    for (const u of items) {
       const fd = festivalDate(u.date);
       const key = `${fd.y}-${fd.m}`;
       if (key !== month) {
-        html += `${month ? "</ul>" : ""}<h3 class="year-month">${MONTH_NAMES[fd.m - 1]} ${fd.y}</h3><ul class="upcoming-list muhurtha-list">`;
+        html += `${month ? "</ul>" : ""}<h3 class="year-month">${monthLong(fd.m - 1)} ${fd.y}</h3><ul class="${ulClass}">`;
         month = key;
       }
-      html += muhurthaRow(u);
+      html += row(u);
     }
-    if (month) html += "</ul>";
-    if (status) html += `<p class="hint">${esc(status)}</p>`;
-    else if (!muhurthas.length) html += `<p class="hint">No shubha muhurtham days found.</p>`;
-    $("muhurthaYear").innerHTML = html;
+    return month ? html + "</ul>" : html;
   };
-
-  const step = () => {
-    if (seq !== festivalSeq) return; // a newer chart replaced this one
-    try {
-      const end = Math.min(done + CHUNK_DAYS, YEAR_DAYS);
-      for (; done < end; done++) {
-        const w = midnight + done * 86400e3;
-        const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset);
-        if (festivals.length) found.push({ date: isoFromWall(w).slice(0, 10), festivals });
-        const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
-        if (m) muhurthas.push({ date: isoFromWall(w).slice(0, 10), m });
-      }
-    } catch {
-      if (!bannerDone) { showUpcoming(true); showMuhurthaBanner(true); }
-      showYear("Couldn't calculate the remaining festivals.");
-      return;
-    }
-    if (!bannerDone && done > UPCOMING_DAYS) { bannerDone = true; showUpcoming(false); showMuhurthaBanner(false); }
-    if (done < YEAR_DAYS) {
-      showYear("Calculating…");
-      setTimeout(step, 0);
-    } else {
-      showYear(found.length ? "" : "No festivals found.");
-    }
-  };
-  setTimeout(step, 30);
+  const place = $("place").value.trim();
+  $("festivalPlace").textContent = place ? `· ${place}` : "";
+  $("festivalYear").innerHTML = byMonth(found, "upcoming-list", (u) =>
+    `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span> ${festivalNames(u.festivals)}</li>`)
+    + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
+  $("muhurthaYear").innerHTML = byMonth(muhurthas, "upcoming-list muhurtha-list", muhurthaRow)
+    + (status ? `<p class="hint">${esc(status)}</p>` : !muhurthas.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "");
 }
 
 function renderPositions(c) {
   const signs = c.constants.signs, abbr = c.constants.sign_abbr;
   const rows = c.bodies.map((b) => `
     <tr class="${b.key === "lagna" ? "lagna" : ""}">
-      <td>${esc(b.name)}${b.retro ? '<span class="retro-tag" title="Retrograde">R</span>' : ""}</td>
-      <td>${esc(signs[b.sign])}</td>
+      <td>${esc(tr(b.name, "planet"))}${b.retro ? `<span class="retro-tag" title="${esc(t("Retrograde"))}">${esc(t("R"))}</span>` : ""}</td>
+      <td>${esc(tr(signs[b.sign], "sign"))}</td>
       <td class="num">${esc(b.dms.text)}</td>
-      <td>${esc(b.nakshatra.name)}</td>
+      <td>${esc(tr(b.nakshatra.name, "nakshatra"))}</td>
       <td>${b.nakshatra.pada}</td>
-      <td>${esc(b.nakshatra.lord)}</td>
-      <td>${esc(abbr[b.navamsa])}</td>
-      <td>${esc(b.karaka || "")}</td>
+      <td>${esc(tr(b.nakshatra.lord, "planet"))}</td>
+      <td>${esc(tr(abbr[b.navamsa], "signAbbr"))}</td>
+      <td>${esc(tr(b.karaka || "", "karaka"))}</td>
     </tr>`).join("");
   $("positions").innerHTML = `
-    <thead><tr><th>Body</th><th>Rasi</th><th>Longitude</th><th>Nakshatra</th><th>Pada</th>
-    <th>Nak. lord</th><th>Navamsa</th><th>Karaka</th></tr></thead>
+    <thead><tr>${["Body", "Rasi", "Longitude|table", "Nakshatra", "Pada", "Nak. lord", "Navamsa", "Karaka"]
+      .map((h) => `<th>${esc(t(h))}</th>`).join("")}</tr></thead>
     <tbody>${rows}</tbody>`;
 }
 
 function renderBhavaTable(c) {
   const abbr = c.constants.sign_abbr;
   const occupants = {};
-  for (const b of c.bodies) if (b.key !== "lagna") (occupants[b.house] ||= []).push(b.abbr);
-  const cell = (sign, d) => `<td class="num">${abbr[sign]} ${esc(d.text)}</td>`;
+  for (const b of c.bodies) if (b.key !== "lagna") (occupants[b.house] ||= []).push(tr(b.abbr, "planetAbbr"));
+  const cell = (sign, d) => `<td class="num">${esc(tr(abbr[sign], "signAbbr"))} ${esc(d.text)}</td>`;
   const rows = c.bhavas.map((h) => `
     <tr><td>${h.house}</td>${cell(h.start_sign, h.start_dms)}${cell(h.mid_sign, h.mid_dms)}${cell(h.end_sign, h.end_dms)}
     <td>${esc((occupants[h.house] || []).join(", "))}</td></tr>`).join("");
   $("bhavaTable").innerHTML = `
-    <thead><tr><th>House</th><th>Start (sandhi)</th><th>Middle (madhya)</th><th>End</th><th>Planets</th></tr></thead>
+    <thead><tr>${["House", "Start (sandhi)", "Middle (madhya)", "End", "Planets"]
+      .map((h) => `<th>${esc(t(h))}</th>`).join("")}</tr></thead>
     <tbody>${rows}</tbody>`;
-  $("bhavaLabel").textContent = `· ${c.settings.bhava_label}`;
+  $("bhavaLabel").textContent = `· ${tr(c.settings.bhava_label, "bhava")}`;
 }
 
 // ---------- tabs ----------
@@ -592,7 +591,7 @@ let selectedMd = 0;
 
 function fmtDate(iso) {
   const [y, m, d] = iso.slice(0, 10).split("-");
-  return `${Number(d)} ${MONTHS[Number(m) - 1]} ${y}`;
+  return `${Number(d)} ${monthShort(Number(m) - 1)} ${y}`;
 }
 
 function fmtSpan(startIso, endIso) {
@@ -601,7 +600,8 @@ function fmtSpan(startIso, endIso) {
   const rest = days - y * 365.2425;
   const m = Math.floor(rest / 30.436875);
   const d = Math.round(rest - m * 30.436875);
-  return [y && `${y}y`, m && `${m}m`, d && `${d}d`].filter(Boolean).join(" ") || "0d";
+  const [uy, um, ud] = spanUnits();
+  return [y && `${y}${uy}`, m && `${m}${um}`, d && `${d}${ud}`].filter(Boolean).join(" ") || `0${ud}`;
 }
 
 const isCurrent = (p, today) => p.start.slice(0, 10) <= today && today < p.end.slice(0, 10);
@@ -613,8 +613,8 @@ function periodRow(tag, cls, p, label, now) {
   row.innerHTML = `
     <span class="row-head"><span class="lord">${esc(label)}</span>
       <span class="dur">${esc(fmtSpan(p.start, p.end))}</span>
-      ${now ? '<span class="now-tag">now</span>' : ""}</span>
-    <span class="row-dates"${p.actualStart ? ` title="Began ${fmtDate(p.actualStart)}, before the entered date"` : ""}>${fmtDate(p.start)} – ${fmtDate(p.end)}</span>`;
+      ${now ? `<span class="now-tag">${esc(t("now"))}</span>` : ""}</span>
+    <span class="row-dates"${p.actualStart ? ` title="${esc(t("Began {date}, before the entered date", { date: fmtDate(p.actualStart) }))}"` : ""}>${fmtDate(p.start)} – ${fmtDate(p.end)}</span>`;
   return row;
 }
 
@@ -626,23 +626,24 @@ function clipDashas(mahadashas, from) {
   }));
 }
 
-function renderDasha(c) {
+function renderDasha(c, keepMd = null) {
   dashaData = { ...c.vimshottari, mahadashas: clipDashas(c.vimshottari.mahadashas, c.input.local_time) };
   const mds = dashaData.mahadashas, today = todayIso();
-  $("dashaBalance").textContent = mds.length ? `· balance remaining: ${mds[0].name} ${fmtSpan(mds[0].start, mds[0].end)}` : "";
+  $("dashaBalance").textContent = mds.length
+    ? t("· balance remaining: {lord} {span}", { lord: tr(mds[0].name, "planet"), span: fmtSpan(mds[0].start, mds[0].end) }) : "";
 
   const list = $("mdList");
   list.innerHTML = "";
   mds.forEach((md, i) => {
     const li = document.createElement("li");
-    const btn = periodRow("button", "md-row", md, md.name, isCurrent(md, today));
+    const btn = periodRow("button", "md-row", md, tr(md.name, "planet"), isCurrent(md, today));
     btn.type = "button";
     btn.addEventListener("click", () => selectMahadasha(i));
     li.appendChild(btn);
     list.appendChild(li);
   });
   const cur = mds.findIndex((md) => isCurrent(md, today));
-  selectMahadasha(cur >= 0 ? cur : 0);
+  selectMahadasha(keepMd ?? (cur >= 0 ? cur : 0));
 }
 
 function selectMahadasha(i) {
@@ -652,12 +653,12 @@ function selectMahadasha(i) {
     el.classList.toggle("selected", j === i);
     el.setAttribute("aria-pressed", String(j === i));
   });
-  $("adTitle").textContent = `Antardashas in ${md.name} mahadasha`;
+  $("adTitle").textContent = t("Antardashas in {lord} mahadasha", { lord: tr(md.name, "planet") });
   const list = $("adList");
   list.innerHTML = "";
   for (const ad of md.antardashas) {
     const now = isCurrent(ad, today);
-    const li = periodRow("li", `ad-row${now ? " current" : ""}`, ad, `${md.name} – ${ad.name}`, now);
+    const li = periodRow("li", `ad-row${now ? " current" : ""}`, ad, `${tr(md.name, "planet")} – ${tr(ad.name, "planet")}`, now);
     list.appendChild(li);
   }
   drawDashaLinks();
@@ -696,13 +697,13 @@ async function calculate(e) {
     date: $("date").value, time: $("time").value, lat: $("lat").value, lon: $("lon").value,
     ayanamsa: $("ayanamsa").value, bhava: $("bhava").value,
   };
-  if (!params.date || !params.time) return showError("Enter a date and time.");
-  if (params.lat === "" || params.lon === "") return showError("Search for a place or enter latitude and longitude.");
+  if (!params.date || !params.time) return showError(t("Enter a date and time."));
+  if (params.lat === "" || params.lon === "") return showError(t("Search for a place or enter latitude and longitude."));
   const lat = Number(params.lat), lon = Number(params.lon);
-  if (!(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180)) return showError("Latitude must be within ±90 and longitude within ±180.");
-  if (offset != null && !(Math.abs(offset) <= 14)) return showError("UTC offset must be within ±14 hours.");
+  if (!(Math.abs(lat) <= 90) || !(Math.abs(lon) <= 180)) return showError(t("Latitude must be within ±90 and longitude within ±180."));
+  if (offset != null && !(Math.abs(offset) <= 14)) return showError(t("UTC offset must be within ±14 hours."));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(params.date) || !/^\d{1,2}:\d{2}(:\d{2})?$/.test(params.time)) {
-    return showError("Date must be YYYY-MM-DD and time HH:MM[:SS]");
+    return showError(t("Date must be YYYY-MM-DD and time HH:MM[:SS]"));
   }
 
   $("go").disabled = true;
@@ -740,15 +741,58 @@ async function calculate(e) {
   }
 }
 
-async function init() {
-  $("datefmt").textContent = `(${dateFormatHint()})`;
-  const opts = {
-    ayanamsas: Object.fromEntries(Object.entries(AYANAMSAS).map(([k, v]) => [k, v[0]])),
-    bhava_methods: BHAVA_METHODS,
-  };
-  for (const [id, map] of [["ayanamsa", opts.ayanamsas], ["bhava", opts.bhava_methods]]) {
-    $(id).innerHTML = Object.entries(map).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("");
+// ---------- language ----------
+
+function fillSelects() {
+  const sets = [
+    ["ayanamsa", Object.fromEntries(Object.entries(AYANAMSAS).map(([k, v]) => [k, v[0]])), "ayanamsa"],
+    ["bhava", BHAVA_METHODS, "bhava"],
+  ];
+  for (const [id, map, ns] of sets) {
+    const keep = $(id).value;
+    $(id).innerHTML = Object.entries(map).map(([k, v]) => `<option value="${k}">${esc(tr(v, ns))}</option>`).join("");
+    if (keep) $(id).value = keep;
   }
+}
+
+// Static text in index.html carries its English key in data-i18n attributes.
+function applyStaticText() {
+  for (const n of document.querySelectorAll("[data-i18n]")) n.textContent = t(n.dataset.i18n);
+  for (const n of document.querySelectorAll("[data-i18n-ph]")) n.placeholder = t(n.dataset.i18nPh);
+  for (const n of document.querySelectorAll("[data-i18n-title]")) n.title = t(n.dataset.i18nTitle);
+  for (const n of document.querySelectorAll("[data-i18n-aria]")) n.setAttribute("aria-label", t(n.dataset.i18nAria));
+  $("footer").innerHTML = FOOTER[getLang()];
+  $("datefmt").textContent = `(${dateFormatHint()})`;
+  document.title = t("Vedic Chart");
+  const toTamil = getLang() !== "ta";
+  $("lang").textContent = toTamil ? "தமிழ்" : "English";
+  $("lang").lang = toTamil ? "ta" : "en";
+  $("lang").setAttribute("aria-label", toTamil ? "தமிழில் காட்டு" : "Show in English");
+}
+
+function switchLanguage(l) {
+  setLang(l);
+  applyStaticText();
+  fillSelects();
+  showTzNote(tzNoteText);
+  const c = lastChart;
+  if (!c || $("output").hidden) return;
+  renderSummary(c);
+  renderPanchanga(c);
+  drawFestivals();
+  renderCharts(c);
+  renderPositions(c);
+  renderBhavaTable(c);
+  renderDasha(c, selectedMd);
+  drawDashaLinks();
+}
+
+async function init() {
+  const qsLang = new URLSearchParams(location.search).get("lang");
+  setLang(qsLang || savedLang());
+  applyStaticText();
+  fillSelects();
+  $("lang").addEventListener("click", () => switchLanguage(getLang() === "ta" ? "en" : "ta"));
   loadPrefs();
   // URL parameters (?date=..&time=..&lat=..&lon=..) override the device defaults.
   const qs = new URLSearchParams(location.search);

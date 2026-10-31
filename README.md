@@ -6,6 +6,7 @@ A web app for Vedic astrology. Enter a place, date and time to get:
 - **Festivals** on the entered date and place, plus those in the next 7 days (Diwali, Ugadi, Pongal, Tamil New Year, Vishu, Onam, Janmashtami, Ganesh Chaturthi, Navaratri, Maha Shivaratri, Holi, Rig/Yajur/Sama Upakarma, Gayatri Japam, Soora Samharam, Karadaiyan Nonbu, Maasi Magam and more), with puja timings such as pradosha, madhyahna and nishita windows, and the shubha muhurtham days in the same 7 days; a **Special Days** tab lists every festival for the year from the entered date, month by month, and the year's **Shubha Muhurtham** days (Tamil calendar style, Valarpirai and Theipirai) with their time windows by lagna
 - **Charts**: South Indian Rasi (D1) and Navamsa (D9), planetary degrees, nakshatras, chara karakas, and a bhava (house) table
 - **Vimshottari dasha**: mahadashas and antardashas with dates
+- **English or Tamil**: a button in the header switches the whole page to Tamil (தமிழ்), including panchanga terms, festival names and dates; the choice is remembered, and `?lang=ta` opens the page in Tamil
 
 All calculations run **in the browser** using the [Swiss Ephemeris](https://www.astro.com/swisseph/) compiled to WebAssembly. Birth details never leave the device; the only network requests are optional OpenStreetMap place lookups. After the first visit the app works offline and can be added to a phone's home screen.
 
@@ -28,6 +29,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
 
 - `docs/`: the browser app (served by GitHub Pages)
   - `js/astro.js`, `js/shadbala.js`, `js/dasha.js`: calculations
+  - `js/i18n.js`: English and Tamil display text; the calculations always produce English names, which the page translates when it draws
   - `js/tz.js`: time zone and historical UTC offset for a place
   - `js/places.js`: offline place autocomplete and OpenStreetMap search
   - `js/festivals.js`: festival rules
@@ -35,7 +37,7 @@ The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
   - `data/places.tsv`: [GeoNames](https://www.geonames.org/) towns with population ≥ 1000 (CC BY 4.0)
   - `vendor/tz-lookup.js`: [@photostructure/tz-lookup](https://github.com/photostructure/tz-lookup) (CC0)
 - `app/`: the Python reference implementation (FastAPI + pyswisseph) that the JavaScript is checked against
-- `tools/`: build scripts (`build_wasm.sh`, `build_places.py`, `make_emblem.py`, `make_icons.sh`) and `parity.py`, which runs both implementations on a set of test charts and compares every value
+- `tools/`: build scripts (`build_wasm.sh`, `build_places.py`, `make_emblem.py`, `make_icons.sh`) `i18n_check.mjs`, which makes sure every festival name, label and interface phrase has Tamil text and that two years of output translate fully, and `parity.py`, which runs both implementations on a set of test charts and compares every value
 - `tests/`: pytest suite, including the JavaScript/Python parity check
 
 ## Running locally

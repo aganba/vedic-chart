@@ -16,52 +16,53 @@
     <span class="emblem" role="img" aria-label="Om Ganesha"></span>
   </div>
   <header class="topbar">
-    <h1>Vedic Chart</h1>
-    <span class="sub">Panchanga · Charts · Vimshottari Dasha</span>
+    <h1 data-i18n="Vedic Chart">Vedic Chart</h1>
+    <span class="sub" data-i18n="Panchanga · Charts · Vimshottari Dasha">Panchanga · Charts · Vimshottari Dasha</span>
+    <button type="button" id="lang" class="secondary lang-toggle" lang="ta" aria-label="தமிழில் காட்டு">தமிழ்</button>
   </header>
 
   <main>
     <form id="form" class="card form" autocomplete="off">
       <div class="field wide place">
-        <label for="place">Place</label>
+        <label for="place" data-i18n="Place">Place</label>
         <div class="row">
-          <input id="place" type="text" placeholder="Start typing a city or town">
-          <button type="button" id="search" class="secondary">Search</button>
+          <input id="place" type="text" placeholder="Start typing a city or town" data-i18n-ph="Start typing a city or town">
+          <button type="button" id="search" class="secondary" data-i18n="Search">Search</button>
         </div>
         <ul id="results" class="results" hidden></ul>
       </div>
       <div class="field">
-        <label for="date">Date <span class="muted" id="datefmt"></span></label>
+        <label for="date"><span data-i18n="Date">Date</span> <span class="muted" id="datefmt"></span></label>
         <input id="date" type="date" required>
       </div>
       <div class="field">
-        <label for="time">Time <span class="muted">(local)</span></label>
+        <label for="time"><span data-i18n="Time">Time</span> <span class="muted" data-i18n="(local)">(local)</span></label>
         <input id="time" type="time" step="1" required>
       </div>
       <div class="field">
-        <label for="lat">Latitude <span class="muted">(N +)</span></label>
+        <label for="lat"><span data-i18n="Latitude">Latitude</span> <span class="muted" data-i18n="(N +)">(N +)</span></label>
         <input id="lat" type="number" step="any" min="-90" max="90" required>
       </div>
       <div class="field">
-        <label for="lon">Longitude <span class="muted">(E +)</span></label>
+        <label for="lon"><span data-i18n="Longitude">Longitude</span> <span class="muted" data-i18n="(E +)">(E +)</span></label>
         <input id="lon" type="number" step="any" min="-180" max="180" required>
       </div>
       <div class="field">
-        <label for="offset">UTC offset <span class="muted" id="tzname"></span></label>
-        <input id="offset" type="text" placeholder="auto, e.g. +05:30" pattern="[+-]?\d{1,2}(:\d{2})?">
+        <label for="offset"><span data-i18n="UTC offset">UTC offset</span> <span class="muted" id="tzname"></span></label>
+        <input id="offset" type="text" placeholder="auto, e.g. +05:30" data-i18n-ph="auto, e.g. +05:30" pattern="[+-]?\d{1,2}(:\d{2})?">
       </div>
       <div class="field">
-        <label for="ayanamsa">Ayanamsa</label>
+        <label for="ayanamsa" data-i18n="Ayanamsa">Ayanamsa</label>
         <select id="ayanamsa"></select>
       </div>
       <div class="field">
-        <label for="bhava">Bhava method</label>
+        <label for="bhava" data-i18n="Bhava method">Bhava method</label>
         <select id="bhava"></select>
       </div>
       <div class="field actions">
         <div class="row">
-          <button type="button" id="now" class="secondary" title="Current date, time and location">Now</button>
-          <button type="submit" id="go">Calculate</button>
+          <button type="button" id="now" class="secondary" title="Current date, time and location" data-i18n-title="Current date, time and location" data-i18n="Now">Now</button>
+          <button type="submit" id="go" data-i18n="Calculate">Calculate</button>
         </div>
       </div>
       <p id="tznote" class="warn" hidden></p>
@@ -71,16 +72,16 @@
     <section id="output" hidden>
       <div class="card summary" id="summary"></div>
 
-      <div class="tabs" role="tablist" aria-label="Chart sections">
-        <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true">Panchanga</button>
-        <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false">Special Days</button>
-        <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false">Birth Chart</button>
+      <div class="tabs" role="tablist" aria-label="Chart sections" data-i18n-aria="Chart sections">
+        <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true" data-i18n="Panchanga">Panchanga</button>
+        <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false" data-i18n="Special Days">Special Days</button>
+        <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false" data-i18n="Birth Chart">Birth Chart</button>
       </div>
 
       <div role="tabpanel" id="panel-panchanga" aria-labelledby="tab-panchanga">
         <div class="panchanga-layout">
           <div class="card">
-            <h2>Panchanga</h2>
+            <h2 data-i18n="Panchanga">Panchanga</h2>
             <dl class="panchanga" id="panchanga"></dl>
           </div>
           <div class="banner-col">
@@ -93,28 +94,28 @@
       <div role="tabpanel" id="panel-chart" aria-labelledby="tab-chart" hidden>
         <div class="charts">
           <div class="card chart-card">
-            <h2>Rasi chart (D1)</h2>
-            <svg id="rasi" viewBox="0 0 400 400" role="img" aria-label="Rasi chart"></svg>
+            <h2 data-i18n="Rasi chart (D1)">Rasi chart (D1)</h2>
+            <svg id="rasi" viewBox="0 0 400 400" role="img" aria-label="Rasi chart" data-i18n-aria="Rasi chart"></svg>
           </div>
           <div class="card chart-card">
-            <h2>Navamsa chart (D9)</h2>
-            <svg id="navamsa" viewBox="0 0 400 400" role="img" aria-label="Navamsa chart"></svg>
+            <h2 data-i18n="Navamsa chart (D9)">Navamsa chart (D9)</h2>
+            <svg id="navamsa" viewBox="0 0 400 400" role="img" aria-label="Navamsa chart" data-i18n-aria="Navamsa chart"></svg>
           </div>
         </div>
 
         <div class="card">
-          <h2>Planetary positions</h2>
+          <h2 data-i18n="Planetary positions">Planetary positions</h2>
           <div class="table-wrap"><table id="positions"></table></div>
         </div>
 
         <div class="card">
-          <h2>Bhavas <span class="muted" id="bhavaLabel"></span></h2>
+          <h2><span data-i18n="Bhavas">Bhavas</span> <span class="muted" id="bhavaLabel"></span></h2>
           <div class="table-wrap"><table id="bhavaTable"></table></div>
         </div>
 
         <div class="card">
-          <h2>Vimshottari Dasha <span class="muted" id="dashaBalance"></span></h2>
-          <p class="hint">Select a mahadasha to see its antardashas (bhuktis).</p>
+          <h2><span data-i18n="Vimshottari Dasha">Vimshottari Dasha</span> <span class="muted" id="dashaBalance"></span></h2>
+          <p class="hint" data-i18n="Select a mahadasha to see its antardashas (bhuktis).">Select a mahadasha to see its antardashas (bhuktis).</p>
           <div class="dasha" id="dasha">
             <ol class="md-list" id="mdList"></ol>
             <svg class="dasha-links" id="dashaLinks" aria-hidden="true"></svg>
@@ -129,12 +130,12 @@
       <div role="tabpanel" id="panel-festivals" aria-labelledby="tab-festivals" hidden>
         <div class="special-layout">
         <div class="card">
-          <h2>Festivals <span class="muted" id="festivalPlace"></span></h2>
+          <h2><span data-i18n="Festivals">Festivals</span> <span class="muted" id="festivalPlace"></span></h2>
           <div id="festivalYear"></div>
         </div>
         <div class="card muhurtha-card">
-          <h2>Shubha Muhurtham</h2>
-          <p class="hint">Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.</p>
+          <h2 data-i18n="Shubha Muhurtham">Shubha Muhurtham</h2>
+          <p class="hint" data-i18n="Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren&#39;t considered, and panchangams differ, so confirm with your family astrologer.">Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.</p>
           <div id="muhurthaYear"></div>
         </div>
         </div>
@@ -142,7 +143,7 @@
     </section>
   </main>
 
-  <footer class="site-footer">
+  <footer class="site-footer" id="footer">
     Calculations run on your device using the <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0).
     Place names from <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0) and
     <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
