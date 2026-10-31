@@ -38,7 +38,7 @@ body {
 }
 .topbar {
   display: flex; align-items: baseline; gap: 12px;
-  padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top));
+  padding: 6px 16px 14px;
   border-bottom: 1px solid var(--line);
 }
 .topbar h1 { margin: 0; font-size: 20px; color: var(--accent); }
@@ -169,3 +169,7 @@ td.weak { color: var(--lagna); }
 
 .site-footer { max-width: 1100px; margin: 8px auto 24px; padding: 0 16px; color: var(--muted); font-size: 12px; }
 .site-footer a { color: var(--muted); }
+
+.invocation { display: flex; justify-content: center; padding: max(10px, env(safe-area-inset-top)) 16px 0; color: var(--accent); }
+.invocation svg { width: 52px; height: 52px; }
+.invocation .ear { opacity: 0.7; }
