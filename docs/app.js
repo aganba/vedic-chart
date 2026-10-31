@@ -476,7 +476,7 @@ function renderFestivals(c) {
   };
 
   const muhurthaRow = ({ date, m }) => {
-    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join(" · ");
+    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(w.lagna)} lagna</span>`).join("");
     return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
         <div>${esc(m.paksha)} · ${esc(m.tithi)} · ${esc(m.nakshatra)}</div>
         <div class="upcoming-times">${wins}</div></div></li>`;
