@@ -9,6 +9,8 @@
 //    Shravana, Uttara Bhadrapada, Revati.
 //  - Weekday: not Tuesday or Saturday.
 //  - Tamil month: not Aadi, Purattasi or Margazhi (Sun in Karka, Kanya, Dhanu).
+//  - Not a Kari naal: the fixed inauspicious days of each Tamil month, as
+//    printed in Tamil calendars (KARI_NAAL below).
 //  - Not in Rahu Kalam, Yamaganda, Gulika Kalam or Vishti (Bhadra) karana.
 //  - Ashtama shuddhi: no planet (Moon included) in the 8th house from the
 //    rising sign.
@@ -17,11 +19,18 @@
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
 import { NAK_SPAN, julFromWall, lagnaAndMc, localFromJul, planetLon } from "./astro.js";
+import { tamilDate } from "./festivals.js";
 
 const GOOD_TITHI = new Set([1, 2, 4, 5, 6, 9, 10, 11, 12, 16, 17, 19]); // 0 = Shukla Pratipada
 const GOOD_NAK = new Set([0, 3, 4, 6, 7, 9, 11, 12, 13, 14, 16, 18, 20, 21, 25, 26]);
 const BAD_WEEKDAY = new Set([2, 6]);
 const BAD_SUN_SIGN = new Set([3, 5, 8]);
+// Kari naal: days of each Tamil month, Chithirai first.
+const KARI_NAAL = {
+  Chithirai: [6, 15], Vaikasi: [7, 16, 17], Aani: [1, 6], Aadi: [2, 10, 20],
+  Avani: [2, 9, 28], Purattasi: [16, 29], Aippasi: [6, 20], Karthigai: [1, 10, 17],
+  Margazhi: [6, 9, 11], Thai: [1, 2, 3, 11, 17], Maasi: [15, 16, 17], Panguni: [6, 15, 19],
+};
 // 1-based eighth of daytime, by weekday (Sunday first); as in astro.js.
 const KALAMS = [[8, 2, 7, 5, 6, 4, 3], [5, 4, 3, 2, 1, 7, 6], [7, 6, 5, 4, 3, 2, 1]];
 const SLOW = [["sun", SE.SUN], ["mercury", SE.MERCURY], ["venus", SE.VENUS], ["mars", SE.MARS],
@@ -107,6 +116,9 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
   }
   const windows = raw.filter((w) => w.end - w.start >= MIN_LEN);
   if (!windows.length) return null;
+  // Checked last: finding the Tamil date means looking back to the month's start.
+  const td = tamilDate(dateWall, lat, lon, offset);
+  if (td && KARI_NAAL[td.month]?.includes(td.day)) return null;
   // Tithis and nakshatras across the windows (either can change inside one).
   const tithis = new Set(), naks = new Set();
   for (const w of windows) for (const jd of [w.start, w.end - 1e-5]) {

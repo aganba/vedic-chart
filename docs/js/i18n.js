@@ -22,7 +22,6 @@ const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars && k in vars ?
 
 const UI = {
   "Vedic Chart": "வேத ஜாதகம்",
-  "Panchanga · Charts": "பஞ்சாங்கம் · ஜாதகக் கட்டங்கள்",
   "Place": "இடம்",
   "Start typing a city or town": "ஊர் அல்லது நகரத்தின் பெயரை உள்ளிடவும்",
   "Search": "தேடு",
@@ -80,6 +79,9 @@ const UI = {
   "Rahu Kalam": "ராகு காலம்",
   "Yamaganda": "எமகண்டம்",
   "Gulika Kalam": "குளிகை காலம்",
+  "Hora": "ஓரை",
+  "day hora {n} of 12 · {from} – {to} · next {lord}": "பகல் ஓரை {n}/12 · {from} – {to} · அடுத்து {lord}",
+  "night hora {n} of 12 · {from} – {to} · next {lord}": "இரவு ஓரை {n}/12 · {from} – {to} · அடுத்து {lord}",
   "Ayanamsa: {name} = {value}": "அயனாம்சம்: {name} = {value}",
   "Chart": "ஜாதகம்",
   // festivals and muhurtham

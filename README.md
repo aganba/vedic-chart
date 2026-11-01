@@ -2,7 +2,7 @@
 
 A web app for Vedic astrology. Enter a place, date and time to get:
 
-- **Panchanga**: Tamil calendar date (month, day and year, e.g. Aippasi 14, Parabhava), vara, tithi, nakshatra (at the entered time and at sunrise), yoga, karana (with end times), lunar month, samvatsara, sunrise/sunset, Rahu Kalam, Yamaganda and Gulika Kalam
+- **Panchanga**: Tamil calendar date (month, day and year, e.g. Aippasi 14, Parabhava), vara, tithi, nakshatra (at the entered time and at sunrise), yoga, karana (with end times), hora (the planetary hour at the entered time), lunar month, samvatsara, sunrise/sunset, Rahu Kalam, Yamaganda and Gulika Kalam
 - **Festivals** on the entered date and place, plus those in the next 7 days (Diwali, Ugadi, Pongal, Tamil New Year, Vishu, Onam, Janmashtami, Ganesh Chaturthi, Navaratri, Maha Shivaratri, Holi, Rig/Yajur/Sama Upakarma, Gayatri Japam, Soora Samharam, Karadaiyan Nonbu, Maasi Magam and more), with puja timings such as pradosha, madhyahna and nishita windows, and the shubha muhurtham days in the same 7 days; a **Special Days** tab lists every festival for the year from the entered date, month by month, and the year's **Shubha Muhurtham** days (Tamil calendar style, Valarpirai and Theipirai) with their time windows by lagna
 - **Charts**: South Indian Rasi (D1) and Navamsa (D9), planetary degrees, nakshatras, chara karakas, and a bhava (house) table
 - **Vimshottari dasha**: mahadashas and antardashas with dates
@@ -14,15 +14,16 @@ All calculations run **in the browser** using the [Swiss Ephemeris](https://www.
 
 The defaults reproduce [Jagannatha Hora](https://www.vedicastrologer.org/jh/):
 
-- Ayanamsa: True Chitrapaksha (Lahiri, Raman and KP also available)
+- Ayanamsa: True Chitrapaksha (Lahiri, Raman and KP are implemented in the code but not offered on the page)
 - Planets: true geometric positions, mean node for Rahu
 - Lagna: apparent tropical ascendant minus the true-position ayanamsa without nutation
-- Bhavas: equal houses with the lagna at the middle of the 1st house (Sripati and Placidus also available)
+- Bhavas: equal houses with the lagna at the middle of the 1st house (Sripati and Placidus are implemented in the code but not offered on the page)
 - Chara karakas: the 8-karaka scheme, including Rahu
 - Vimshottari dasha: dasha years measured by the Sun's sidereal motion (t years = the Sun moving t × 360°)
+- Hora: the Vedic day's daytime and night are each split into 12 equal horas, ruled in the Chaldean order (Saturn, Jupiter, Mars, Sun, Venus, Mercury, Moon) starting from the vara lord at sunrise
 - Sunrise: upper limb of the Sun with standard refraction
 - Festivals: tithi festivals fall on the first day whose kaala (sunrise, madhyahna, aparahna, pradosha or nishita) lies in the tithi, in the amanta lunar month, never in an adhika month; Raksha Bandhan and Holika Dahan avoid Bhadra. Tamil and Malayalam months start on the day of the sankranti if it falls before 3/5 of the daytime; Makara Sankranti uses sunset. `tools/festival_check.mjs` checks 53 published 2025–2026 dates and scans both years to make sure no festival is reported twice.
-- Shubha muhurtham: good tithi (Valarpirai Dwitiya–Trayodashi except Chaturthi, Ashtami and Navami; Theipirai Dwitiya, Tritiya, Panchami), good nakshatra, not Tuesday or Saturday, not in Aadi, Purattasi or Margazhi; windows between sunrise and sunset outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti, with no planet in the 8th from the lagna. Panchangams disagree on the finer rules: against LiveChennai's published Valarpirai dates for Chennai this finds 19 of 29 (2025) and 19 of 28 (2026).
+- Shubha muhurtham: good tithi (Valarpirai Dwitiya–Trayodashi except Chaturthi, Ashtami and Navami; Theipirai Dwitiya, Tritiya, Panchami), good nakshatra, not Tuesday or Saturday, not in Aadi, Purattasi or Margazhi, not a Kari naal (the fixed inauspicious days of each Tamil month); windows between sunrise and sunset outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti, with no planet in the 8th from the lagna. Panchangams disagree on the finer rules: against LiveChennai's published Valarpirai dates for Chennai this finds 19 of 29 (2025) and 18 of 28 (2026); LiveChennai lists 20 April 2026 (Chithirai 6), a Kari naal.
 - Shadbala (computed but not shown on the page until it matches Jagannatha Hora on more charts): Brihat Parashara Hora Shastra rules, with the conventions listed at the top of `app/shadbala.py` (cyclic hora in Saptavargaja, Dig bala from the lagna, Ayana bala from the true obliquity, hora/abda/masa lords, Mercury's nature, special aspects by sign). Cheshta bala uses Surya Siddhanta mean motions with bija corrections. Planetary war (yuddha bala) is not applied.
 
 ## Layout

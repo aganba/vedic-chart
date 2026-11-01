@@ -1,7 +1,7 @@
 // Browser app: all calculations run locally (Swiss Ephemeris compiled to
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
-import { AYANAMSAS, BHAVA_METHODS, computeChart, isoFromWall, wallMs } from "./js/astro.js";
+import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { festivalsFor, tamilDate } from "./js/festivals.js";
 import { muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
@@ -18,8 +18,11 @@ const sweReady = initSwe(async (f) => {
 
 const $ = (id) => document.getElementById(id);
 const SVGNS = "http://www.w3.org/2000/svg";
-const STORE_KEY = "vedic-chart-input";
-const FIELDS = ["place", "date", "time", "lat", "lon", "offset", "ayanamsa", "bhava"];
+const FIELDS = ["place", "date", "time", "lat", "lon", "offset"];
+// The page always uses the Jagannatha Hora defaults. astro.js still supports the
+// other AYANAMSAS and BHAVA_METHODS if a choice is ever offered again.
+const AYANAMSA = "true_chitra";
+const BHAVA = "equal_mid";
 
 // South Indian chart: signs are fixed. [row, col] for Aries..Pisces.
 const SOUTH_POS = [
@@ -97,20 +100,6 @@ function showTzNote(msg) {
 function showError(msg) {
   $("error").textContent = msg || "";
   $("error").hidden = !msg;
-}
-
-// Only preferences persist; each visit starts at the current moment and place.
-function savePrefs() {
-  const data = { ayanamsa: $("ayanamsa").value, bhava: $("bhava").value };
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch {}
-}
-
-function loadPrefs() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORE_KEY) || "null") || {};
-    if (data.ayanamsa) $("ayanamsa").value = data.ayanamsa;
-    if (data.bhava) $("bhava").value = data.bhava;
-  } catch {}
 }
 
 // ---------- defaults from this device ----------
@@ -385,6 +374,10 @@ function renderPanchanga(c) {
         u: fmtTime(p.sunrise_nakshatra.end, ref), lord: tr(p.sunrise_nakshatra.lord, "planet") })]] : []),
     [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
     [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
+    ...(p.hora ? [[t("Hora"), tr(p.hora.lord, "planet"),
+      t(p.hora.night ? "night hora {n} of 12 · {from} – {to} · next {lord}" : "day hora {n} of 12 · {from} – {to} · next {lord}",
+        { n: p.hora.night ? p.hora.number - 12 : p.hora.number, from: fmtTime(p.hora.start, ref),
+          to: fmtTime(p.hora.end, ref), lord: tr(p.hora.next_lord, "planet") })]] : []),
     [t("Lunar month / year"), tr(p.masa, "masa"), t("{year} samvatsara (amanta)", { year: tr(p.samvatsara, "samvatsara") })],
     [t("Sunrise / Sunset"), `${fmtTime(p.sunrise, ref)} / ${fmtTime(p.sunset, ref)}`, t("next sunrise {t}", { t: fmtTime(p.next_sunrise, ref) })],
   ];
@@ -700,7 +693,6 @@ async function calculate(e) {
   try { offset = parseOffset($("offset").value); } catch (err) { return showError(err.message); }
   const params = {
     date: $("date").value, time: $("time").value, lat: $("lat").value, lon: $("lon").value,
-    ayanamsa: $("ayanamsa").value, bhava: $("bhava").value,
   };
   if (!params.date || !params.time) return showError(t("Enter a date and time."));
   if (params.lat === "" || params.lon === "") return showError(t("Search for a place or enter latitude and longitude."));
@@ -720,7 +712,7 @@ async function calculate(e) {
       tzInfo = timezoneFor(lat, lon, params.date, params.time);
       offset = tzInfo.offset;
     }
-    const c = computeChart(wallFromInputs(params.date, params.time), offset, lat, lon, params.ayanamsa, params.bhava);
+    const c = computeChart(wallFromInputs(params.date, params.time), offset, lat, lon, AYANAMSA, BHAVA);
     c.input.timezone = tzInfo.timezone;
     c.input.tz_note = tzInfo.note;
     lastChart = c;
@@ -738,7 +730,6 @@ async function calculate(e) {
     renderDasha(c);
     $("output").hidden = false;
     drawDashaLinks();
-    savePrefs();
   } catch (err) {
     showError(err.message);
   } finally {
@@ -747,18 +738,6 @@ async function calculate(e) {
 }
 
 // ---------- language ----------
-
-function fillSelects() {
-  const sets = [
-    ["ayanamsa", Object.fromEntries(Object.entries(AYANAMSAS).map(([k, v]) => [k, v[0]])), "ayanamsa"],
-    ["bhava", BHAVA_METHODS, "bhava"],
-  ];
-  for (const [id, map, ns] of sets) {
-    const keep = $(id).value;
-    $(id).innerHTML = Object.entries(map).map(([k, v]) => `<option value="${k}">${esc(tr(v, ns))}</option>`).join("");
-    if (keep) $(id).value = keep;
-  }
-}
 
 // Static text in index.html carries its English key in data-i18n attributes.
 function applyStaticText() {
@@ -778,7 +757,6 @@ function applyStaticText() {
 function switchLanguage(l) {
   setLang(l);
   applyStaticText();
-  fillSelects();
   showTzNote(tzNoteText);
   const c = lastChart;
   if (!c || $("output").hidden) return;
@@ -796,9 +774,7 @@ async function init() {
   const qsLang = new URLSearchParams(location.search).get("lang");
   setLang(qsLang || savedLang());
   applyStaticText();
-  fillSelects();
   $("lang").addEventListener("click", () => switchLanguage(getLang() === "ta" ? "en" : "ta"));
-  loadPrefs();
   // URL parameters (?date=..&time=..&lat=..&lon=..) override the device defaults.
   const qs = new URLSearchParams(location.search);
   const fromUrl = qs.has("date");

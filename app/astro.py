@@ -71,6 +71,9 @@ YOGAS = ["Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
          "Harshana", "Vajra", "Siddhi", "Vyatipata", "Variyan", "Parigha", "Shiva",
          "Siddha", "Sadhya", "Shubha", "Shukla", "Brahma", "Indra", "Vaidhriti"]
 MOVABLE_KARANAS = ["Bava", "Balava", "Kaulava", "Taitila", "Gara", "Vanija", "Vishti"]
+# Hora lords in descending order of speed, and each vara lord's place in it.
+HORA_ORDER = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"]
+HORA_START = [0, 3, 6, 2, 5, 1, 4]  # Sunday first
 VARAS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 VARA_SKT = ["Ravivara", "Somavara", "Mangalavara", "Budhavara", "Guruvara",
             "Shukravara", "Shanivara"]
@@ -298,6 +301,20 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
 
     nak = nakshatra_of(_moon(jd))
 
+    # Hora at the entered time: twelve equal parts of the Vedic day's daytime,
+    # then twelve of its night, ruled in the Chaldean order from the vara lord.
+    hora = None
+    if sunrise is not None and sunset is not None and next_sunrise is not None:
+        night = jd >= sunset
+        start, end = (sunset, next_sunrise) if night else (sunrise, sunset)
+        length = (end - start) / 12
+        i = min(11, int((jd - start) // length))
+        n = (12 if night else 0) + i
+        lord_at = lambda k: HORA_ORDER[(HORA_START[weekday] + k) % 7]
+        hora = {"lord": lord_at(n), "number": n + 1, "night": night,
+                "start": loc(start + i * length), "end": loc(start + (i + 1) * length),
+                "next_lord": lord_at(n + 1)}
+
     # Nakshatra at sunrise on the entered civil date.
     sunrise_nak = None
     if day_sunrise is not None:
@@ -317,6 +334,7 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
         "karana": {"name": _karana_name(kr), "end": loc(kr_end), "pct_left": round(kr_left * 100, 2)},
         "sunrise": loc(day_sunrise), "sunset": loc(day_sunset), "next_sunrise": loc(day_next_sunrise),
         **kalams,
+        "hora": hora,
         "_raw": {"sunrise": sunrise, "sunset": sunset, "next_sunrise": next_sunrise, "weekday": weekday},
     }
 

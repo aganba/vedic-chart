@@ -44,7 +44,6 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .topbar h1 { margin: 0; font-size: 20px; color: var(--accent); }
-.sub { color: var(--muted); font-size: 13px; }
 .topbar .lang-toggle { margin-left: auto; align-self: center; padding: 4px 12px; font-size: 14px; }
 /* Tamil words run longer: widen the date column and keep "today" in Tamil */
 :root[lang="ta"] .upcoming-date { min-width: 120px; }

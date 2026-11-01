@@ -60,6 +60,9 @@ const YOGAS = ["Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atig
   "Siddhi", "Vyatipata", "Variyan", "Parigha", "Shiva", "Siddha", "Sadhya", "Shubha", "Shukla",
   "Brahma", "Indra", "Vaidhriti"];
 const MOVABLE_KARANAS = ["Bava", "Balava", "Kaulava", "Taitila", "Gara", "Vanija", "Vishti"];
+// Hora lords in descending order of speed, and each vara lord's place in it.
+const HORA_ORDER = ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"];
+const HORA_START = [0, 3, 6, 2, 5, 1, 4]; // Sunday first
 const VARAS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const VARA_SKT = ["Ravivara", "Somavara", "Mangalavara", "Budhavara", "Guruvara",
   "Shukravara", "Shanivara"];
@@ -287,6 +290,20 @@ export function panchanga(jd, lat, lon, offset) {
 
   const nak = nakshatraOf(moonLon(jd));
 
+  // Hora at the entered time: twelve equal parts of the Vedic day's daytime,
+  // then twelve of its night, ruled in the Chaldean order from the vara lord.
+  let hora = null;
+  if (sunrise !== null && sunset !== null && nextSunrise !== null) {
+    const night = jd >= sunset;
+    const [from, to] = night ? [sunset, nextSunrise] : [sunrise, sunset];
+    const len = (to - from) / 12;
+    const i = Math.min(11, Math.floor((jd - from) / len));
+    const n = (night ? 12 : 0) + i;
+    const lordAt = (k) => HORA_ORDER[(HORA_START[weekday] + k) % 7];
+    hora = { lord: lordAt(n), number: n + 1, night, start: loc(from + i * len), end: loc(from + (i + 1) * len),
+      next_lord: lordAt(n + 1) };
+  }
+
   // Nakshatra at sunrise on the entered civil date.
   let sunriseNak = null;
   if (daySunrise !== null) {
@@ -307,6 +324,7 @@ export function panchanga(jd, lat, lon, offset) {
     karana: { name: karanaName(kr), end: loc(krEnd), pct_left: round2(krLeft * 100) },
     sunrise: loc(daySunrise), sunset: loc(daySunset), next_sunrise: loc(dayNextSunrise),
     ...kalams,
+    hora,
     _raw: { sunrise, sunset, next_sunrise: nextSunrise, weekday },
   };
 }
