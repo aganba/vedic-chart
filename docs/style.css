@@ -173,6 +173,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 
 .site-footer { max-width: 1100px; margin: 8px auto 24px; padding: 0 16px; color: var(--muted); font-size: 12px; }
 .site-footer a { color: var(--muted); }
+.site-footer .about { margin: 0 0 6px; }
 
 .invocation { display: flex; justify-content: center; padding: max(10px, env(safe-area-inset-top)) 16px 0; color: var(--accent); }
 /* The emblem SVG is used as a mask so it takes the theme's accent colour. */

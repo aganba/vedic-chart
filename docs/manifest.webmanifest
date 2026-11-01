@@ -1,7 +1,7 @@
 {
   "name": "Vedic Chart",
   "short_name": "Vedic Chart",
-  "description": "Panchanga, South Indian charts, Shadbala and Vimshottari dasha, calculated on your device.",
+  "description": "Panchangam, Tamil calendar, festivals, Shubha Muhurtham, South Indian charts, Shadbala and Vimshottari dasha, calculated on your device.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

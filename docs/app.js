@@ -745,7 +745,16 @@ function applyStaticText() {
   for (const n of document.querySelectorAll("[data-i18n-aria]")) n.setAttribute("aria-label", t(n.dataset.i18nAria));
   $("footer").innerHTML = FOOTER[getLang()];
   $("datefmt").textContent = `(${dateFormatHint()})`;
-  document.title = t("Vedic Chart");
+  // Search-result title, description and canonical URL for the current language.
+  document.title = t("Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
+  document.querySelector('meta[name="description"]').content = t("Free Vedic astrology app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Shadbala and Vimshottari dasha.");
+  let canon = document.querySelector('link[rel="canonical"]');
+  if (!canon) {
+    canon = document.createElement("link");
+    canon.rel = "canonical";
+    document.head.append(canon);
+  }
+  canon.href = "https://aganba.github.io/vedic-chart/" + (getLang() === "ta" ? "?lang=ta" : "");
   const toTamil = getLang() !== "ta";
   $("lang").textContent = toTamil ? "தமிழ்" : "English";
   $("lang").lang = toTamil ? "ta" : "en";
