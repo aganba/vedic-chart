@@ -747,7 +747,7 @@ function applyStaticText() {
   $("datefmt").textContent = `(${dateFormatHint()})`;
   // Search-result title, description and canonical URL for the current language.
   document.title = t("Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
-  document.querySelector('meta[name="description"]').content = t("Free Vedic astrology app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.");
+  document.querySelector('meta[name="description"]').content = t("Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.");
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) {
     canon = document.createElement("link");

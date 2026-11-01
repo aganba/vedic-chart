@@ -23,7 +23,7 @@ const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars && k in vars ?
 const UI = {
   "Vedic Chart": "வேத ஜாதகம்",
   "Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart": "வேத ஜாதகம் – இலவச பஞ்சாங்கம், தமிழ்த் தேதி, முகூர்த்தம், ஜாதகம்",
-  "Free Vedic astrology app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.": "இலவச வேத ஜோதிட செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.",
+  "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.": "இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.",
   "Place": "இடம்",
   "Start typing a city or town": "ஊர் அல்லது நகரத்தின் பெயரை உள்ளிடவும்",
   "Search": "தேடு",
@@ -141,12 +141,14 @@ export function t(key, vars) {
 
 // Footer with links, per language.
 export const FOOTER = {
-  en: `<p class="about">Free Vedic astrology app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.</p>
+  en: `<p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
+    <p class="about"><strong>Your data stays with you.</strong> No sign-up and no cookies, and your birth date and time never leave your device. The site counts anonymous page views only. Places not in the built-in list are looked up on OpenStreetMap.</p>
     Calculations run on your device using the <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0).
     Place names from <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0) and
     <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
     <a href="https://github.com/aganba/vedic-chart">Source code</a>.`,
-  ta: `<p class="about">இலவச வேத ஜோதிட செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.</p>
+  ta: `<p class="about">இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம். அச்சிட்ட பஞ்சாங்கம் கிடைக்காத இடங்களுக்காக உருவாக்கப்பட்டது: அனைத்தும் உங்கள் இருப்பிடத்துக்கும் உள்ளூர் நேரத்துக்கும் ஏற்பக் கணக்கிடப்படுகின்றன.</p>
+    <p class="about"><strong>உங்கள் தகவல் உங்களிடமே.</strong> பதிவு தேவையில்லை, குக்கீகள் இல்லை; உங்கள் பிறந்த தேதியும் நேரமும் உங்கள் சாதனத்தை விட்டு வெளியே செல்வதில்லை. பக்கப் பார்வைகள் மட்டும் அடையாளமின்றி எண்ணப்படுகின்றன. உள்ளமைந்த பட்டியலில் இல்லாத இடங்கள் OpenStreetMap-இல் தேடப்படுகின்றன.</p>
     கணக்கீடுகள் அனைத்தும் <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0) கொண்டு உங்கள் சாதனத்திலேயே செய்யப்படுகின்றன.
     இடப் பெயர்கள்: <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0),
     <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
