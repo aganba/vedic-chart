@@ -52,8 +52,8 @@ const UI = {
   "Select a mahadasha to see its antardashas (bhuktis).": "ஒரு மகா தசையைத் தேர்ந்தெடுத்தால் அதன் புக்திகள் தெரியும்.",
   "Festivals": "பண்டிகைகள்",
   "Shubha Muhurtham": "சுப முகூர்த்தம்",
-  "Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.":
-    "நல்ல திதி, நட்சத்திரம், கிழமை உள்ள நாட்கள் (ஆடி, புரட்டாசி, மார்கழி தவிர). நேரங்கள் ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம் இல்லாதவை; லக்னத்திலிருந்து 8-ஆம் வீட்டில் கிரகம் இல்லாதவை. தாராபலம், சந்திரபலம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை; பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம், எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
+  "Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi and not a Kari naal, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.":
+    "நல்ல திதி, நட்சத்திரம், கிழமை உள்ள நாட்கள் (ஆடி, புரட்டாசி, மார்கழி மாதங்களும் கரி நாட்களும் தவிர). நேரங்கள் ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம் இல்லாதவை; லக்னத்திலிருந்து 8-ஆம் வீட்டில் கிரகம் இல்லாதவை. தாராபலம், சந்திரபலம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை; பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம், எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
   // panchanga
   "Day": "நாள்",
   "{date} (calendar date)": "{date} (ஆங்கிலத் தேதி)",
@@ -80,8 +80,7 @@ const UI = {
   "Yamaganda": "எமகண்டம்",
   "Gulika Kalam": "குளிகை காலம்",
   "Hora": "ஓரை",
-  "day hora {n} of 12 · {from} – {to} · next {lord}": "பகல் ஓரை {n}/12 · {from} – {to} · அடுத்து {lord}",
-  "night hora {n} of 12 · {from} – {to} · next {lord}": "இரவு ஓரை {n}/12 · {from} – {to} · அடுத்து {lord}",
+  "{from} – {to} · next {lord}": "{from} – {to} · அடுத்து {lord}",
   "Ayanamsa: {name} = {value}": "அயனாம்சம்: {name} = {value}",
   "Chart": "ஜாதகம்",
   // festivals and muhurtham

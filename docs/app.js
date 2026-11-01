@@ -375,9 +375,8 @@ function renderPanchanga(c) {
     [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
     [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
     ...(p.hora ? [[t("Hora"), tr(p.hora.lord, "planet"),
-      t(p.hora.night ? "night hora {n} of 12 · {from} – {to} · next {lord}" : "day hora {n} of 12 · {from} – {to} · next {lord}",
-        { n: p.hora.night ? p.hora.number - 12 : p.hora.number, from: fmtTime(p.hora.start, ref),
-          to: fmtTime(p.hora.end, ref), lord: tr(p.hora.next_lord, "planet") })]] : []),
+      t("{from} – {to} · next {lord}", { from: fmtTime(p.hora.start, ref),
+        to: fmtTime(p.hora.end, ref), lord: tr(p.hora.next_lord, "planet") })]] : []),
     [t("Lunar month / year"), tr(p.masa, "masa"), t("{year} samvatsara (amanta)", { year: tr(p.samvatsara, "samvatsara") })],
     [t("Sunrise / Sunset"), `${fmtTime(p.sunrise, ref)} / ${fmtTime(p.sunset, ref)}`, t("next sunrise {t}", { t: fmtTime(p.next_sunrise, ref) })],
   ];
@@ -489,7 +488,9 @@ function drawFestivals() {
   $("festivals").hidden = false;
 
   const muhurthaRow = ({ date, m }) => {
-    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)} – ${hm(w.end, date)}</strong> ${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span>`).join("");
+    // One window per line; start, dash, end and lagna each line up in a column.
+    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)}</strong><strong>–</strong>`
+      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span></span>`).join("");
     return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
         <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))}</div>
         <div class="upcoming-times">${wins}</div></div></li>`;

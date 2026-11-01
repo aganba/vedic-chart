@@ -214,7 +214,10 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 #festivalYear .upcoming-list li.today { font-weight: 700; }
 .muhurtha-list { gap: 8px; }
 .muhurtha-list li { display: flex; gap: 6px; }
-.muhurtha-list .win { display: block; white-space: nowrap; }
+.muhurtha-list .upcoming-times { display: grid; grid-template-columns: auto auto auto 1fr; column-gap: 6px; row-gap: 2px; margin-top: 2px; }
+.muhurtha-list .win { display: contents; white-space: nowrap; }
+.muhurtha-list .win > * { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.muhurtha-list .win > span { margin-left: 6px; }
 /* muhurtham days are colour-coded green */
 .muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
 .muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
