@@ -523,7 +523,8 @@ function drawFestivals() {
   const place = $("place").value.trim();
   $("festivalPlace").textContent = place ? `· ${place}` : "";
   $("festivalYear").innerHTML = byMonth(found, "upcoming-list", (u) =>
-    `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span> ${festivalNames(u.festivals)}</li>`)
+    `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${
+      u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
   $("muhurthaYear").innerHTML = byMonth(muhurthas, "upcoming-list muhurtha-list", muhurthaRow)
     + (status ? `<p class="hint">${esc(status)}</p>` : !muhurthas.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "");
