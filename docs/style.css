@@ -222,7 +222,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
 .muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
 .muhurtha-card { border-left: 4px solid var(--good); }
-.muhurtha-list .upcoming-date { color: var(--good); }
 .muhurtha-list li.today .upcoming-date::after { content: "today"; display: block; font-size: 12px; font-weight: 600; }
 .muhurtha-list li.today > div > div:first-child { font-weight: 700; }
 #upcoming .upcoming-list { gap: 8px; }
