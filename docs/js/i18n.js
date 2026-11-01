@@ -256,11 +256,6 @@ const NS = {
     "Equal, lagna at middle of 1st house": "சம பாவம், லக்னம் முதல் பாவத்தின் மத்தியில்",
     "Sripati": "ஸ்ரீபதி", "Placidus": "பிளாசிடஸ்",
   },
-  region: {
-    "Tamil Nadu": "தமிழ்நாடு", "Andhra Pradesh": "ஆந்திரப் பிரதேசம்", "Telangana": "தெலங்கானா",
-    "Karnataka": "கர்நாடகா", "Maharashtra": "மகாராஷ்டிரா", "Kerala": "கேரளா",
-    "North India": "வட இந்தியா", "South India": "தென்னிந்தியா",
-  },
   festival: {
     "Aadi Perukku": "ஆடிப்பெருக்கு",
     "Akshaya Tritiya": "அட்சய திருதியை",
@@ -361,8 +356,6 @@ export function tr(s, ns) {
     }
     case "nakshatra":
       return s.includes(" / ") ? s.split(" / ").map((x) => tr(x, "nakshatra")).join(" / ") : s;
-    case "region":
-      return s.split(", ").map((x) => look("region", x) ?? x).join(", ");
     case "label": { // festival time labels, some built from parts
       let m = s.match(/^(.+) nakshatra$/);
       if (m) return `${tr(m[1], "nakshatra")} நட்சத்திரம்`;

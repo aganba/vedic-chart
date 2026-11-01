@@ -68,13 +68,16 @@ function parseOffset(s) {
   throw new Error(t("UTC offset should look like +05:30 or -4"));
 }
 
-// "2000-01-02T02:39:06" -> "02:39:06 (2 Jan)" when the date differs from refDate.
+// "2000-01-02T14:39:06" -> "2:39 PM", plus " (2 Jan)" when the date differs from
+// refDate. The seconds are computed but only hours and minutes are shown.
 function fmtTime(iso, refDate) {
   if (!iso) return "—";
-  const [d, t] = iso.split("T");
-  if (d === refDate) return t;
+  const [d, tm] = iso.split("T");
+  const [h, m] = tm.split(":").map(Number);
+  const clock = `${h % 12 || 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+  if (d === refDate) return clock;
   const [, mo, day] = d.split("-");
-  return `${t} (${Number(day)} ${monthShort(Number(mo) - 1)})`;
+  return `${clock} (${Number(day)} ${monthShort(Number(mo) - 1)})`;
 }
 
 // "YYYY-MM-DD" + "HH:MM[:SS]" -> local wall-clock ms (see astro.wallMs).
@@ -403,8 +406,7 @@ const CHUNK_DAYS = 8;
 let fest = null;
 
 function festivalNames(festivals) {
-  return festivals.map((f) => esc(tr(f.name, "festival"))
-    + (f.region ? ` <span class="festival-region">${esc(tr(f.region, "region"))}</span>` : "")).join(" · ");
+  return festivals.map((f) => esc(tr(f.name, "festival"))).join(" · ");
 }
 
 function festivalDate(iso) {
@@ -454,13 +456,7 @@ function drawFestivals() {
   const { c, ref, found, muhurthas, done, failed, cut } = fest;
   const list = c.panchanga.festivals || [];
   const bannerReady = done > UPCOMING_DAYS;
-  // HH:MM, with the date added when it isn't on `on`.
-  const hm = (iso, on = ref) => {
-    const [d, tm] = iso.split("T");
-    if (d === on) return tm.slice(0, 5);
-    const [, mo, day] = d.split("-");
-    return `${tm.slice(0, 5)} (${Number(day)} ${monthShort(Number(mo) - 1)})`;
-  };
+  const hm = (iso, on = ref) => fmtTime(iso, on);
   const timeText = (tt, day = ref) =>
     `${esc(tr(tt.label, "label"))}: <strong>${tt.at ? hm(tt.at, day) : `${hm(tt.start, day)} – ${hm(tt.end, day)}`}</strong>`;
   const note = (msg) => `<div class="festival-note">${esc(msg)}</div>`;
@@ -468,7 +464,7 @@ function drawFestivals() {
   // Today's festivals, then the next 7 days.
   const today = list.map((f) => `
     <div class="festival">
-      <div class="festival-name">${esc(tr(f.name, "festival"))}${f.region ? ` <span class="festival-region">${esc(tr(f.region, "region"))}</span>` : ""}</div>
+      <div class="festival-name">${esc(tr(f.name, "festival"))}</div>
       ${f.times.map((tt) => `<div class="festival-time">${timeText(tt)}</div>`).join("")}
       ${f.note ? `<div class="festival-note">${esc(tr(f.note, "note"))}</div>` : ""}
     </div>`).join("");
@@ -478,7 +474,7 @@ function drawFestivals() {
   else {
     const rows = found.filter((u) => u.date !== ref && u.date < cut).map((u) => {
       const items = u.festivals.map((f) => `<div class="upcoming-festival">${festivalNames([f])}${f.times.length
-        ? `<div class="upcoming-times">${f.times.map((tt) => timeText(tt, u.date)).join(" · ")}</div>` : ""}</div>`).join("");
+        ? `<div class="upcoming-times">${f.times.map((tt) => `<span class="upcoming-time">${timeText(tt, u.date)}</span>`).join("")}</div>` : ""}</div>`).join("");
       return `<li><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${items}</div></li>`;
     });
     upcoming = rows.length ? `<ul class="upcoming-list">${rows.join("")}</ul>`

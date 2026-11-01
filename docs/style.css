@@ -203,7 +203,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 }
 .festival + .festival { border-top: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); padding-top: 10px; }
 .festival-name { font-size: 17px; font-weight: 700; color: var(--accent); }
-.festival-region { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 6px; }
 .festival-time { font-size: 14px; margin-top: 2px; }
 .festival-note { font-size: 13px; color: var(--muted); margin-top: 2px; }
 .upcoming-title { font-size: 13px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
@@ -218,6 +217,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .muhurtha-list .win { display: contents; white-space: nowrap; }
 .muhurtha-list .win > * { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .muhurtha-list .win > span { margin-left: 6px; }
+.muhurtha-list .win > strong:nth-child(odd) { text-align: right; }
 /* muhurtham days are colour-coded green */
 .muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
 .muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
@@ -229,4 +229,10 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 #upcoming .upcoming-list li { display: flex; gap: 6px; }
 .upcoming-festival + .upcoming-festival { margin-top: 4px; }
 .upcoming-times { font-size: 13px; color: var(--muted); }
+/* several times for one festival: dot-separated on wide screens, one per line on phones */
+.upcoming-time + .upcoming-time::before { content: " · "; }
+@media (max-width: 760px) {
+  .upcoming-time { display: block; }
+  .upcoming-time + .upcoming-time::before { content: none; }
+}
 .upcoming-times strong { color: var(--ink); font-weight: 600; }

@@ -18,7 +18,6 @@ need("note", strings(fest, "note"));
 const labels = [...strings(fest, "label"), ...[...fest.matchAll(/win(?:\[0\])?: \["([^"]+)"/g)].map((m) => m[1]),
   ...[...fest.matchAll(/win = \["([^"]+)"/g)].map((m) => m[1])];
 need("label", labels.filter((s) => !s.includes("${")));
-for (const r of strings(fest, "region")) need("region", r.split(", "));
 
 // Interface phrases: t("...") calls in app.js and data-i18n keys in index.html.
 const ui = readFileSync(new URL("../docs/js/i18n.js", import.meta.url), "utf8");
@@ -45,7 +44,6 @@ for (const [lat, lon] of [[13.0827, 80.2707], [28.6139, 77.209], [9.9312, 76.267
     const w = Date.UTC(2025, 0, 1) + d * 86400e3;
     for (const f of festivalsFor(w, lat, lon, 5.5)) {
       check(f.name, "festival");
-      if (f.region) check(f.region, "region");
       if (f.note) check(f.note, "note");
       for (const tt of f.times) check(tt.label, "label");
     }
