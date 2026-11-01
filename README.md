@@ -8,7 +8,7 @@ A web app for Vedic astrology. Enter a place, date and time to get:
 - **Vimshottari dasha**: mahadashas and antardashas with dates
 - **English or Tamil**: a button in the header switches the whole page to Tamil (தமிழ்), including panchanga terms, festival names and dates; the choice is remembered, and `?lang=ta` opens the page in Tamil
 
-All calculations run **in the browser** using the [Swiss Ephemeris](https://www.astro.com/swisseph/) compiled to WebAssembly. Birth details never leave the device; the only network requests are optional OpenStreetMap place lookups. After the first visit the app works offline and can be added to a phone's home screen.
+All calculations run **in the browser** using the [Swiss Ephemeris](https://www.astro.com/swisseph/) compiled to WebAssembly. Birth details never leave the device; the only network requests are optional OpenStreetMap place lookups and an anonymous Google Analytics page view (no cookies, sent without the URL's query string, so dates, times and places entered or shared in a link are not included). After the first visit the app works offline and can be added to a phone's home screen.
 
 ## Conventions
 
