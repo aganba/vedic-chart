@@ -42,7 +42,6 @@ const UI = {
   "Current date, time and location": "தற்போதைய தேதி, நேரம், இடம்",
   "Calculate": "கணி",
   "Panchanga": "பஞ்சாங்கம்",
-  "Subha Muhurtham": "சுப முகூர்த்தம்",
   "Birth Chart": "ஜாதகம்",
   "Rasi chart (D1)": "ராசி கட்டம் (D1)",
   "Navamsa chart (D9)": "நவாம்ச கட்டம் (D9)",

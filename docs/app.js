@@ -395,7 +395,7 @@ function renderPanchanga(c) {
 // Festivals on the entered date (with timings) and in the next 7 days, as a
 // banner at the top of the Panchanga tab with the muhurtham days below it, and festivals for the year from the
 // entered date in the Festivals tab, and the year's shubha muhurtham days and
-// their time windows in the Subha Muhurtham tab. The year is computed in small chunks after
+// their time windows in the Shubha Muhurtham tab. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
@@ -450,7 +450,7 @@ function renderFestivals(c) {
   setTimeout(step, 30);
 }
 
-// Draws the Panchanga-tab banners and the Festivals and Subha Muhurtham lists from `fest`.
+// Draws the Panchanga-tab banners and the Festivals and Shubha Muhurtham lists from `fest`.
 function drawFestivals() {
   if (!fest) return;
   const { c, ref, found, muhurthas, done, failed, cut } = fest;
@@ -504,7 +504,7 @@ function drawFestivals() {
   $("muhurthaBanner").innerHTML = mTitle + mBody;
   $("muhurthaBanner").hidden = false;
 
-  // Festivals and Subha Muhurtham tabs: the year, month by month.
+  // Festivals and Shubha Muhurtham tabs: the year, month by month.
   const status = failed ? t("Couldn't calculate the remaining festivals.")
     : done < YEAR_DAYS ? t("Calculating…") : "";
   const byMonth = (items, ulClass, row) => {
