@@ -13,6 +13,8 @@ const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.me
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 swe.setSidMode(swe.SE.SIDM_TRUE_CITRA);
 
+// [lat, lon, UTC offset in hours (default IST)]
+const CUPERTINO = [37.323, -122.0322, -8], NEW_YORK = [40.7128, -74.006, -5];
 const DELHI = [28.6139, 77.209], CHENNAI = [13.0827, 80.2707], KOCHI = [9.9312, 76.2673], MUMBAI = [19.076, 72.8777];
 const EXPECTED = [
   ["Thai Pongal", "2025-01-14", CHENNAI], ["Bhogi", "2025-01-13", CHENNAI], ["Mattu Pongal", "2025-01-15", CHENNAI],
@@ -37,11 +39,16 @@ const EXPECTED = [
   ["Maasi Magam", "2026-03-03", CHENNAI], ["Holi", "2026-03-04", DELHI], ["Ugadi", "2026-03-19", CHENNAI], ["Puthandu", "2026-04-14", CHENNAI],
   ["Krishna Janmashtami", "2026-09-04", DELHI], ["Ganesh Chaturthi", "2026-09-14", MUMBAI],
   ["Vijayadashami", "2026-10-20", DELHI], ["Lakshmi Puja", "2026-11-08", DELHI],
+  // Karthigai Deepam goes by Krittika at sunset, so abroad it can fall before
+  // Kartika Purnima, and in 2027 a day earlier in Chennai than in Delhi.
+  ["Kartika Purnima", "2026-11-23", CUPERTINO], ["Karthigai Deepam", "2026-11-23", CUPERTINO],
+  ["Kartika Purnima", "2026-11-24", NEW_YORK], ["Karthigai Deepam", "2026-11-23", NEW_YORK],
+  ["Karthigai Deepam", "2027-12-11", CHENNAI], ["Karthigai Deepam", "2027-12-12", DELHI],
 ];
 
-const names = (date, [lat, lon]) => {
+const names = (date, [lat, lon, offset = 5.5]) => {
   const [y, m, d] = date.split("-").map(Number);
-  return festivalsFor(astro.wallMs(y, m, d), lat, lon, 5.5).map((f) => f.name);
+  return festivalsFor(astro.wallMs(y, m, d), lat, lon, offset).map((f) => f.name);
 };
 // Whole-word match, so "Holi" doesn't match "Holika Dahan".
 const has = (list, fest) => list.some((n) => new RegExp(`(^|[ /(])${fest}($|[ /)])`).test(n));
@@ -91,9 +98,11 @@ for (const [date, month, day, year] of TAMIL_DATES) {
 
 // Shubha muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27 list for
 // Chennai (Vakya panchangam, harikesanallur.com) must all be found as general
-// muhurtham days, except six that break rules this list doesn't follow but
-// the app does: Raman's empty 7th house (4 June 2026, 26 February 2027), Venus
-// combust (25 October 2026) and the panchanga yoga rule (29 May 2026,
+// muhurtham days, except ten that break rules this list doesn't follow but
+// the app does: Raman's empty 7th house (4 June 2026, 26 February 2027), Raman's
+// no malefic in the lagna (24 and 25 June, 5 July and 29 November 2026, when
+// the malefics fill five signs and no lagna clear of them is free otherwise),
+// Venus combust (25 October 2026) and the panchanga yoga rule (29 May 2026,
 // 22 November 2026, 24 March 2027). Other days may be listed too, as panchangams
 // disagree on the finer rules. No day may break the weekday rule.
 const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-05-18 2026-05-25 2026-05-28 2026-05-29 "
@@ -102,7 +111,8 @@ const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-0
   + "2026-11-22 2026-11-29 2026-12-04 2026-12-14 2027-01-20 2027-02-08 2027-02-10 2027-02-11 2027-02-26 2027-03-10 "
   + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12";
 {
-  const EXCEPT = new Set(["2026-06-04", "2026-10-25", "2027-02-26", "2026-05-29", "2026-11-22", "2027-03-24"]);
+  const EXCEPT = new Set(["2026-06-04", "2026-10-25", "2027-02-26", "2026-05-29", "2026-11-22", "2027-03-24",
+    "2026-06-24", "2026-06-25", "2026-07-05", "2026-11-29"]);
   const ref = new Set(MUHURTHAM.split(" ").filter((d) => !EXCEPT.has(d)));
   let found = 0, days = 0, education = 0;
   const missed = [];
@@ -117,7 +127,7 @@ const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-0
   }
   const ok = found === ref.size;
   if (!ok) bad++;
-  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days and ${education} extra education days, ${found}/${ref.size} published days found (6 more excepted)${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
+  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days and ${education} extra education days, ${found}/${ref.size} published days found (${EXCEPT.size} more excepted)${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
 }
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

@@ -272,9 +272,15 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 
 /* Special Days tab: one card per kind of day, each in its own colour */
 .special-intro { margin: 0 0 12px; }
-/* columns rather than a grid, so a short card (often the eclipses) doesn't leave a gap beside a long one */
-.special-grid { columns: 2 380px; column-gap: 16px; }
-.special-grid > .card { break-inside: avoid; display: inline-block; width: 100%; }
+/* sub-tabs: one pill per kind of day, in its colour when selected */
+.subtabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+.subtabs button {
+  background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 500;
+  border-radius: 999px; padding: 8px 14px; min-height: 40px; white-space: nowrap;
+}
+.subtabs button:hover { color: var(--ink); border-color: var(--sd); }
+.subtabs button[aria-selected="true"] { color: var(--sd); border-color: var(--sd); border-width: 2px; padding: 7px 13px; font-weight: 600; }
+.sd-count { font-size: 12px; opacity: .75; margin-left: 2px; }
 .special-card { --sd: var(--accent); border-left: 4px solid var(--sd); }
 .special-card h2, .special-card .sd-year { color: var(--sd); }
 .sd-eclipse { --sd: var(--sd-eclipse); }

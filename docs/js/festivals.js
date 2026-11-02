@@ -74,7 +74,10 @@ const NAKSHATRA_FESTIVALS = [
   { name: "Panguni Uttiram", purnima: true, calendar: "tamil", sign: 11, nak: 11, kaala: "sunrise", region: "Tamil Nadu" },
   { name: "Vaikasi Visakam", purnima: true, calendar: "tamil", sign: 1, nak: 15, kaala: "sunrise", region: "Tamil Nadu" },
   { name: "Arudra Darshan", purnima: true, calendar: "tamil", sign: 8, nak: 5, kaala: "sunrise", region: "Tamil Nadu" },
-  { name: "Karthigai Deepam", purnima: true, calendar: "tamil", sign: 7, nak: 2, kaala: "sunrise", lamp: true, region: "Tamil Nadu" },
+  // Karthigai Deepam: the lamps are lit at dusk, so the day is the one with
+  // Krittika at sunset; only if Krittika spans no sunset, the one with it at
+  // sunrise. This matches Drik Panchang for Chennai 2024-2028 and the US in 2026.
+  { name: "Karthigai Deepam", purnima: true, calendar: "tamil", sign: 7, nak: 2, kaala: "sunset", lamp: true, region: "Tamil Nadu" },
   { name: "Onam (Thiruvonam)", calendar: "kerala", sign: 4, nak: 21, kaala: "sunrise", region: "Kerala" },
 ];
 
@@ -218,7 +221,11 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
   for (const f of TITHI_FESTIVALS) {
     if (!tithiObserved(f, 0)) continue;
     const w = kaala(0, f.kaala);
-    const [ts, te] = tithiSpan(mid(w));
+    // The tithi's own span: when it is kshaya (spans no kaala), the kaala falls
+    // in another tithi, so look for it across the day instead.
+    const d = day(0), end = day(1)?.sr ?? d.nsr;
+    const at = [mid(w), d.sr, (d.sr + end) / 2, end - 1e-4].find((jd) => tithiAt(jd) === f.tithi) ?? mid(w);
+    const [ts, te] = tithiSpan(at);
     const times = [{ label: tithiLabel(f.tithi), start: fmt(ts), end: fmt(te) }];
     if (f.label) times.unshift(window(f.label, kaala(0, f.show || f.kaala)));
     out.push({ name: f.name, region: f.region || null, note: f.note || null, times });
@@ -297,9 +304,17 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
   for (const f of NAKSHATRA_FESTIVALS) {
     const holds = (n, jd) => nakAt(jd) === f.nak && solarMonth(n, f.calendar) === f.sign
       && (!f.purnima || purnimaSign(jd) === f.sign);
-    if (!observedOn(0, f, holds, moonLon, NAK_SPAN, 13.2)) continue;
-    const w = kaala(0, f.kaala);
-    const [ns, ne] = spanOf(moonLon, NAK_SPAN, mid(w), 13.2);
+    let at;
+    if (f.kaala === "sunset") {
+      const atSunset = (k) => day(k) && holds(k, day(k).ss);
+      if (atSunset(0)) { if (atSunset(-1)) continue; at = day(0).ss; }
+      else if (!atSunset(-1) && observedOn(0, { kaala: "sunrise" }, holds, moonLon, NAK_SPAN, 13.2)) at = day(0).sr;
+      else continue;
+    } else {
+      if (!observedOn(0, f, holds, moonLon, NAK_SPAN, 13.2)) continue;
+      at = mid(kaala(0, f.kaala));
+    }
+    const [ns, ne] = spanOf(moonLon, NAK_SPAN, at, 13.2);
     const times = [{ label: `${NAK_NAMES[f.nak]} nakshatra`, start: fmt(ns), end: fmt(ne) }];
     if (f.lamp) times.unshift({ label: "Lamps lit at sunset", at: fmt(day(0).ss) });
     out.push({ name: f.name, region: f.region || null, note: null, times });

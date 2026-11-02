@@ -19,8 +19,12 @@
 //  - At least 20 minutes long.
 // and the tithi, nakshatra, weekday, lagna and month rules of one of RULES:
 //  - general: Tamil calendar practice for marriage and other auspicious
-//    beginnings, plus two of Raman's marriage conditions: the 7th house from
-//    the lagna is empty, and neither Jupiter nor Venus is combust (moudhyam).
+//    beginnings, plus three of Raman's marriage conditions: the 7th house from
+//    the lagna is empty, no malefic (Sun, Mars, Saturn, Rahu, Ketu) is in the
+//    lagna, and neither Jupiter nor Venus is combust (moudhyam). A malefic in
+//    the lagna is excused by three of Raman's cancellations (chapter 5): Jupiter,
+//    Venus or Mercury also in the lagna, any planet exalted in the lagna, or the
+//    Sun or Moon in the 11th. Without them the rule drops about a third of the days.
 //  - education: the stars, weekdays and lagnas of B. V. Raman's Muhurtha
 //    (chapter 11), with the Tamil tithis less the Rikta ones. Checked only on
 //    days that aren't general muhurtham days; most of these fall in Aadi,
@@ -45,7 +49,7 @@ const RULES = {
     // Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha,
     // Uttara Bhadrapada, Revati.
     nak: set(0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 18, 20, 21, 22, 23, 25, 26),
-    weekday: set(0, 1, 3, 4, 5), months: true, seventhEmpty: true, noCombust: true },
+    weekday: set(0, 1, 3, 4, 5), months: true, seventhEmpty: true, cleanLagna: true, noCombust: true },
   education: {
     // Without the Rikta tithis (Chaturthi, Chaturdashi), which Raman rejects.
     tithi: new Set([...TAMIL_TITHI].filter((t) => ![3, 13, 18].includes(t))),
@@ -74,6 +78,9 @@ const YOGAM = [
 ];
 // 1-based eighth of daytime, by weekday (Sunday first); as in astro.js.
 const KALAMS = [[8, 2, 7, 5, 6, 4, 3], [5, 4, 3, 2, 1, 7, 6], [7, 6, 5, 4, 3, 2, 1]];
+const MALEFICS = ["sun", "mars", "saturn", "rahu", "ketu"];
+// Sign of exaltation (Rahu and Ketu left out: authorities differ).
+const EXALTED = { sun: 0, moon: 1, mars: 9, mercury: 5, jupiter: 3, venus: 11, saturn: 6 };
 const SLOW = [["sun", SE.SUN], ["mercury", SE.MERCURY], ["venus", SE.VENUS], ["mars", SE.MARS],
   ["jupiter", SE.JUPITER], ["saturn", SE.SATURN], ["rahu", SE.MEAN_NODE]];
 
@@ -184,6 +191,12 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
     const houses = Object.values(signs).map((s) => (s - lagna + 12) % 12);
     if (houses.includes(7)) return null; // 8th house
     if (r.seventhEmpty && houses.includes(6)) return null;
+    if (r.cleanLagna && MALEFICS.some((k) => signs[k] === lagna)) {
+      const excused = ["jupiter", "venus", "mercury"].some((k) => signs[k] === lagna)
+        || Object.entries(EXALTED).some(([k, s]) => signs[k] === lagna && s === lagna)
+        || signs.sun === (lagna + 10) % 12 || signs.moon === (lagna + 10) % 12;
+      if (!excused) return null;
+    }
     return { key: lagna, ti, nak, lagna };
   };
 

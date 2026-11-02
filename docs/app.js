@@ -491,9 +491,13 @@ function renderFestivals(c) {
   setTimeout(step, 30);
 }
 
-// Special Days tab: one colour-coded card per kind of day, in this order.
+// Special Days tab: one colour-coded card per kind of day, in this order, each
+// under its own sub-tab. The fourth field is the sub-tab label, if shorter than the title.
+const SPECIAL_KEY = "vedic-chart-special-tab";
+let specialTab = "eclipse";
+try { specialTab = localStorage.getItem(SPECIAL_KEY) || specialTab; } catch {}
 const SPECIAL_CARDS = [
-  ["eclipse", "Eclipses (grahanam)", "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon."],
+  ["eclipse", "Eclipses (grahanam)", "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon.", "Eclipses"],
   ["amavasya", "Amavasya", "The day Amavasya prevails in the afternoon (aparahna), when tarpanam is offered."],
   ["pournami", "Pournami", "The day Purnima prevails at sunset, when the full moon rises."],
   ["maasa", "Maasa pirappu", "The first day of each Tamil month, with the moment the Sun enters the new sign."],
@@ -544,7 +548,14 @@ function drawSpecialDays(timeText, status) {
     }
     return `<ul class="upcoming-list special-list">${html}</ul>`;
   };
-  $("specialDays").innerHTML = SPECIAL_CARDS.map(([kind, title, hint]) => {
+  if (!SPECIAL_CARDS.some(([k]) => k === specialTab)) specialTab = SPECIAL_CARDS[0][0];
+  const tabs = SPECIAL_CARDS.map(([kind, title, , label]) => {
+    const on = kind === specialTab, n = (items[kind] || []).length;
+    return `<button type="button" role="tab" class="sd-${kind}" id="sdtab-${kind}" data-sd="${kind}" aria-controls="sdpanel-${kind}"`
+      + ` aria-selected="${on}" tabindex="${on ? 0 : -1}">${esc(t(label || title))}${n ? ` <span class="sd-count">${n}</span>` : ""}</button>`;
+  }).join("");
+  $("specialDays").innerHTML = `<div class="subtabs" role="tablist" aria-label="${esc(t("Special Days"))}">${tabs}</div>`
+    + SPECIAL_CARDS.map(([kind, title, hint]) => {
     const rows = items[kind] || [];
     let body;
     if (kind === "eclipse") {
@@ -553,8 +564,23 @@ function drawSpecialDays(timeText, status) {
     } else {
       body = (rows.length ? list(rows) : "") + (status ? `<p class="hint">${esc(status)}</p>` : "");
     }
-    return `<div class="card special-card sd-${kind}"><h2>${esc(t(title))}</h2><p class="hint">${esc(t(hint))}</p>${body}</div>`;
+    return `<div class="card special-card sd-${kind}" role="tabpanel" id="sdpanel-${kind}" aria-labelledby="sdtab-${kind}"`
+      + `${kind === specialTab ? "" : " hidden"}><h2>${esc(t(title))}</h2><p class="hint">${esc(t(hint))}</p>${body}</div>`;
   }).join("");
+}
+
+// Shows one Special Days card; the list is redrawn as the year is computed, so
+// the choice is kept in specialTab as well as applied to the current DOM.
+function selectSpecialTab(kind, focus) {
+  specialTab = kind;
+  try { localStorage.setItem(SPECIAL_KEY, kind); } catch {}
+  for (const b of $("specialDays").querySelectorAll(".subtabs [data-sd]")) {
+    const on = b.dataset.sd === kind;
+    b.setAttribute("aria-selected", String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+    $(`sdpanel-${b.dataset.sd}`).hidden = !on;
+  }
 }
 
 // Draws the Panchanga-tab banners and the Festivals, Special Days and Shubha Muhurtham lists from `fest`.
@@ -638,7 +664,7 @@ function drawFestivals() {
   // The year's list, then a note with the extra days for starting education.
   const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`
     + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra."))}</p>`
-    + `<details class="muhurtha-rules"><summary>${esc(t("Rules used"))}</summary><p>${esc(t("They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house and moudhyam."))}</p></details>`
+    + `<details class="muhurtha-rules"><summary>${esc(t("Rules used"))}</summary><p>${esc(t("They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house, the lagna rule and moudhyam."))}</p></details>`
     + byMonth(education, "upcoming-list muhurtha-list", muhurthaRow) + "</div>" : "";
   drawSpecialDays(timeText, status);
   $("muhurthaYear").innerHTML = byMonth(general, "upcoming-list muhurtha-list", muhurthaRow)
@@ -923,6 +949,18 @@ async function init() {
 
   $("now").addEventListener("click", resetToNow);
   for (const t of TABS) $(`tab-${t}`).addEventListener("click", () => selectTab(t));
+  $("specialDays").addEventListener("click", (e) => {
+    const b = e.target.closest(".subtabs [data-sd]");
+    if (b) selectSpecialTab(b.dataset.sd);
+  });
+  $("specialDays").addEventListener("keydown", (e) => {
+    const b = e.target.closest(".subtabs [data-sd]");
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+    if (!b || !step) return;
+    e.preventDefault();
+    const kinds = SPECIAL_CARDS.map(([k]) => k);
+    selectSpecialTab(kinds[(kinds.indexOf(b.dataset.sd) + step + kinds.length) % kinds.length], true);
+  });
   window.addEventListener("resize", drawDashaLinks);
   let savedTab = "panchanga";
   try { savedTab = localStorage.getItem(TAB_KEY) || savedTab; } catch {}
