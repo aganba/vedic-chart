@@ -125,10 +125,12 @@ for (const [date, month, day, year] of TAMIL_DATES) {
 
 // Shubha muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27 list for
 // Chennai (Vakya panchangam, harikesanallur.com) must all be found as general
-// muhurtham days, except ten that break rules this list doesn't follow but
+// muhurtham days, except twelve that break rules this list doesn't follow but
 // the app does: Raman's empty 7th house (4 June 2026, 26 February 2027), Raman's
 // no malefic in the lagna (24 and 25 June, 5 July and 29 November 2026, when
-// the malefics fill five signs and no lagna clear of them is free otherwise),
+// the malefics fill five signs and no lagna clear of them is free otherwise;
+// 12 July and 14 December 2026, when the only lagnas left hold the Sun with a
+// combust Mercury, which doesn't count as a benefic),
 // Venus combust (25 October 2026) and the panchanga yoga rule (29 May 2026,
 // 22 November 2026, 24 March 2027). Other days may be listed too, as panchangams
 // disagree on the finer rules. No day may break the weekday rule.
@@ -139,7 +141,7 @@ const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-0
   + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12";
 {
   const EXCEPT = new Set(["2026-06-04", "2026-10-25", "2027-02-26", "2026-05-29", "2026-11-22", "2027-03-24",
-    "2026-06-24", "2026-06-25", "2026-07-05", "2026-11-29"]);
+    "2026-06-24", "2026-06-25", "2026-07-05", "2026-11-29", "2026-07-12", "2026-12-14"]);
   const ref = new Set(MUHURTHAM.split(" ").filter((d) => !EXCEPT.has(d)));
   let found = 0, days = 0, education = 0;
   const missed = [];

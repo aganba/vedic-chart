@@ -23,8 +23,9 @@
 //    the lagna is empty, no malefic (Sun, Mars, Saturn, Rahu, Ketu) is in the
 //    lagna, and neither Jupiter nor Venus is combust (moudhyam). A malefic in
 //    the lagna is excused by three of Raman's cancellations (chapter 5): Jupiter,
-//    Venus or Mercury also in the lagna, any planet exalted in the lagna, or the
-//    Sun or Moon in the 11th. Without them the rule drops about a third of the days.
+//    Venus or an unafflicted Mercury (at least 14 degrees from the Sun, not with
+//    the Sun, Mars or Saturn) also in the lagna, any planet exalted in the
+//    lagna, or the Sun or Moon in the 11th. Without them the rule drops about a third of the days.
 //  - education: the stars, weekdays and lagnas of B. V. Raman's Muhurtha
 //    (chapter 11), with the Tamil tithis less the Rikta ones. Checked only on
 //    days that aren't general muhurtham days; most of these fall in Aadi,
@@ -192,7 +193,11 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
     if (houses.includes(7)) return null; // 8th house
     if (r.seventhEmpty && houses.includes(6)) return null;
     if (r.cleanLagna && MALEFICS.some((k) => signs[k] === lagna)) {
-      const excused = ["jupiter", "venus", "mercury"].some((k) => signs[k] === lagna)
+      // Mercury counts as a benefic only unafflicted, as in shadbala.js: at
+      // least 14 degrees from the Sun and not in a sign with the Sun, Mars or Saturn.
+      const mercuryBenefic = gap(planetLon(jd, SE.MERCURY)[0], sun) >= 14
+        && !["sun", "mars", "saturn"].some((k) => signs[k] === signs.mercury);
+      const excused = ["jupiter", "venus", ...(mercuryBenefic ? ["mercury"] : [])].some((k) => signs[k] === lagna)
         || Object.entries(EXALTED).some(([k, s]) => signs[k] === lagna && s === lagna)
         || signs.sun === (lagna + 10) % 12 || signs.moon === (lagna + 10) % 12;
       if (!excused) return null;
