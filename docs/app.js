@@ -492,7 +492,7 @@ function renderFestivals(c) {
 }
 
 // Special Days tab: one colour-coded card per kind of day, in this order, each
-// under its own sub-tab. The fourth field is the sub-tab label, if shorter than the title.
+// under its own sub-tab, which names it. The fourth field is the sub-tab label, if shorter than the title.
 const SPECIAL_KEY = "vedic-chart-special-tab";
 let specialTab = "eclipse";
 try { specialTab = localStorage.getItem(SPECIAL_KEY) || specialTab; } catch {}
@@ -555,7 +555,7 @@ function drawSpecialDays(timeText, status) {
       + ` aria-selected="${on}" tabindex="${on ? 0 : -1}">${esc(t(label || title))}${n ? ` <span class="sd-count">${n}</span>` : ""}</button>`;
   }).join("");
   $("specialDays").innerHTML = `<div class="subtabs" role="tablist" aria-label="${esc(t("Special Days"))}">${tabs}</div>`
-    + SPECIAL_CARDS.map(([kind, title, hint]) => {
+    + SPECIAL_CARDS.map(([kind, , hint]) => {
     const rows = items[kind] || [];
     let body;
     if (kind === "eclipse") {
@@ -565,7 +565,7 @@ function drawSpecialDays(timeText, status) {
       body = (rows.length ? list(rows) : "") + (status ? `<p class="hint">${esc(status)}</p>` : "");
     }
     return `<div class="card special-card sd-${kind}" role="tabpanel" id="sdpanel-${kind}" aria-labelledby="sdtab-${kind}"`
-      + `${kind === specialTab ? "" : " hidden"}><h2>${esc(t(title))}</h2><p class="hint">${esc(t(hint))}</p>${body}</div>`;
+      + `${kind === specialTab ? "" : " hidden"}><p class="hint sd-hint">${esc(t(hint))}</p>${body}</div>`;
   }).join("");
 }
 

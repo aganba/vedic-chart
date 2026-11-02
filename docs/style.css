@@ -272,17 +272,20 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 
 /* Special Days tab: one card per kind of day, each in its own colour */
 .special-intro { margin: 0 0 12px; }
-/* sub-tabs: one pill per kind of day, in its colour when selected */
+/* sub-tabs: one pill per kind of day in its own colour, tinted, and filled when selected */
 .subtabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .subtabs button {
-  background: transparent; color: var(--muted); border: 1px solid var(--line); font-weight: 500;
+  color: var(--sd); background: color-mix(in srgb, var(--sd) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sd) 45%, transparent); font-weight: 600;
   border-radius: 999px; padding: 8px 14px; min-height: 40px; white-space: nowrap;
 }
-.subtabs button:hover { color: var(--ink); border-color: var(--sd); }
-.subtabs button[aria-selected="true"] { color: var(--sd); border-color: var(--sd); border-width: 2px; padding: 7px 13px; font-weight: 600; }
-.sd-count { font-size: 12px; opacity: .75; margin-left: 2px; }
+.subtabs button:hover { background: color-mix(in srgb, var(--sd) 16%, transparent); border-color: var(--sd); }
+.subtabs button[aria-selected="true"] { color: var(--card); background: var(--sd); border-color: var(--sd); }
+.subtabs button:focus-visible { outline: 2px solid var(--sd); outline-offset: 2px; }
+.sd-count { font-size: 12px; font-weight: 500; opacity: .8; margin-left: 2px; }
 .special-card { --sd: var(--accent); border-left: 4px solid var(--sd); }
-.special-card h2, .special-card .sd-year { color: var(--sd); }
+.special-card .sd-year { color: var(--sd); }
+.sd-hint { margin-top: 0; }
 .sd-eclipse { --sd: var(--sd-eclipse); }
 .sd-amavasya { --sd: var(--sd-amavasya); }
 .sd-pournami { --sd: var(--sd-pournami); }
