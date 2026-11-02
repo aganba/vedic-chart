@@ -394,8 +394,8 @@ function renderPanchanga(c) {
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
 // banner at the top of the Panchanga tab with the muhurtham days below it, and festivals for the year from the
-// entered date in the Special Days tab, along with the year's shubha muhurtham
-// days and their time windows. The year is computed in small chunks after
+// entered date in the Festivals tab, and the year's shubha muhurtham days and
+// their time windows in the Subha Muhurtham tab. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
@@ -450,7 +450,7 @@ function renderFestivals(c) {
   setTimeout(step, 30);
 }
 
-// Draws the Panchanga-tab banners and the Special Days lists from `fest`.
+// Draws the Panchanga-tab banners and the Festivals and Subha Muhurtham lists from `fest`.
 function drawFestivals() {
   if (!fest) return;
   const { c, ref, found, muhurthas, done, failed, cut } = fest;
@@ -504,7 +504,7 @@ function drawFestivals() {
   $("muhurthaBanner").innerHTML = mTitle + mBody;
   $("muhurthaBanner").hidden = false;
 
-  // Special Days tab: the year, month by month.
+  // Festivals and Subha Muhurtham tabs: the year, month by month.
   const status = failed ? t("Couldn't calculate the remaining festivals.")
     : done < YEAR_DAYS ? t("Calculating…") : "";
   const byMonth = (items, ulClass, row) => {
@@ -520,8 +520,6 @@ function drawFestivals() {
     }
     return month ? html + "</ul>" : html;
   };
-  const place = $("place").value.trim();
-  $("festivalPlace").textContent = place ? `· ${place}` : "";
   $("festivalYear").innerHTML = byMonth(found, "upcoming-list", (u) =>
     `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
@@ -567,7 +565,7 @@ function renderBhavaTable(c) {
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "festivals", "chart"];
+const TABS = ["panchanga", "festivals", "muhurtham", "chart"];
 
 function selectTab(name) {
   if (name === "dasha") name = "chart"; // the dasha now sits on the Birth Chart tab

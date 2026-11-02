@@ -190,11 +190,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
   .panchanga-layout .banner-col { order: -1; }
 }
 
-/* Special Days tab: festivals and muhurtham side by side */
-.special-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
-.special-layout > .card { margin-bottom: 0; }
-@media (max-width: 760px) { .special-layout { grid-template-columns: minmax(0, 1fr); } }
-
 /* festival and muhurtham banners (Panchanga tab) */
 .banner-col { display: grid; gap: 16px; }
 .banner-col > .festival-banner { margin-bottom: 0; }
@@ -224,6 +219,9 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
 .muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
 .muhurtha-card { border-left: 4px solid var(--good); }
+/* festivals card matches the muhurtham card, in the festival accent colour */
+.festival-card h2 { color: var(--accent); }
+.festival-card { border-left: 4px solid var(--accent); }
 .muhurtha-list li.today .upcoming-date::after { content: "today"; display: block; font-size: 12px; font-weight: 600; }
 .muhurtha-list li.today > div > div:first-child { font-weight: 700; }
 #upcoming .upcoming-list { gap: 8px; }

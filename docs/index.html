@@ -111,7 +111,8 @@
 
       <div class="tabs" role="tablist" aria-label="Chart sections" data-i18n-aria="Chart sections">
         <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true" data-i18n="Panchanga">Panchanga</button>
-        <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false" data-i18n="Special Days">Special Days</button>
+        <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false" data-i18n="Festivals">Festivals</button>
+        <button type="button" role="tab" id="tab-muhurtham" aria-controls="panel-muhurtham" aria-selected="false" data-i18n="Subha Muhurtham">Subha Muhurtham</button>
         <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false" data-i18n="Birth Chart">Birth Chart</button>
       </div>
 
@@ -165,16 +166,17 @@
       </div>
 
       <div role="tabpanel" id="panel-festivals" aria-labelledby="tab-festivals" hidden>
-        <div class="special-layout">
-        <div class="card">
-          <h2><span data-i18n="Festivals">Festivals</span> <span class="muted" id="festivalPlace"></span></h2>
+        <div class="card festival-card">
+          <h2 data-i18n="Festivals">Festivals</h2>
           <div id="festivalYear"></div>
         </div>
+      </div>
+
+      <div role="tabpanel" id="panel-muhurtham" aria-labelledby="tab-muhurtham" hidden>
         <div class="card muhurtha-card">
           <h2 data-i18n="Shubha Muhurtham">Shubha Muhurtham</h2>
           <p class="hint" data-i18n="Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi and not a Kari naal, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren&#39;t considered, and panchangams differ, so confirm with your family astrologer.">Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi and not a Kari naal, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.</p>
           <div id="muhurthaYear"></div>
-        </div>
         </div>
       </div>
     </section>
