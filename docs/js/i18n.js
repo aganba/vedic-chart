@@ -208,15 +208,37 @@ export function t(key, vars) {
   return fill(lang === "ta" && UI[key] != null ? UI[key] : key.split("|")[0], vars);
 }
 
+// References, in English in both languages (also in index.html for the first paint).
+const REFERENCES = `    <details class="references">
+      <summary>References</summary>
+      <h4>Calculations</h4>
+      <ul>
+        <li><a href="https://www.astro.com/swisseph/" target="_blank" rel="noopener">Swiss Ephemeris</a>: planet positions, sunrise and sunset, eclipses.</li>
+        <li><a href="https://www.vedicastrologer.org/jh/" target="_blank" rel="noopener">Jagannatha Hora</a>: the birth chart settings (True Chitra ayanamsa, true planet positions, mean node) are chosen to reproduce its output.</li>
+      </ul>
+      <h4>Panchangam and festivals</h4>
+      <ul>
+        <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
+      </ul>
+      <h4>Shubha Muhurtham</h4>
+      <ul>
+        <li>B. V. Raman, <cite>Muhurtha or Electional Astrology</cite>: the marriage, lagna and education rules (<a href="https://vedastro.org/blog/Muhurtha-Chapter-1-The-Importance-of-Muhurtha.html" target="_blank" rel="noopener">chapter summaries on VedAstro</a>).</li>
+        <li><a href="https://www.harikesanallur.com/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: the published muhurtham list the general days are checked against.</li>
+        <li><a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener">Ungal Vazhkkai Vazhikatti</a>: the Amirtha, Siddha and Marana yogam table.</li>
+      </ul>
+    </details>`;
+
 // Footer with links, per language.
 export const FOOTER = {
   en: `<p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
+    ${REFERENCES}
     <p class="about"><strong>Your data stays with you.</strong> No sign-up and no cookies, and your birth date and time never leave your device. The site counts anonymous page views only. Places not in the built-in list are looked up on OpenStreetMap.</p>
     Calculations run on your device using the <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0).
     Place names from <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0) and
     <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
     <a href="https://github.com/aganba/vedic-chart">Source code</a>.`,
   ta: `<p class="about">இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம். அச்சிட்ட பஞ்சாங்கம் கிடைக்காத இடங்களுக்காக உருவாக்கப்பட்டது: அனைத்தும் உங்கள் இருப்பிடத்துக்கும் உள்ளூர் நேரத்துக்கும் ஏற்பக் கணக்கிடப்படுகின்றன.</p>
+    ${REFERENCES}
     <p class="about"><strong>உங்கள் தகவல் உங்களிடமே.</strong> பதிவு தேவையில்லை, குக்கீகள் இல்லை; உங்கள் பிறந்த தேதியும் நேரமும் உங்கள் சாதனத்தை விட்டு வெளியே செல்வதில்லை. பக்கப் பார்வைகள் மட்டும் அடையாளமின்றி எண்ணப்படுகின்றன. உள்ளமைந்த பட்டியலில் இல்லாத இடங்கள் OpenStreetMap-இல் தேடப்படுகின்றன.</p>
     கணக்கீடுகள் அனைத்தும் <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0) கொண்டு உங்கள் சாதனத்திலேயே செய்யப்படுகின்றன.
     இடப் பெயர்கள்: <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0),
