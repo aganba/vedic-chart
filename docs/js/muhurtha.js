@@ -8,9 +8,12 @@
 //  - The day's yogam (weekday + sunrise nakshatra, YOGAM below) is Amirtha or
 //    Siddha, not Marana or Prabalarishta.
 // Every window must pass these:
-//  - Between an hour before sunrise (but not before 5 am) and 1 pm, as in
-//    Tamil calendars.
+//  - Between an hour before sunrise (but not before 5 am) and sunset.
 //  - Not in Rahu Kalam, Yamaganda, Gulika Kalam or Vishti (Bhadra) karana.
+//  - Panchanga yoga (BAD_YOGA below): not Vyatipata or Vaidhriti, not the
+//    first half of Parigha, and not the opening ghatis (24 minutes each) of
+//    Vishkambha, Vajra (3), Shula (5), Ganda, Atiganda (6) or Vyaghata (9).
+//    Tamil calendars often skip this; it drops 3 of Harikesanallur's days.
 //  - Ashtama shuddhi: no planet (Moon included) in the 8th house from the lagna.
 //  - The lagna isn't in the first or last degree of its sign (sandhi).
 //  - At least 20 minutes long.
@@ -83,6 +86,11 @@ const NAK_NAMES = ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ar
 const SIGN_NAMES = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya",
   "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"];
 
+// Panchanga yogas (0 = Vishkambha ... 26 = Vaidhriti) barred for their first
+// so many ghatis; Parigha (18) is barred for its first half.
+const BAD_YOGA = { 16: Infinity, 26: Infinity, 0: 3, 14: 3, 8: 5, 5: 6, 9: 6, 12: 9 };
+const YOGA_SPAN = 360 / 27;
+
 const STEP = 5 / 1440; // sampling step: 5 minutes
 const MIN_LEN = 20 / 1440;
 const norm = (x) => ((x % 360) + 360) % 360;
@@ -134,7 +142,7 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
   const combust = gap(planetLon(noon, SE.JUPITER)[0], sunNoon) < 11 || gap(ven, sunNoon) < (venSpeed < 0 ? 8 : 10);
 
   const start = Math.max(sr - 1 / 24, julFromWall(dateWall + 5 * 3600e3 + 1000, wallOffset));
-  const end = Math.min(julFromWall(dateWall + 13 * 3600e3, wallOffset), ss);
+  const end = ss;
   const eighth = (ss - sr) / 8;
   const kalams = KALAMS.map((t) => [sr + (t[weekday] - 1) * eighth, sr + t[weekday] * eighth]);
   // Planets other than the Moon barely move in a day: take their signs at the
@@ -159,6 +167,13 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
     if (!r.tithi.has(ti)) return null;
     const k = Math.floor(el / 6);
     if (k >= 1 && k <= 56 && (k - 1) % 7 === 6) return null; // Vishti
+    // Panchanga yoga; ghatis since it began, from the current Sun + Moon speed.
+    const yl = norm(moon + sun), yi = Math.floor(yl / YOGA_SPAN), into = yl - yi * YOGA_SPAN;
+    if (yi === 18 && into < YOGA_SPAN / 2) return null; // Parigha
+    if (yi in BAD_YOGA) {
+      const rate = planetLon(jd, SE.MOON)[1] + planetLon(jd, SE.SUN)[1]; // degrees a day
+      if ((into / rate) * 60 < BAD_YOGA[yi]) return null;
+    }
     const nak = Math.floor(moon / NAK_SPAN);
     if (!r.nak.has(nak)) return null;
     const lagnaLon = norm(lagnaAndMc(jd, lat, lon)[0]);

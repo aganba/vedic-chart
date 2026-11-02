@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Vedic Chart">
+  <meta name="apple-mobile-web-app-title" content="Vedic Calendar">
   <meta name="theme-color" content="#7a2e12">
-  <title>Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart</title>
+  <title>Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart</title>
   <meta name="description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.">
   <!-- app.js points the canonical link at https://aganba.github.io/vedic-chart/ (or ?lang=ta in Tamil), so
        shared links with birth details or ?tab= are folded into one page. -->
@@ -14,20 +14,20 @@
   <link rel="alternate" hreflang="ta" href="https://aganba.github.io/vedic-chart/?lang=ta">
   <link rel="alternate" hreflang="x-default" href="https://aganba.github.io/vedic-chart/">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Vedic Chart">
-  <meta property="og:title" content="Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart">
+  <meta property="og:site_name" content="Vedic Calendar">
+  <meta property="og:title" content="Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart">
   <meta property="og:description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.">
   <meta property="og:url" content="https://aganba.github.io/vedic-chart/">
   <meta property="og:image" content="https://aganba.github.io/vedic-chart/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Vedic Chart: Panchangam, Tamil calendar, festivals, Muhurtham, birth charts and dasha">
+  <meta property="og:image:alt" content="Vedic Calendar: Panchangam, Tamil calendar, festivals, Muhurtham, birth charts and dasha">
   <meta name="twitter:card" content="summary_large_image">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    "name": "Vedic Chart",
+    "name": "Vedic Calendar",
     "url": "https://aganba.github.io/vedic-chart/",
     "image": "https://aganba.github.io/vedic-chart/og-image.png",
     "description": "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.",
@@ -62,7 +62,7 @@
     <span class="emblem" role="img" aria-label="Om Ganesha"></span>
   </div>
   <header class="topbar">
-    <h1 data-i18n="Vedic Chart">Vedic Chart</h1>
+    <h1 data-i18n="Vedic Calendar">Vedic Calendar</h1>
     <button type="button" id="lang" class="secondary lang-toggle" lang="ta" aria-label="தமிழில் காட்டு">தமிழ்</button>
   </header>
 
@@ -80,9 +80,16 @@
         <label for="date"><span data-i18n="Date">Date</span> <span class="muted" id="datefmt"></span></label>
         <input id="date" type="date" required>
       </div>
-      <div class="field">
-        <label for="time"><span data-i18n="Time">Time</span> <span class="muted" data-i18n="(local)">(local)</span></label>
-        <input id="time" type="time" step="1" required>
+      <div class="field time-field">
+        <label for="hour"><span data-i18n="Time">Time</span> <span class="muted" data-i18n="(local)">(local)</span></label>
+        <!-- Hour, minute and AM/PM pickers rather than a native time field, whose
+             12/24-hour display follows the device. app.js keeps #time as HH:MM. -->
+        <div class="row time-row">
+          <select id="hour" aria-label="Hour" data-i18n-aria="Hour"></select>
+          <select id="minute" aria-label="Minute" data-i18n-aria="Minute"></select>
+          <select id="ampm" aria-label="AM or PM" data-i18n-aria="AM or PM"><option>AM</option><option>PM</option></select>
+        </div>
+        <input id="time" type="hidden">
       </div>
       <div class="field">
         <label for="lat"><span data-i18n="Latitude">Latitude</span> <span class="muted" data-i18n="(N +)">(N +)</span></label>
@@ -196,15 +203,16 @@
             </ul>
             <h3 data-i18n="The time">The time</h3>
             <ul>
-              <li data-i18n="Between an hour before sunrise (not before 5 am) and 1 pm.">Between an hour before sunrise (not before 5 am) and 1 pm.</li>
+              <li data-i18n="Between an hour before sunrise (not before 5 am) and sunset.">Between an hour before sunrise (not before 5 am) and sunset.</li>
               <li data-i18n="Outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana.">Outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana.</li>
+              <li data-i18n="Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.">Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.</li>
               <li data-i18n="No planet in the 7th or 8th house from the lagna.">No planet in the 7th or 8th house from the lagna.</li>
               <li data-i18n="The lagna isn&#39;t in the first or last degree of its sign.">The lagna isn't in the first or last degree of its sign.</li>
               <li data-i18n="At least 20 minutes long.">At least 20 minutes long.</li>
             </ul>
             <h3 data-i18n="Sources">Sources</h3>
             <ul>
-              <li data-i18n="Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice.">Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice.</li>
+              <li data-i18n="Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice. The panchanga yoga rule follows classical muhurtha texts such as Muhurta Chintamani; many Tamil calendars don't apply it, so a few of their days aren't listed here.">Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice. The panchanga yoga rule follows classical muhurtha texts such as Muhurta Chintamani; many Tamil calendars don't apply it, so a few of their days aren't listed here.</li>
               <li><span data-i18n="The empty 7th house and the rules for the extra education days: B. V. Raman, Muhurtha or Electional Astrology, chapters 9 and 11">The empty 7th house and the rules for the extra education days: B. V. Raman, Muhurtha or Electional Astrology, chapters 9 and 11</span> (<a href="https://vedastro.org/blog/Muhurtha-Chapter-9-Marriage.html" target="_blank" rel="noopener" data-i18n="chapter 9 summary">chapter 9 summary</a>, <a href="https://vedastro.org/blog/Muhurtha-Chapter-11-Elections-Pertaining-to-Education.html" target="_blank" rel="noopener" data-i18n="chapter 11 summary">chapter 11 summary</a>)</li>
               <li><span data-i18n="Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:">Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:</span> <a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener" data-i18n="Ungal Vazhkkai Vazhikatti">Ungal Vazhkkai Vazhikatti</a></li>
             </ul>

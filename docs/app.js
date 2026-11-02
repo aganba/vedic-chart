@@ -126,7 +126,39 @@ function setNow() {
   const d = new Date();
   const p = (n) => String(n).padStart(2, "0");
   $("date").value = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-  $("time").value = `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+  setTime(`${p(d.getHours())}:${p(d.getMinutes())}`);
+}
+
+// The time pickers: hour 1-12, minute, AM/PM. #time holds the same time as
+// 24-hour "HH:MM" for the calculations and shared links.
+function initTimePicker() {
+  const p = (n) => String(n).padStart(2, "0");
+  $("hour").innerHTML = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("");
+  $("minute").innerHTML = Array.from({ length: 60 }, (_, i) => `<option value="${i}">${p(i)}</option>`).join("");
+  for (const id of ["hour", "minute", "ampm"]) {
+    $(id).addEventListener("change", () => {
+      const h = Number($("hour").value) % 12 + ($("ampm").value === "PM" ? 12 : 0);
+      $("time").value = `${p(h)}:${p(Number($("minute").value))}`;
+      refreshTimezone();
+    });
+  }
+}
+
+// Sets the pickers and #time from "HH:MM" (seconds, if given, are dropped).
+function setTime(v) {
+  const m = String(v).match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return;
+  const h = Math.min(Number(m[1]), 23), mi = Math.min(Number(m[2]), 59);
+  $("hour").value = String(h % 12 || 12);
+  $("minute").value = String(mi);
+  $("ampm").value = h < 12 ? "AM" : "PM";
+  $("time").value = `${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")}`;
+}
+
+// "2026-11-01 10:00 AM": the entered date and time, 12-hour clock.
+function whenText(c) {
+  const date = c.input.local_time.slice(0, 10);
+  return `${date} ${fmtTime(c.input.local_time, date)}`;
 }
 
 function devicePosition() {
@@ -325,7 +357,7 @@ function chartItem(b) {
 }
 
 function renderCharts(c) {
-  const when = `${c.input.local_time.replace("T", " ")} (UTC${fmtOffset(c.input.utc_offset)})`;
+  const when = `${whenText(c)} (UTC${fmtOffset(c.input.utc_offset)})`;
 
   const rasiBoxes = {};
   for (const b of c.bodies) (rasiBoxes[b.sign] ||= []).push(chartItem(b));
@@ -345,7 +377,7 @@ function renderSummary(c) {
   const coord = `${Math.abs(lat).toFixed(4)}°${compass(lat >= 0 ? "N" : "S")}, ${Math.abs(lon).toFixed(4)}°${compass(lon >= 0 ? "E" : "W")}`;
   $("summary").innerHTML = `
     <strong>${esc($("place").value || t("Chart"))}</strong>
-    <span>${esc(c.input.local_time.replace("T", " "))} · UTC${fmtOffset(c.input.utc_offset)}${c.input.timezone ? " · " + esc(c.input.timezone) : ""}</span>
+    <span>${esc(whenText(c))} · UTC${fmtOffset(c.input.utc_offset)}${c.input.timezone ? " · " + esc(c.input.timezone) : ""}</span>
     <span>${coord}</span>
     <span>${esc(t("Ayanamsa: {name} = {value}", { name: tr(c.settings.ayanamsa_label, "ayanamsa"),
       value: `${c.settings.ayanamsa_deg}° ${c.settings.ayanamsa_dms.replace(/^\d+° /, "")}` }))}</span>`;
@@ -605,7 +637,8 @@ function drawFestivals() {
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
   // The year's list, then a note with the extra days for starting education.
   const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`
-    + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra. They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house and moudhyam."))}</p>`
+    + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra."))}</p>`
+    + `<details class="muhurtha-rules"><summary>${esc(t("Rules used"))}</summary><p>${esc(t("They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house and moudhyam."))}</p></details>`
     + byMonth(education, "upcoming-list muhurtha-list", muhurthaRow) + "</div>" : "";
   drawSpecialDays(timeText, status);
   $("muhurthaYear").innerHTML = byMonth(general, "upcoming-list muhurtha-list", muhurthaRow)
@@ -830,7 +863,7 @@ function applyStaticText() {
   $("footer").innerHTML = FOOTER[getLang()];
   $("datefmt").textContent = `(${dateFormatHint()})`;
   // Search-result title, description and canonical URL for the current language.
-  document.title = t("Vedic Chart – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
+  document.title = t("Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
   document.querySelector('meta[name="description"]').content = t("Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.");
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) {
@@ -866,11 +899,13 @@ async function init() {
   setLang(qsLang || savedLang());
   applyStaticText();
   $("lang").addEventListener("click", () => switchLanguage(getLang() === "ta" ? "en" : "ta"));
+  initTimePicker();
+  setTime("12:00"); // until the current time or a URL's time fills it in
   // URL parameters (?date=..&time=..&lat=..&lon=..) override the device defaults.
   const qs = new URLSearchParams(location.search);
   const fromUrl = qs.has("date");
   if (fromUrl) {
-    for (const f of FIELDS) if (qs.has(f)) $(f).value = qs.get(f);
+    for (const f of FIELDS) if (qs.has(f)) f === "time" ? setTime(qs.get(f)) : ($(f).value = qs.get(f));
     offsetManual = qs.has("offset");
   }
 
@@ -883,7 +918,7 @@ async function init() {
     $("tzname").textContent = "";
     showTzNote("");
   });
-  for (const id of ["lat", "lon", "date", "time"]) $(id).addEventListener("change", refreshTimezone);
+  for (const id of ["lat", "lon", "date"]) $(id).addEventListener("change", refreshTimezone);
   document.addEventListener("click", (e) => { if (!e.target.closest(".place")) $("results").hidden = true; });
 
   $("now").addEventListener("click", resetToNow);

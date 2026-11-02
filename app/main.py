@@ -14,7 +14,7 @@ from timezonefinder import TimezoneFinder
 
 from . import astro, places
 
-app = FastAPI(title="Vedic Chart")
+app = FastAPI(title="Vedic Calendar")
 _geocoder = Nominatim(user_agent="vedic-chart-local", timeout=10)
 
 

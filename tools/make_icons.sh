@@ -60,8 +60,8 @@ im.save('$DOCS/favicon.ico', sizes=[(16, 16), (32, 32), (48, 48)])
   printf 'font-family:-apple-system,BlinkMacSystemFont,sans-serif">'
   sed 's/<svg /<svg width="300" height="336" style="flex:none" /' "$DOCS/ganesha.svg"
   printf '<div>'
-  printf '<div style="font-size:88px;font-weight:700;letter-spacing:-1px;line-height:1">Vedic Chart</div>'
-  printf '<div style="font-size:40px;font-weight:600;margin-top:14px;opacity:.85">வேத ஜாதகம்</div>'
+  printf '<div style="font-size:88px;font-weight:700;letter-spacing:-1px;line-height:1">Vedic Calendar</div>'
+  printf '<div style="font-size:40px;font-weight:600;margin-top:14px;opacity:.85">வேத நாட்காட்டி</div>'
   printf '<div style="font-size:34px;line-height:1.45;margin-top:40px">Panchangam · Tamil calendar<br>Festivals · Muhurtham<br>Birth charts · Dasha</div>'
   printf '<div style="font-size:26px;margin-top:36px;opacity:.75">Free · works offline · English &amp; தமிழ்</div>'
   printf '</div></body></html>'

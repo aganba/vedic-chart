@@ -1,6 +1,6 @@
 {
-  "name": "Vedic Chart",
-  "short_name": "Vedic Chart",
+  "name": "Vedic Calendar",
+  "short_name": "Vedic Calendar",
   "description": "Panchangam, Tamil calendar, festivals, Shubha Muhurtham, South Indian charts and Vimshottari dasha, calculated on your device.",
   "start_url": "./",
   "scope": "./",
