@@ -484,22 +484,24 @@ function drawFestivals() {
   $("festivals").hidden = false;
 
   const muhurthaRow = ({ date, m }) => {
-    // One window per line; start, dash, end, lagna and the events it suits
-    // each line up in a column.
+    // One window per line; start, dash, end and lagna each line up in a column.
     const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)}</strong><strong>–</strong>`
-      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span>`
-      + `<span class="events">${w.events.map((e) => `<span class="event">${esc(tr(e, "event"))}</span>`).join("")}</span></span>`).join("");
+      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span></span>`).join("");
     return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
         <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))} · ${esc(tr(m.yogam, "dayYoga"))}</div>
         <div class="upcoming-times">${wins}</div></div></li>`;
   };
+
+  // General muhurtham days, and the extra days for starting education.
+  const general = muhurthas.filter((u) => u.m.kind === "general");
+  const education = muhurthas.filter((u) => u.m.kind === "education");
 
   // Muhurtham days from the entered date through the next UPCOMING_DAYS days.
   const mTitle = `<div class="upcoming-title">${esc(t("Shubha Muhurtham (next {n} days)", { n: UPCOMING_DAYS }))}</div>`;
   let mBody;
   if (!bannerReady) mBody = failed ? note(t("Couldn't calculate muhurtham days.")) : note(t("Checking…"));
   else {
-    const rows = muhurthas.filter((u) => u.date < cut).map(muhurthaRow);
+    const rows = general.filter((u) => u.date < cut).map(muhurthaRow);
     mBody = rows.length ? `<ul class="upcoming-list muhurtha-list">${rows.join("")}</ul>`
       : note(t("No muhurtham days in the next {n} days.", { n: UPCOMING_DAYS }));
   }
@@ -526,29 +528,15 @@ function drawFestivals() {
     `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
-  // The year's list, narrowed to the chosen event: only its days and times.
-  const shown = !muhurthaEvent ? muhurthas : muhurthas.map((u) => {
-    const windows = u.m.windows.filter((w) => w.events.includes(muhurthaEvent));
-    return windows.length ? { ...u, m: { ...u.m, windows } } : null;
-  }).filter(Boolean);
-  const none = muhurthaEvent ? t("No {event} days found.", { event: t(muhurthaEvent) }) : t("No shubha muhurtham days found.");
-  $("muhurthaYear").innerHTML = byMonth(shown, "upcoming-list muhurtha-list", muhurthaRow)
-    + (status ? `<p class="hint">${esc(status)}</p>` : !shown.length ? `<p class="hint">${esc(none)}</p>` : "");
+  // The year's list, then a note with the extra days for starting education.
+  const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`
+    + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra. They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house and moudhyam."))}</p>`
+    + byMonth(education, "upcoming-list muhurtha-list", muhurthaRow) + "</div>" : "";
+  $("muhurthaYear").innerHTML = byMonth(general, "upcoming-list muhurtha-list", muhurthaRow)
+    + (status ? `<p class="hint">${esc(status)}</p>` : !general.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "")
+    + extra;
 }
 
-// ---------- muhurtham event filter ----------
-
-const EVENT_KEY = "vedic-chart-muhurtham-event";
-let muhurthaEvent = "";
-
-function selectMuhurthaEvent(name) {
-  const buttons = [...document.querySelectorAll(".event-filter button")];
-  if (!buttons.some((b) => b.dataset.event === name)) name = "";
-  muhurthaEvent = name;
-  for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.event === name));
-  try { localStorage.setItem(EVENT_KEY, name); } catch {}
-  drawFestivals();
-}
 
 function renderPositions(c) {
   const signs = c.constants.signs, abbr = c.constants.sign_abbr;
@@ -828,12 +816,6 @@ async function init() {
   let savedTab = "panchanga";
   try { savedTab = localStorage.getItem(TAB_KEY) || savedTab; } catch {}
   selectTab(new URLSearchParams(location.search).get("tab") || savedTab);
-  for (const b of document.querySelectorAll(".event-filter button")) {
-    b.addEventListener("click", () => selectMuhurthaEvent(b.dataset.event));
-  }
-  let savedEvent = "";
-  try { savedEvent = localStorage.getItem(EVENT_KEY) || ""; } catch {}
-  selectMuhurthaEvent(savedEvent);
 
   if ("serviceWorker" in navigator && window.isSecureContext) {
     // When a new version's service worker takes over, reload once so the page

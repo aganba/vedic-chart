@@ -1,9 +1,10 @@
-// Shubha muhurtham days in the style of Tamil calendars, with the events each
-// time window suits.
+// Shubha muhurtham days in the style of Tamil calendars, and the extra days
+// that suit starting education.
 //
-// Every day must pass these, whatever the event:
-//  - Weekday: not Tuesday or Saturday.
+// Every day must pass these:
 //  - Not a Kari naal (KARI_NAAL below) or the first day of a Tamil month.
+//  - Not an eclipse day: no new or full moon that day close enough to the
+//    Moon's node for an eclipse anywhere.
 //  - The day's yogam (weekday + sunrise nakshatra, YOGAM below) is Amirtha or
 //    Siddha, not Marana or Prabalarishta.
 // Every window must pass these:
@@ -11,14 +12,16 @@
 //    Tamil calendars.
 //  - Not in Rahu Kalam, Yamaganda, Gulika Kalam or Vishti (Bhadra) karana.
 //  - Ashtama shuddhi: no planet (Moon included) in the 8th house from the lagna.
+//  - The lagna isn't in the first or last degree of its sign (sandhi).
 //  - At least 20 minutes long.
-// Then each window is tagged with the events whose own rules it meets (EVENTS):
-//  - Marriage: Tamil calendar practice. These rules reproduce all 47 days of
-//    Harikesanallur Venkatraman's 2026-27 list for Chennai.
-//  - Griha pravesham and starting education: the stars, weekdays and lagnas of
-//    B. V. Raman's Muhurtha (chapters 12 and 11), with the Tamil tithis.
-//  - New business: common panchangam practice (Raman has no chapter on it).
-// A day is listed when at least one window suits at least one event.
+// and the tithi, nakshatra, weekday, lagna and month rules of one of RULES:
+//  - general: Tamil calendar practice for marriage and other auspicious
+//    beginnings, plus two of Raman's marriage conditions: the 7th house from
+//    the lagna is empty, and neither Jupiter nor Venus is combust (moudhyam).
+//  - education: the stars, weekdays and lagnas of B. V. Raman's Muhurtha
+//    (chapter 11), with the Tamil tithis less the Rikta ones. Checked only on
+//    days that aren't general muhurtham days; most of these fall in Aadi,
+//    Purattasi or Margazhi, or have Ardra nakshatra.
 // Personal factors (tarabala, chandrabala) aren't applied.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
@@ -33,33 +36,22 @@ const BAD_SUN_SIGN = set(3, 5, 8); // Aadi, Purattasi, Margazhi
 // Tithis used in Tamil calendar lists: not Pratipada, Ashtami, Navami, Purnima,
 // Amavasya or Krishna Chaturdashi (Chaturthi and Shukla Chaturdashi are used).
 const TAMIL_TITHI = set(1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 16, 17, 18, 19, 20, 21, 24, 25, 26, 27);
-// The same without the Rikta tithis (Chaturthi, Chaturdashi), which Raman and
-// panchangam practice reject for house entry, education and business.
-const NO_RIKTA = new Set([...TAMIL_TITHI].filter((t) => ![3, 13, 18].includes(t)));
-const EVENTS = [
-  { name: "Marriage", tithi: TAMIL_TITHI,
+const RULES = {
+  general: { tithi: TAMIL_TITHI,
     // Ashwini, Rohini, Mrigashira, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra,
     // Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha,
     // Uttara Bhadrapada, Revati.
     nak: set(0, 3, 4, 6, 7, 11, 12, 13, 14, 16, 18, 20, 21, 22, 23, 25, 26),
-    weekday: set(0, 1, 3, 4, 5), months: true },
-  { name: "Griha Pravesham", tithi: NO_RIKTA,
-    // Raman's best and middling stars (Rohini, Mrigashira, Uttara Ashadha, Chitra,
-    // Uttara Bhadrapada; Anuradha, Revati) and Uttara Phalguni, the third fixed star.
-    nak: set(3, 4, 11, 13, 16, 20, 25, 26),
-    weekday: set(1, 3, 4, 5), lagna: (s) => s % 3 !== 0, months: true, noCombust: true },
-  { name: "Education", tithi: NO_RIKTA,
+    weekday: set(0, 1, 3, 4, 5), months: true, seventhEmpty: true, noCombust: true },
+  education: {
+    // Without the Rikta tithis (Chaturthi, Chaturdashi), which Raman rejects.
+    tithi: new Set([...TAMIL_TITHI].filter((t) => ![3, 13, 18].includes(t))),
     // Raman's best stars (Ashwini, Mrigashira, Ardra, Punarvasu, Pushya, Hasta,
     // Chitra, Swati, Shravana, Dhanishta, Shatabhisha) and his neutral ones (Rohini,
     // Uttara Phalguni, Uttara Ashadha, Revati). Sunday he allows as acceptable.
     nak: set(0, 3, 4, 5, 6, 7, 11, 12, 13, 14, 20, 21, 22, 23, 26),
     weekday: set(0, 1, 3, 4, 5), lagna: (s) => s % 3 !== 1 },
-  { name: "New business", tithi: NO_RIKTA,
-    // Light, fixed and soft stars: Ashwini, Pushya, Hasta; Rohini and the three
-    // Uttaras; Mrigashira, Chitra, Anuradha, Revati; and Punarvasu.
-    nak: set(0, 3, 4, 6, 7, 11, 12, 13, 16, 20, 25, 26),
-    weekday: set(1, 3, 4, 5), lagna: (s) => s % 3 !== 0, noMercuryRetro: true },
-];
+};
 // Kari naal: days of each Tamil month, Chithirai first.
 const KARI_NAAL = {
   Chithirai: [6, 15], Vaikasi: [7, 16, 17], Aani: [1, 6], Aadi: [2, 10, 20],
@@ -96,13 +88,32 @@ const MIN_LEN = 20 / 1440;
 const norm = (x) => ((x % 360) + 360) % 360;
 const sign = (lon) => Math.floor(norm(lon) / 30);
 const gap = (a, b) => Math.abs(norm(a - b + 180) - 180);
+const ONE_DAY = 1; // in jd
+
+// Whether a solar or lunar eclipse happens (anywhere) between jd0 and jd1: a new
+// moon with the Sun within 18.5 degrees of a node, or a full moon within 12.5.
+function eclipseBetween(jd0, jd1) {
+  const el = (jd) => norm(planetLon(jd, SE.MOON)[0] - planetLon(jd, SE.SUN)[0]);
+  const a = el(jd0), b = el(jd1);
+  const newMoon = b < a, fullMoon = a < 180 && b >= 180;
+  if (!newMoon && !fullMoon) return false;
+  // Moment of the syzygy, by bisection.
+  let lo = jd0, hi = jd1;
+  for (let i = 0; i < 20; i++) {
+    const m = (lo + hi) / 2, e = el(m);
+    if (newMoon ? e > 180 : e < 180) lo = m; else hi = m;
+  }
+  const node = planetLon(lo, SE.MEAN_NODE)[0], sun = planetLon(lo, SE.SUN)[0];
+  return Math.min(gap(sun, node), gap(sun, node + 180)) < (newMoon ? 18.5 : 12.5);
+}
 
 // `offset`: UTC offset in hours, or a function of the UTC instant (ms), as in festivalsFor.
+// Returns null, or the day's windows with `kind` "general" or "education".
 export function muhurthaFor(dateWall, lat, lon, offset) {
   const offsetAt = typeof offset === "function" ? offset : () => offset;
   const weekday = new Date(dateWall).getUTCDay();
-  const events = EVENTS.filter((e) => e.weekday.has(weekday));
-  if (!events.length) return null;
+  const kinds = Object.keys(RULES).filter((k) => RULES[k].weekday.has(weekday));
+  if (!kinds.length) return null;
   const wallOffset = offsetAt(dateWall - offsetAt(dateWall) * 3600e3);
   const sr = swe.riseTrans(julFromWall(dateWall, wallOffset), SE.SUN, SE.CALC_RISE, lon, lat);
   const ss = sr && swe.riseTrans(sr, SE.SUN, SE.CALC_SET, lon, lat);
@@ -114,12 +125,13 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
   if (marana.includes(nakAtSunrise) || prabala.includes(nakAtSunrise)) return null;
   const yogam = amirtha.includes(nakAtSunrise) ? "Amirtha yogam" : "Siddha yogam";
 
-  // Combustion and Mercury's motion, taken at midday.
+  const midnight = julFromWall(dateWall, wallOffset);
+  if (eclipseBetween(midnight, midnight + ONE_DAY)) return null;
+  // Jupiter or Venus combust (too close to the Sun), taken at midday.
   const noon = (sr + ss) / 2;
   const sunNoon = planetLon(noon, SE.SUN)[0];
   const [ven, venSpeed] = planetLon(noon, SE.VENUS);
   const combust = gap(planetLon(noon, SE.JUPITER)[0], sunNoon) < 11 || gap(ven, sunNoon) < (venSpeed < 0 ? 8 : 10);
-  const mercuryRetro = planetLon(noon, SE.MERCURY)[1] < 0;
 
   const start = Math.max(sr - 1 / 24, julFromWall(dateWall + 5 * 3600e3 + 1000, wallOffset));
   const end = Math.min(julFromWall(dateWall + 13 * 3600e3, wallOffset), ss);
@@ -135,67 +147,83 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
   const sStart = signsAt(start), sEnd = signsAt(end);
   const steady = Object.keys(sStart).every((k) => sStart[k] === sEnd[k]);
 
-  // State at jd: null if no event suits it, else a key identifying the window
-  // (lagna and events) it belongs to.
-  const state = (jd) => {
+  // State at jd under rule r: null if inauspicious, else its lagna (the window key).
+  const state = (jd, r) => {
+    if (r.noCombust && combust) return null;
     if (kalams.some(([a, b]) => jd >= a && jd < b)) return null;
     const sun = planetLon(jd, SE.SUN)[0];
+    if (r.months && BAD_SUN_SIGN.has(sign(sun))) return null;
     const moon = planetLon(jd, SE.MOON)[0];
     const el = norm(moon - sun);
+    const ti = Math.floor(el / 12);
+    if (!r.tithi.has(ti)) return null;
     const k = Math.floor(el / 6);
     if (k >= 1 && k <= 56 && (k - 1) % 7 === 6) return null; // Vishti
-    const lagna = sign(lagnaAndMc(jd, lat, lon)[0]);
+    const nak = Math.floor(moon / NAK_SPAN);
+    if (!r.nak.has(nak)) return null;
+    const lagnaLon = norm(lagnaAndMc(jd, lat, lon)[0]);
+    if (lagnaLon % 30 < 1 || lagnaLon % 30 > 29) return null; // sandhi
+    const lagna = sign(lagnaLon);
+    if (r.lagna && !r.lagna(lagna)) return null;
     const signs = { ...(steady ? sStart : signsAt(jd)), moon: sign(moon) };
-    if (Object.values(signs).some((s) => (s - lagna + 12) % 12 === 7)) return null;
-    const ti = Math.floor(el / 12), nak = Math.floor(moon / NAK_SPAN), sunSign = sign(sun);
-    const ok = events.filter((e) => e.tithi.has(ti) && e.nak.has(nak)
-      && (!e.lagna || e.lagna(lagna)) && (!e.months || !BAD_SUN_SIGN.has(sunSign))
-      && (!e.noCombust || !combust) && (!e.noMercuryRetro || !mercuryRetro)).map((e) => e.name);
-    if (!ok.length) return null;
-    return { key: `${lagna}:${ok.join()}`, ti, nak, lagna, events: ok };
+    const houses = Object.values(signs).map((s) => (s - lagna + 12) % 12);
+    if (houses.includes(7)) return null; // 8th house
+    if (r.seventhEmpty && houses.includes(6)) return null;
+    return { key: lagna, ti, nak, lagna };
   };
 
-  // Moment between a (state sa) and b where the state stops being sa.
-  const edge = (a, b, sa) => {
-    for (let i = 0; i < 12; i++) {
-      const m = (a + b) / 2;
-      if ((state(m)?.key ?? null) === sa) a = m; else b = m;
+  // Windows of at least MIN_LEN where rule r holds.
+  const scan = (r) => {
+    const at = (jd) => state(jd, r);
+    // Moment between a (state sa) and b where the state stops being sa.
+    const edge = (a, b, sa) => {
+      for (let i = 0; i < 12; i++) {
+        const m = (a + b) / 2;
+        if ((at(m)?.key ?? null) === sa) a = m; else b = m;
+      }
+      return (a + b) / 2;
+    };
+    const raw = [];
+    let cur = null, curStart = 0, prevJd = start, prev = at(start);
+    if (prev) { cur = prev; curStart = start; }
+    for (let jd = start + STEP; ; jd += STEP) {
+      const t = Math.min(jd, end);
+      const s = t < end ? at(t) : null;
+      if ((s?.key ?? null) !== (cur?.key ?? null)) {
+        const e = edge(prevJd, t, prev?.key ?? null);
+        if (cur) raw.push({ ...cur, start: curStart, end: e });
+        cur = s; curStart = e;
+      }
+      prev = s; prevJd = t;
+      if (t >= end) break;
     }
-    return (a + b) / 2;
+    return raw.filter((w) => w.end - w.start >= MIN_LEN);
   };
 
-  const raw = [];
-  let cur = null, curStart = 0, prevJd = start, prev = state(start);
-  if (prev) { cur = prev; curStart = start; }
-  for (let jd = start + STEP; ; jd += STEP) {
-    const t = Math.min(jd, end);
-    const s = t < end ? state(t) : null;
-    if ((s?.key ?? null) !== (cur?.key ?? null)) {
-      const at = edge(prevJd, t, prev?.key ?? null);
-      if (cur) raw.push({ ...cur, start: curStart, end: at });
-      cur = s; curStart = at;
-    }
-    prev = s; prevJd = t;
-    if (t >= end) break;
+  // General muhurtham first; education only on days that aren't.
+  let kind = null, windows = [];
+  for (const k of kinds) {
+    windows = scan(RULES[k]);
+    if (windows.length) { kind = k; break; }
   }
-  const windows = raw.filter((w) => w.end - w.start >= MIN_LEN);
-  if (!windows.length) return null;
+  if (!kind) return null;
   // Checked last: finding the Tamil date means looking back to the month's start.
   const td = tamilDate(dateWall, lat, lon, offset);
   if (td && (td.day === 1 || KARI_NAAL[td.month]?.includes(td.day))) return null;
   // Tithis and nakshatras across the windows (either can change inside one).
   const tithis = new Set(), naks = new Set();
   for (const w of windows) for (const jd of [w.start, w.end - 1e-5]) {
-    const st = state(jd);
+    const st = state(jd, RULES[kind]);
     if (st) { tithis.add(st.ti); naks.add(st.nak); }
   }
 
   const fmt = (jd) => localFromJul(jd, offsetAt((jd - 2440587.5) * 86400e3));
   return {
+    kind,
     paksha: windows[0].ti < 15 ? "Valarpirai" : "Theipirai",
     tithi: [...tithis].map((t) => TITHI_NAMES[t % 15]).join(" / "),
     nakshatra: [...naks].map((n) => NAK_NAMES[n]).join(" / "),
     yogam,
-    windows: windows.map((w) => ({ start: fmt(w.start), end: fmt(w.end), lagna: SIGN_NAMES[w.lagna], events: w.events })),
+    windows: windows.map((w) => ({ start: fmt(w.start), end: fmt(w.end), lagna: SIGN_NAMES[w.lagna] })),
   };
 }

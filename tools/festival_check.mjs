@@ -90,29 +90,33 @@ for (const [date, month, day, year] of TAMIL_DATES) {
 }
 
 // Shubha muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27 list for
-// Chennai (Vakya panchangam, harikesanallur.com) must all be found with a
-// marriage time. Other days may be listed too: panchangams disagree on the finer
-// rules, and the list covers marriage only. No day may break the weekday rule.
+// Chennai (Vakya panchangam, harikesanallur.com) must all be found as general
+// muhurtham days, except three that break rules this list doesn't follow but
+// the app does: Raman's empty 7th house (4 June 2026, 26 February 2027) and
+// Venus combust (25 October 2026). Other days may be listed too, as panchangams
+// disagree on the finer rules. No day may break the weekday rule.
 const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-05-18 2026-05-25 2026-05-28 2026-05-29 "
   + "2026-06-04 2026-06-11 2026-06-17 2026-06-18 2026-06-24 2026-06-25 2026-07-05 2026-07-12 2026-08-23 2026-08-30 "
   + "2026-08-31 2026-09-07 2026-10-25 2026-10-30 2026-11-01 2026-11-11 2026-11-13 2026-11-15 2026-11-16 2026-11-20 "
   + "2026-11-22 2026-11-29 2026-12-04 2026-12-14 2027-01-20 2027-02-08 2027-02-10 2027-02-11 2027-02-26 2027-03-10 "
   + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12";
 {
-  const ref = new Set(MUHURTHAM.split(" "));
-  let marriage = 0, days = 0;
+  const EXCEPT = new Set(["2026-06-04", "2026-10-25", "2027-02-26"]);
+  const ref = new Set(MUHURTHAM.split(" ").filter((d) => !EXCEPT.has(d)));
+  let found = 0, days = 0, education = 0;
   const missed = [];
   for (let t = Date.parse("2026-04-14T00:00:00Z"); t <= Date.parse("2027-04-13T00:00:00Z"); t += 86400e3) {
     const date = new Date(t).toISOString().slice(0, 10);
     const m = muhurthaFor(t, ...CHENNAI, 5.5);
-    if (m) days++;
+    if (m?.kind === "general") days++;
+    if (m?.kind === "education") education++;
     if ([2, 6].includes(new Date(t).getUTCDay()) && m) { bad++; console.log(`FAIL muhurtham on ${date}`); }
     if (!ref.has(date)) continue;
-    if (m?.windows.some((w) => w.events.includes("Marriage"))) marriage++; else missed.push(date);
+    if (m?.kind === "general") found++; else missed.push(date);
   }
-  const ok = marriage === ref.size;
+  const ok = found === ref.size;
   if (!ok) bad++;
-  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days, ${marriage}/${ref.size} published marriage days found${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
+  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days and ${education} extra education days, ${found}/${ref.size} published days found (3 more excepted)${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
 }
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);
