@@ -53,8 +53,8 @@ const UI = {
   "Select a mahadasha to see its antardashas (bhuktis).": "ஒரு மகா தசையைத் தேர்ந்தெடுத்தால் அதன் புக்திகள் தெரியும்.",
   "Festivals": "பண்டிகைகள்",
   "Shubha Muhurtham": "சுப முகூர்த்தம்",
-  "Days with a good tithi, nakshatra and weekday, outside Aadi, Purattasi and Margazhi and not a Kari naal, with time windows that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.":
-    "நல்ல திதி, நட்சத்திரம், கிழமை உள்ள நாட்கள் (ஆடி, புரட்டாசி, மார்கழி மாதங்களும் கரி நாட்களும் தவிர). நேரங்கள் ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம் இல்லாதவை; லக்னத்திலிருந்து 8-ஆம் வீட்டில் கிரகம் இல்லாதவை. தாராபலம், சந்திரபலம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை; பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம், எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
+  "Days in the style of Tamil calendars: not a Tuesday, Saturday, Kari naal or Marana yogam, with times between an hour before sunrise and 1 pm that avoid Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana and have no planet in the 8th house from the lagna. Each time shows the events its tithi, nakshatra, weekday and lagna suit: marriage as in Tamil calendars, griha pravesham and education by the stars and lagnas in B. V. Raman's Muhurtha, and new business as in common panchangam practice. Marriage and griha pravesham also skip Aadi, Purattasi and Margazhi, and griha pravesham skips weeks when Jupiter or Venus is combust. Personal factors such as tarabala and chandrabala aren't considered, and panchangams differ, so confirm with your family astrologer.":
+    "தமிழ் நாட்காட்டி முறையிலான நாட்கள்: செவ்வாய், சனி, கரி நாள், மரண யோகம் அல்லாதவை. நேரங்கள் சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து மதியம் 1 மணி வரை; ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம் இல்லாதவை; லக்னத்திலிருந்து 8-ஆம் வீட்டில் கிரகம் இல்லாதவை. ஒவ்வொரு நேரத்துக்கும் அதன் திதி, நட்சத்திரம், கிழமை, லக்னத்துக்கு ஏற்ற நிகழ்வுகள் காட்டப்படுகின்றன: திருமணம் தமிழ் நாட்காட்டி முறைப்படி, கிரகப்பிரவேசமும் கல்வி தொடக்கமும் பி. வி. ராமனின் முகூர்த்த நூலின் நட்சத்திரங்கள், லக்னங்கள்படி, புதிய தொழில் பொதுவான பஞ்சாங்க வழக்கப்படி. திருமணமும் கிரகப்பிரவேசமும் ஆடி, புரட்டாசி, மார்கழி மாதங்களில் இல்லை; குரு அல்லது சுக்கிரன் மௌட்யத்தில் இருக்கும் வாரங்களில் கிரகப்பிரவேசம் இல்லை. தாராபலம், சந்திரபலம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை; பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம், எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
   // panchanga
   "Day": "நாள்",
   "{date} (calendar date)": "{date} (ஆங்கிலத் தேதி)",
@@ -97,6 +97,13 @@ const UI = {
   "Couldn't calculate the remaining festivals.": "மீதமுள்ள பண்டிகைகளைக் கணக்கிட முடியவில்லை.",
   "No festivals found.": "பண்டிகைகள் எதுவும் இல்லை.",
   "{lagna} lagna": "{lagna} லக்னம்",
+  "Show muhurtham for": "முகூர்த்தம் காட்ட வேண்டிய நிகழ்வு",
+  "All events": "அனைத்தும்",
+  "Marriage": "திருமணம்",
+  "Griha Pravesham": "கிரகப்பிரவேசம்",
+  "Education": "கல்வி தொடக்கம்",
+  "New business": "புதிய தொழில்",
+  "No {event} days found.": "{event} நாட்கள் எதுவும் இல்லை.",
   // tables
   "Body": "கிரகம்",
   "Longitude|table": "பாகை", // "|context" keys show the part before "|" in English
@@ -210,6 +217,9 @@ const NS = {
       "அஷ்டமி", "நவமி", "தசமி", "ஏகாதசி", "துவாதசி", "திரயோதசி", "சதுர்த்தசி"]),
     Purnima: "பௌர்ணமி", Amavasya: "அமாவாசை",
   },
+  // muhurtham: the events a time suits, and the day's Tamil yogam
+  event: { "Marriage": "திருமணம்", "Griha Pravesham": "கிரகப்பிரவேசம்", "Education": "கல்வி தொடக்கம்", "New business": "புதிய தொழில்" },
+  dayYoga: { "Amirtha yogam": "அமிர்த யோகம்", "Siddha yogam": "சித்த யோகம்" },
   paksha: { Shukla: "வளர்பிறை", Krishna: "தேய்பிறை", Valarpirai: "வளர்பிறை", Theipirai: "தேய்பிறை" },
   yoga: zip(["Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
     "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra",

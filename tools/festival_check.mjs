@@ -89,26 +89,30 @@ for (const [date, month, day, year] of TAMIL_DATES) {
   console.log(`${ok ? "ok  " : "FAIL"} Tamil date ${date}: ${td ? `${td.month} ${td.day}, ${td.year}` : "none"}`);
 }
 
-// Shubha muhurtham: panchangams disagree on the finer rules, so require only
-// that most Valarpirai dates published by LiveChennai for Chennai are found,
-// and that no day breaks the weekday rule.
-const MUHURTHAM = {
-  2025: "02-02 02-03 02-12 03-02 03-05 03-06 03-07 03-12 04-30 05-01 05-08 05-09 05-28 06-02 06-04 06-05 06-08 06-29 06-30 07-02 07-03 07-04 07-06 07-07 11-02 11-03 11-23 11-30 12-01",
-  2026: "01-28 02-20 02-22 03-25 04-01 04-20 04-23 04-30 05-18 05-25 05-28 05-29 06-17 06-18 06-24 06-25 08-23 09-13 09-17 10-25 11-11 11-13 11-15 11-16 11-20 12-10 12-13 12-14",
-};
-for (const [year, list] of Object.entries(MUHURTHAM)) {
-  const ref = list.split(" ").map((d) => `${year}-${d}`);
-  let hit = 0, days = 0;
-  for (let t = Date.parse(`${year}-01-01T00:00:00Z`); t <= Date.parse(`${year}-12-31T00:00:00Z`); t += 86400e3) {
+// Shubha muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27 list for
+// Chennai (Vakya panchangam, harikesanallur.com) must all be found with a
+// marriage time. Other days may be listed too: panchangams disagree on the finer
+// rules, and the list covers marriage only. No day may break the weekday rule.
+const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-05-18 2026-05-25 2026-05-28 2026-05-29 "
+  + "2026-06-04 2026-06-11 2026-06-17 2026-06-18 2026-06-24 2026-06-25 2026-07-05 2026-07-12 2026-08-23 2026-08-30 "
+  + "2026-08-31 2026-09-07 2026-10-25 2026-10-30 2026-11-01 2026-11-11 2026-11-13 2026-11-15 2026-11-16 2026-11-20 "
+  + "2026-11-22 2026-11-29 2026-12-04 2026-12-14 2027-01-20 2027-02-08 2027-02-10 2027-02-11 2027-02-26 2027-03-10 "
+  + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12";
+{
+  const ref = new Set(MUHURTHAM.split(" "));
+  let marriage = 0, days = 0;
+  const missed = [];
+  for (let t = Date.parse("2026-04-14T00:00:00Z"); t <= Date.parse("2027-04-13T00:00:00Z"); t += 86400e3) {
+    const date = new Date(t).toISOString().slice(0, 10);
     const m = muhurthaFor(t, ...CHENNAI, 5.5);
-    if (!m) continue;
-    days++;
-    if (ref.includes(new Date(t).toISOString().slice(0, 10))) hit++;
-    if ([2, 6].includes(new Date(t).getUTCDay()) || !m.windows.length) { bad++; console.log(`FAIL muhurtham on ${new Date(t).toISOString().slice(0, 10)}`); }
+    if (m) days++;
+    if ([2, 6].includes(new Date(t).getUTCDay()) && m) { bad++; console.log(`FAIL muhurtham on ${date}`); }
+    if (!ref.has(date)) continue;
+    if (m?.windows.some((w) => w.events.includes("Marriage"))) marriage++; else missed.push(date);
   }
-  const ok = hit >= ref.length * 0.6;
+  const ok = marriage === ref.size;
   if (!ok) bad++;
-  console.log(`${ok ? "ok  " : "FAIL"} muhurtham ${year}: ${days} days, ${hit}/${ref.length} published Valarpirai dates found`);
+  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days, ${marriage}/${ref.size} published marriage days found${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
 }
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

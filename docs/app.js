@@ -484,11 +484,13 @@ function drawFestivals() {
   $("festivals").hidden = false;
 
   const muhurthaRow = ({ date, m }) => {
-    // One window per line; start, dash, end and lagna each line up in a column.
+    // One window per line; start, dash, end, lagna and the events it suits
+    // each line up in a column.
     const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)}</strong><strong>–</strong>`
-      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span></span>`).join("");
+      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span>`
+      + `<span class="events">${w.events.map((e) => `<span class="event">${esc(tr(e, "event"))}</span>`).join("")}</span></span>`).join("");
     return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
-        <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))}</div>
+        <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))} · ${esc(tr(m.yogam, "dayYoga"))}</div>
         <div class="upcoming-times">${wins}</div></div></li>`;
   };
 
@@ -524,8 +526,28 @@ function drawFestivals() {
     `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
-  $("muhurthaYear").innerHTML = byMonth(muhurthas, "upcoming-list muhurtha-list", muhurthaRow)
-    + (status ? `<p class="hint">${esc(status)}</p>` : !muhurthas.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "");
+  // The year's list, narrowed to the chosen event: only its days and times.
+  const shown = !muhurthaEvent ? muhurthas : muhurthas.map((u) => {
+    const windows = u.m.windows.filter((w) => w.events.includes(muhurthaEvent));
+    return windows.length ? { ...u, m: { ...u.m, windows } } : null;
+  }).filter(Boolean);
+  const none = muhurthaEvent ? t("No {event} days found.", { event: t(muhurthaEvent) }) : t("No shubha muhurtham days found.");
+  $("muhurthaYear").innerHTML = byMonth(shown, "upcoming-list muhurtha-list", muhurthaRow)
+    + (status ? `<p class="hint">${esc(status)}</p>` : !shown.length ? `<p class="hint">${esc(none)}</p>` : "");
+}
+
+// ---------- muhurtham event filter ----------
+
+const EVENT_KEY = "vedic-chart-muhurtham-event";
+let muhurthaEvent = "";
+
+function selectMuhurthaEvent(name) {
+  const buttons = [...document.querySelectorAll(".event-filter button")];
+  if (!buttons.some((b) => b.dataset.event === name)) name = "";
+  muhurthaEvent = name;
+  for (const b of buttons) b.setAttribute("aria-pressed", String(b.dataset.event === name));
+  try { localStorage.setItem(EVENT_KEY, name); } catch {}
+  drawFestivals();
 }
 
 function renderPositions(c) {
@@ -806,6 +828,12 @@ async function init() {
   let savedTab = "panchanga";
   try { savedTab = localStorage.getItem(TAB_KEY) || savedTab; } catch {}
   selectTab(new URLSearchParams(location.search).get("tab") || savedTab);
+  for (const b of document.querySelectorAll(".event-filter button")) {
+    b.addEventListener("click", () => selectMuhurthaEvent(b.dataset.event));
+  }
+  let savedEvent = "";
+  try { savedEvent = localStorage.getItem(EVENT_KEY) || ""; } catch {}
+  selectMuhurthaEvent(savedEvent);
 
   if ("serviceWorker" in navigator && window.isSecureContext) {
     // When a new version's service worker takes over, reload once so the page

@@ -133,7 +133,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .tabs { display: flex; gap: 4px; margin: 0 0 16px; border-bottom: 1px solid var(--line); overflow-x: auto; }
 .tabs button {
   background: transparent; color: var(--muted); border: 0; border-bottom: 3px solid transparent;
-  border-radius: 0; padding: 10px 14px; min-height: 44px; white-space: nowrap;
+  border-radius: 0; padding: 10px 14px; min-height: 44px; white-space: nowrap; flex: none;
 }
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .tabs button:hover { color: var(--ink); }
@@ -209,12 +209,39 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 #festivalYear .upcoming-list li.today { font-weight: 700; }
 /* several festivals on one day: one per line, aligned after the date */
 #festivalYear .upcoming-list li { display: flex; gap: 6px; }
-.muhurtha-list { gap: 8px; }
+.muhurtha-list { gap: 8px; container-type: inline-size; }
 .muhurtha-list li { display: flex; gap: 6px; }
-.muhurtha-list .upcoming-times { display: grid; grid-template-columns: auto auto auto 1fr; column-gap: 6px; row-gap: 2px; margin-top: 2px; }
+/* start and end times and the lagna get the same width on every day, with the
+   times right-aligned, so the dashes, lagnas and events line up down the whole list */
+.muhurtha-list .upcoming-times { display: grid; grid-template-columns: minmax(5em, max-content) auto minmax(5em, max-content) minmax(9.5em, max-content) 1fr; column-gap: 6px; row-gap: 4px; margin-top: 2px; align-items: baseline; }
+.muhurtha-list .win > strong:nth-child(odd) { text-align: right; }
 .muhurtha-list .win { display: contents; white-space: nowrap; }
 .muhurtha-list .win > * { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .muhurtha-list .win > span { margin-left: 6px; }
+/* event filter above the year's muhurtham list */
+.event-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; }
+.event-filter button {
+  background: transparent; color: var(--muted); border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 12px; min-height: 36px; font-weight: 600; font-size: 13px;
+}
+.event-filter button:hover { color: var(--ink); }
+.event-filter button[aria-pressed="true"] { background: var(--good); border-color: var(--good); color: var(--card); }
+/* the events a window suits, as small tags */
+.muhurtha-list .win > .events { display: flex; flex-wrap: wrap; gap: 4px; white-space: normal; }
+.muhurtha-list .event {
+  font-size: 12px; line-height: 1.5; padding: 0 7px; border-radius: 999px; white-space: nowrap;
+  color: var(--good); border: 1px solid color-mix(in srgb, var(--good) 45%, transparent);
+}
+/* too narrow for a fifth column (phones, the Panchanga-tab banner): events go under the time */
+@container (max-width: 560px) {
+  .muhurtha-list .upcoming-times { grid-template-columns: minmax(5em, max-content) auto minmax(5em, max-content) 1fr; }
+  .muhurtha-list .win > .events { grid-column: 1 / -1; margin: 0 0 4px; }
+}
+/* phones: the date goes above the day's details so the times have the full width */
+@container (max-width: 380px) {
+  .muhurtha-list li { flex-direction: column; gap: 2px; }
+  .muhurtha-list li.today .upcoming-date::after { display: inline; margin-left: 6px; }
+}
 /* muhurtham days are colour-coded green */
 .muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
 .muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
