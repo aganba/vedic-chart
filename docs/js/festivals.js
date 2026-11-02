@@ -12,6 +12,16 @@
 //    full-moon festivals (Thai Poosam, Maasi Magam, Karthigai Deepam, ...) the nakshatra day
 //    must belong to that month's Purnima, since the nakshatra can recur twice.
 // Festivals are not observed in an adhika (leap) lunar month.
+// Some festivals have rules of their own, each matching Drik Panchang:
+//  - An Upakarma on a day with a lunar eclipse (local midnight to midnight,
+//    seen or not) is flagged `eclipse`: panchangams may move it then, as Drik
+//    does in 2026, so the page asks to check with a temple.
+//  - Sama Upakarma: Hasta at aparahna, not sunrise (Chennai 2024-2028).
+//  - The Pongal days follow Makara Sankranti (before sunset, that day), not
+//    the Tamil month start: Pongal 2026 is 14 January in Chennai.
+//  - Vaikuntha Ekadashi follows the Vaishnava rule used by Tamil calendars and
+//    temples: the fast is on the first day Ekadashi has begun by arunodaya
+//    (96 minutes before sunrise), so a day with Dashami at dawn is passed over.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
 import { NAK_SPAN, SAMVATSARAS, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
@@ -46,7 +56,7 @@ const TITHI_FESTIVALS = [
   { name: "Ratha Saptami", masa: 10, tithi: 6, kaala: "sunrise" },
   { name: "Maha Shivaratri", masa: 10, tithi: 28, kaala: "nishita", label: "Nishita kaal puja" },
   // Tithi within a Tamil solar month rather than a lunar month.
-  { name: "Vaikuntha Ekadashi", solar: 8, tithi: 10, kaala: "sunrise", region: "Tamil Nadu" },
+  { name: "Vaikuntha Ekadashi", solar: 8, tithi: 10, kaala: "arunodaya", region: "Tamil Nadu" },
   { name: "Soora Samharam (Skanda Sashti)", solar: 6, tithi: 5, kaala: "sunset", label: "Soora Samharam (evening, from sunset)",
     region: "Tamil Nadu" },
 ];
@@ -54,15 +64,15 @@ const TITHI_FESTIVALS = [
 // Nakshatra in an amanta lunar month, Shukla paksha, at sunrise (Upakarmas).
 const LUNAR_NAKSHATRA_FESTIVALS = [
   { name: "Rig Upakarma", masa: 4, nak: 21, kaala: "sunrise", region: "South India" },
-  { name: "Sama Upakarma", masa: 5, nak: 12, kaala: "sunrise", region: "South India" },
+  { name: "Sama Upakarma", masa: 5, nak: 12, kaala: "aparahna", region: "South India" },
 ];
 
 const SOLAR_FESTIVALS = [
   { name: "Makara Sankranti", calendar: "sunset", sign: 9, day: 1, sankranti: true },
-  { name: "Bhogi", calendar: "tamil", sign: 9, day: 0, region: "Tamil Nadu, Andhra Pradesh" },
-  { name: "Thai Pongal", calendar: "tamil", sign: 9, day: 1, sankranti: true, region: "Tamil Nadu" },
-  { name: "Mattu Pongal", calendar: "tamil", sign: 9, day: 2, region: "Tamil Nadu" },
-  { name: "Kaanum Pongal", calendar: "tamil", sign: 9, day: 3, region: "Tamil Nadu" },
+  { name: "Bhogi", calendar: "sunset", sign: 9, day: 0, region: "Tamil Nadu, Andhra Pradesh" },
+  { name: "Thai Pongal", calendar: "sunset", sign: 9, day: 1, sankranti: true, region: "Tamil Nadu" },
+  { name: "Mattu Pongal", calendar: "sunset", sign: 9, day: 2, region: "Tamil Nadu" },
+  { name: "Kaanum Pongal", calendar: "sunset", sign: 9, day: 3, region: "Tamil Nadu" },
   { name: "Puthandu (Tamil New Year)", calendar: "tamil", sign: 0, day: 1, sankranti: true, region: "Tamil Nadu" },
   { name: "Vishu", calendar: "kerala", sign: 0, day: 1, sankranti: true, region: "Kerala" },
   { name: "Aadi Perukku", calendar: "tamil", sign: 3, day: 18, region: "Tamil Nadu" },
@@ -91,6 +101,7 @@ export const SIGN_NAMES = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "K
   "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"];
 
 const norm = (x) => ((x % 360) + 360) % 360;
+const ARUNODAYA = 96 / 1440; // 4 ghatis before sunrise, in days
 export const sunLon = (jd) => planetLon(jd, SE.SUN)[0];
 const moonLon = (jd) => planetLon(jd, SE.MOON)[0];
 export const elong = (jd) => norm(moonLon(jd) - sunLon(jd));
@@ -133,6 +144,7 @@ export function dayFrame(dateWall, lat, lon, offset) {
     if (!d) return null;
     switch (name) {
       case "sunrise": return [d.sr, d.sr];
+      case "arunodaya": return [d.sr - ARUNODAYA, d.sr - ARUNODAYA];
       case "sunset": return [d.ss, d.ss];
       case "madhyahna": return [d.sr + d.len * 2 / 5, d.sr + d.len * 3 / 5];
       case "aparahna": return [d.sr + d.len * 3 / 5, d.sr + d.len * 4 / 5];
@@ -200,13 +212,15 @@ export function dayFrame(dateWall, lat, lon, offset) {
   }
 
   const tithiSpan = (jd) => spanOf(elong, 12, jd, 12.19);
+  // Julian day of local midnight starting civil day n.
+  const midnight = (n) => { const wall = dateWall + n * 86400e3; return julFromWall(wall, wallOffset(wall)); };
   return { dateWall, lat, lon, offsetAt, day, kaala, mid, masaAt, solarMonth, monthStarts, fmt, window,
-    spanOf, observedOn, tithiSpan };
+    spanOf, observedOn, tithiSpan, midnight };
 }
 
 // Festivals on the civil day starting at local midnight `dateWall`; see dayFrame.
 export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWall, lat, lon, offset)) {
-  const { day, kaala, mid, masaAt, solarMonth, monthStarts, fmt, window, spanOf, observedOn, tithiSpan } = frame;
+  const { day, kaala, mid, masaAt, solarMonth, monthStarts, fmt, window, spanOf, observedOn, tithiSpan, midnight } = frame;
   if (!day(0)) return []; // polar day/night: no sunrise frame
 
   const tithiHolds = (f) => (n, jd) => {
@@ -215,7 +229,23 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
     const m = masaAt(jd);
     return m.masa === f.masa && !m.adhika;
   };
-  const tithiObserved = (f, n) => observedOn(n, f, tithiHolds(f), elong, 12, 12.19);
+  // Vaishnava Ekadashi: the first day whose arunodaya falls in the tithi or
+  // after it (in the same paksha), so a kshaya Ekadashi is kept on Dwadashi.
+  const reached = (f, n) => {
+    const w = kaala(n, f.kaala);
+    if (!w) return false;
+    const t = tithiAt(w[0]);
+    return t >= f.tithi && Math.floor(t / 15) === Math.floor(f.tithi / 15)
+      && (f.solar !== undefined ? solarMonth(n, "tamil") === f.solar : masaAt(w[0]).masa === f.masa);
+  };
+  const tithiObserved = (f, n) => (f.kaala === "arunodaya" ? reached(f, n) && !reached(f, n - 1)
+    : observedOn(n, f, tithiHolds(f), elong, 12, 12.19));
+  // Some part of a lunar eclipse in the umbra (seen here or not) on civil day n.
+  const eclipsedDay = (n) => {
+    const m0 = midnight(n), m1 = midnight(n + 1);
+    const [max, , pb, pe] = swe.lunEclipseWhen(m0 - 1).tret;
+    return !!pb && max < m1 + 1 && pb < m1 && pe > m0;
+  };
 
   const out = [];
   for (const f of TITHI_FESTIVALS) {
@@ -224,7 +254,9 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
     // The tithi's own span: when it is kshaya (spans no kaala), the kaala falls
     // in another tithi, so look for it across the day instead.
     const d = day(0), end = day(1)?.sr ?? d.nsr;
-    const at = [mid(w), d.sr, (d.sr + end) / 2, end - 1e-4].find((jd) => tithiAt(jd) === f.tithi) ?? mid(w);
+    let at = [mid(w), d.sr, (d.sr + end) / 2, end - 1e-4].find((jd) => tithiAt(jd) === f.tithi);
+    // A Vaishnava Ekadashi kept on Dwadashi: the Ekadashi ended before arunodaya.
+    if (at === undefined) at = tithiAt(w[0]) > f.tithi ? tithiSpan(w[0])[0] - 1e-4 : mid(w);
     const [ts, te] = tithiSpan(at);
     const times = [{ label: tithiLabel(f.tithi), start: fmt(ts), end: fmt(te) }];
     if (f.label) times.unshift(window(f.label, kaala(0, f.show || f.kaala)));
@@ -366,6 +398,9 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
       out.push({ name: "Varalakshmi Vratam", region: "Karnataka, Andhra Pradesh, Tamil Nadu", note: null,
         times: [{ label: `${tithiLabel(t)} at sunrise`, at: fmt(d.sr) }] });
     }
+  }
+  if (out.some((f) => f.name.includes("Upakarma")) && eclipsedDay(0)) {
+    for (const f of out) if (f.name.includes("Upakarma")) f.eclipse = true;
   }
   return out;
 }

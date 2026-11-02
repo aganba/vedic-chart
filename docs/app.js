@@ -438,9 +438,13 @@ const CHUNK_DAYS = 8;
 // them without recalculating.
 let fest = null;
 
+// An Upakarma on a lunar eclipse day gets an asterisk, explained by eclipseFootnote.
+const ECLIPSE_NOTE = "* A lunar eclipse falls on this day, and some panchangams move the Upakarma because of it. Check the date with your temple.";
 function festivalNames(festivals) {
-  return festivals.map((f) => esc(tr(f.name, "festival"))).join(" · ");
+  return festivals.map((f) => esc(tr(f.name, "festival")) + (f.eclipse ? "*" : "")).join(" · ");
 }
+const eclipseFootnote = (festivals) =>
+  (festivals.some((f) => f.eclipse) ? `<p class="hint eclipse-footnote">${esc(t(ECLIPSE_NOTE))}</p>` : "");
 
 function festivalDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -597,9 +601,10 @@ function drawFestivals() {
   // Today's festivals, then the next 7 days.
   const today = list.map((f) => `
     <div class="festival">
-      <div class="festival-name">${esc(tr(f.name, "festival"))}</div>
+      <div class="festival-name">${festivalNames([f])}</div>
       ${f.times.map((tt) => `<div class="festival-time">${timeText(tt)}</div>`).join("")}
       ${f.note ? `<div class="festival-note">${esc(tr(f.note, "note"))}</div>` : ""}
+      ${f.eclipse ? `<div class="festival-note">${esc(t(ECLIPSE_NOTE))}</div>` : ""}
     </div>`).join("");
   const upTitle = `<div class="upcoming-title">${esc(t("Coming up (next {n} days)", { n: UPCOMING_DAYS }))}</div>`;
   let upcoming;
@@ -610,7 +615,8 @@ function drawFestivals() {
         ? `<div class="upcoming-times">${f.times.map((tt) => `<span class="upcoming-time">${timeText(tt, u.date)}</span>`).join("")}</div>` : ""}</div>`).join("");
       return `<li><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${items}</div></li>`;
     });
-    upcoming = rows.length ? `<ul class="upcoming-list">${rows.join("")}</ul>`
+    const shown = found.filter((u) => u.date !== ref && u.date < cut).flatMap((u) => u.festivals);
+    upcoming = rows.length ? `<ul class="upcoming-list">${rows.join("")}</ul>${eclipseFootnote(shown)}`
       : note(t("No festivals in the next {n} days.", { n: UPCOMING_DAYS }));
   }
   $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">${upTitle}${upcoming}</div>`;
@@ -660,6 +666,7 @@ function drawFestivals() {
   $("festivalYear").innerHTML = byMonth(found, "upcoming-list", (u) =>
     `<li${u.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(u.date).label}</span><div>${
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
+    + eclipseFootnote(found.flatMap((u) => u.festivals))
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
   // The year's list, then a note with the extra days for starting education.
   const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`

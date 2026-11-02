@@ -154,6 +154,7 @@ const UI = {
   "At least 20 minutes long.": "குறைந்தது 20 நிமிடம்.",
   "Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.": "பஞ்சாங்க யோகம்: வியதீபாதம், வைதிருதி அல்ல; பரிகத்தின் முதல் பாதி அல்ல; விஷ்கம்பம், வஜ்ரம் ஆகியவற்றின் முதல் 3 நாழிகை (72 நிமிடம்), சூலத்தின் முதல் 5, கண்டம், அதிகண்டம் ஆகியவற்றின் முதல் 6, வியாகாதத்தின் முதல் 9 நாழிகை அல்ல.",
   "Rules used": "பயன்படுத்திய விதிகள்",
+  "* A lunar eclipse falls on this day, and some panchangams move the Upakarma because of it. Check the date with your temple.": "* இந்த நாளில் சந்திர கிரகணம் நிகழ்கிறது; அதனால் சில பஞ்சாங்கங்கள் உபாகர்மாவை வேறு நாளுக்கு மாற்றுகின்றன. தேதியை உங்கள் கோவிலில் உறுதி செய்துகொள்ளவும்.",
   "The day": "நாள்",
   "The time": "நேரம்",
   "Sources": "ஆதாரங்கள்",

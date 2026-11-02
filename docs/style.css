@@ -190,6 +190,11 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .site-footer { max-width: 1100px; margin: 8px auto 24px; padding: 0 16px; color: var(--muted); font-size: 12px; }
 .site-footer a { color: var(--muted); }
 .site-footer .about { margin: 0 0 6px; }
+.references { margin: 0 0 8px; }
+.references summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.references h4 { margin: 10px 0 4px; font-size: 12px; color: var(--ink); }
+.references ul { margin: 0; padding-left: 18px; }
+.references li { margin: 2px 0; }
 
 .invocation { display: flex; justify-content: center; padding: max(10px, env(safe-area-inset-top)) 16px 0; color: var(--accent); }
 /* The emblem SVG is used as a mask so it takes the theme's accent colour. */
@@ -286,6 +291,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .special-card { --sd: var(--accent); border-left: 4px solid var(--sd); }
 .special-card .sd-year { color: var(--sd); }
 .sd-hint { margin-top: 0; }
+.eclipse-footnote { margin-top: 8px; }
 .sd-eclipse { --sd: var(--sd-eclipse); }
 .sd-amavasya { --sd: var(--sd-amavasya); }
 .sd-pournami { --sd: var(--sd-pournami); }

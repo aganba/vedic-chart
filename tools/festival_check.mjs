@@ -13,8 +13,11 @@ const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.me
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 swe.setSidMode(swe.SE.SIDM_TRUE_CITRA);
 
-// [lat, lon, UTC offset in hours (default IST)]
-const CUPERTINO = [37.323, -122.0322, -8], NEW_YORK = [40.7128, -74.006, -5];
+// [lat, lon, time zone (default IST)]
+const { offsetAtUtc } = await import(new URL("../docs/js/tz.js", import.meta.url));
+const zone = (z) => (ms) => offsetAtUtc(z, ms);
+const CUPERTINO = [37.323, -122.0322, zone("America/Los_Angeles")], NEW_YORK = [40.7128, -74.006, zone("America/New_York")];
+const LONDON = [51.5074, -0.1278, zone("Europe/London")];
 const DELHI = [28.6139, 77.209], CHENNAI = [13.0827, 80.2707], KOCHI = [9.9312, 76.2673], MUMBAI = [19.076, 72.8777];
 const EXPECTED = [
   ["Thai Pongal", "2025-01-14", CHENNAI], ["Bhogi", "2025-01-13", CHENNAI], ["Mattu Pongal", "2025-01-15", CHENNAI],
@@ -35,7 +38,7 @@ const EXPECTED = [
   ["Naraka Chaturdashi", "2025-10-20", CHENNAI], ["Lakshmi Puja", "2025-10-20", DELHI],
   ["Govardhan Puja", "2025-10-22", DELHI], ["Bhai Dooj", "2025-10-23", DELHI],
   ["Kartika Purnima", "2025-11-05", DELHI], ["Karthigai Deepam", "2025-12-04", CHENNAI],
-  ["Makara Sankranti", "2026-01-14", DELHI], ["Thai Pongal", "2026-01-15", CHENNAI], ["Maha Shivaratri", "2026-02-15", DELHI],
+  ["Makara Sankranti", "2026-01-14", DELHI], ["Thai Pongal", "2026-01-14", CHENNAI], ["Maha Shivaratri", "2026-02-15", DELHI],
   ["Maasi Magam", "2026-03-03", CHENNAI], ["Holi", "2026-03-04", DELHI], ["Ugadi", "2026-03-19", CHENNAI], ["Puthandu", "2026-04-14", CHENNAI],
   ["Krishna Janmashtami", "2026-09-04", DELHI], ["Ganesh Chaturthi", "2026-09-14", MUMBAI],
   ["Vijayadashami", "2026-10-20", DELHI], ["Lakshmi Puja", "2026-11-08", DELHI],
@@ -44,6 +47,18 @@ const EXPECTED = [
   ["Kartika Purnima", "2026-11-23", CUPERTINO], ["Karthigai Deepam", "2026-11-23", CUPERTINO],
   ["Kartika Purnima", "2026-11-24", NEW_YORK], ["Karthigai Deepam", "2026-11-23", NEW_YORK],
   ["Karthigai Deepam", "2027-12-11", CHENNAI], ["Karthigai Deepam", "2027-12-12", DELHI],
+  // Yajur Upakarma: Purnima at sunrise. Drik moves it for the 2026 eclipse
+  // (US, Chennai) and the 2027 Simha sankranti (Chennai); the app keeps the
+  // sunrise day and flags eclipse days instead (checked below).
+  ["Yajur Upakarma", "2024-08-19", CHENNAI], ["Yajur Upakarma", "2025-08-09", CHENNAI], ["Yajur Upakarma", "2028-08-05", CHENNAI],
+  ["Yajur Upakarma", "2027-08-16", CUPERTINO], ["Yajur Upakarma", "2026-08-27", LONDON],
+  // Sama Upakarma: Hasta at aparahna.
+  ["Sama Upakarma", "2024-09-05", CHENNAI], ["Sama Upakarma", "2026-09-12", CHENNAI], ["Sama Upakarma", "2027-09-03", CHENNAI],
+  ["Sama Upakarma", "2028-08-23", CHENNAI], ["Sama Upakarma", "2026-09-12", CUPERTINO], ["Sama Upakarma", "2027-09-02", CUPERTINO],
+  // Pongal follows Makara Sankranti (3:13 pm on 14 January 2026, before sunset).
+  ["Bhogi", "2026-01-13", CHENNAI], ["Mattu Pongal", "2026-01-15", CHENNAI],
+  // Vaikuntha Ekadashi on the Vaishnava day, as in Tamil calendars.
+  ["Vaikuntha Ekadashi", "2025-12-31", CHENNAI], ["Vaikuntha Ekadashi", "2026-12-20", CUPERTINO],
 ];
 
 const names = (date, [lat, lon, offset = 5.5]) => {
@@ -64,6 +79,18 @@ for (const [fest, date, place] of EXPECTED) {
   console.log(`${ok ? "ok  " : "FAIL"} ${fest.padEnd(22)} ${date}${ok ? "" : `  (on=${on} dayBefore=${early} dayAfter=${late})`}`);
 }
 console.log(`${EXPECTED.length - bad}/${EXPECTED.length} festival dates match`);
+
+// An Upakarma on a day with a lunar eclipse in the umbra is flagged: the 2026
+// eclipse is on the Yajur Upakarma day in the US and Chennai (28 August
+// morning, unseen) but the day after it in London.
+for (const [date, place, want] of [["2026-08-27", CUPERTINO, true], ["2026-08-28", CHENNAI, true],
+  ["2026-08-27", LONDON, false], ["2025-08-09", CHENNAI, false]]) {
+  const [y, m, d] = date.split("-").map(Number);
+  const f = festivalsFor(astro.wallMs(y, m, d), place[0], place[1], place[2] ?? 5.5).find((x) => x.name.startsWith("Yajur"));
+  const ok = !!f && !!f.eclipse === want;
+  if (!ok) bad++;
+  console.log(`${ok ? "ok  " : "FAIL"} Yajur Upakarma ${date} eclipse flag ${want}`);
+}
 
 // Every festival must occur at most once per lunar/solar year: scan each day of
 // 2025-2026 (Chennai and Delhi) and flag repeats less than 300 days apart.
