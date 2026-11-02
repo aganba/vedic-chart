@@ -112,6 +112,7 @@
       <div class="tabs" role="tablist" aria-label="Chart sections" data-i18n-aria="Chart sections">
         <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true" data-i18n="Panchanga">Panchanga</button>
         <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false" data-i18n="Festivals">Festivals</button>
+        <button type="button" role="tab" id="tab-special" aria-controls="panel-special" aria-selected="false" data-i18n="Special Days">Special Days</button>
         <button type="button" role="tab" id="tab-muhurtham" aria-controls="panel-muhurtham" aria-selected="false" data-i18n="Shubha Muhurtham">Shubha Muhurtham</button>
         <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false" data-i18n="Birth Chart">Birth Chart</button>
       </div>
@@ -170,6 +171,11 @@
           <h2 data-i18n="Festivals">Festivals</h2>
           <div id="festivalYear"></div>
         </div>
+      </div>
+
+      <div role="tabpanel" id="panel-special" aria-labelledby="tab-special" hidden>
+        <p class="hint special-intro" data-i18n="Eclipses and monthly observances from the entered date through the next 365 days, calculated for the place you entered, in local time.">Eclipses and monthly observances from the entered date through the next 365 days, calculated for the place you entered, in local time.</p>
+        <div class="special-grid" id="specialDays"></div>
       </div>
 
       <div role="tabpanel" id="panel-muhurtham" aria-labelledby="tab-muhurtham" hidden>

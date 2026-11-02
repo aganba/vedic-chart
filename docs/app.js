@@ -2,7 +2,8 @@
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
 import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
-import { festivalsFor, tamilDate } from "./js/festivals.js";
+import { dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
+import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
 import { muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
@@ -419,7 +420,7 @@ function renderFestivals(c) {
   const ref = c.input.local_time.slice(0, 10);
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
   fest = {
-    c, ref, midnight, found: [], muhurthas: [], done: 0, failed: false,
+    c, ref, midnight, found: [], muhurthas: [], observances: [], eclipses: null, done: 0, failed: false,
     cut: isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10),
   };
   const state = fest;
@@ -427,6 +428,12 @@ function renderFestivals(c) {
   // a manually entered offset is used for every day.
   const zone = c.input.timezone;
   const offset = zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset;
+  try {
+    state.eclipses = eclipsesBetween(midnight, YEAR_DAYS, c.input.lat, c.input.lon, offset);
+  } catch {
+    state.eclipses = [];
+    state.eclipseFailed = true;
+  }
   drawFestivals();
 
   const step = () => {
@@ -436,8 +443,10 @@ function renderFestivals(c) {
       for (; state.done < end; state.done++) {
         const w = midnight + state.done * 86400e3;
         const date = isoFromWall(w).slice(0, 10);
-        const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset);
+        const frame = dayFrame(w, c.input.lat, c.input.lon, offset);
+        const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset, frame);
         if (festivals.length) state.found.push({ date, festivals });
+        for (const o of observancesFor(w, c.input.lat, c.input.lon, offset, frame)) state.observances.push({ date, ...o });
         const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
         if (m) state.muhurthas.push({ date, m });
       }
@@ -450,7 +459,73 @@ function renderFestivals(c) {
   setTimeout(step, 30);
 }
 
-// Draws the Panchanga-tab banners and the Festivals and Shubha Muhurtham lists from `fest`.
+// Special Days tab: one colour-coded card per kind of day, in this order.
+const SPECIAL_CARDS = [
+  ["eclipse", "Eclipses (grahanam)", "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon."],
+  ["amavasya", "Amavasya", "The day Amavasya prevails in the afternoon (aparahna), when tarpanam is offered."],
+  ["pournami", "Pournami", "The day Purnima prevails at sunset, when the full moon rises."],
+  ["maasa", "Maasa pirappu", "The first day of each Tamil month, with the moment the Sun enters the new sign."],
+  ["sankatahara", "Sankatahara Chaturthi", "The day Krishna Chaturthi prevails at moonrise; the fast ends after sighting the moon."],
+  ["pradosham", "Pradosham", "The day Trayodashi prevails at sunset. Pradosha kaalam is 1½ hours before sunset to sunset, as in Tamil calendars."],
+];
+
+function specialTitle(o) {
+  const month = o.month && tr(o.month, "tamilMonth");
+  switch (o.kind) {
+    case "eclipse": return t(o.type);
+    case "amavasya": return t("{month} Amavasya", { month });
+    case "pournami": return t("{month} Pournami", { month });
+    case "maasa": return t("{month} month begins", { month });
+    case "sankatahara": return o.weekday === 2 ? t("Angaraka Sankatahara Chaturthi") : t("Sankatahara Chaturthi");
+    case "pradosham": {
+      const name = t("{paksha} Pradosham", { paksha: tr(o.paksha, "paksha") });
+      const day = { 1: "Soma Pradosham", 6: "Shani Pradosham" }[o.weekday];
+      return day ? `${name} · ${t(day)}` : name;
+    }
+  }
+  return "";
+}
+
+function drawSpecialDays(timeText, status) {
+  const { ref, observances, eclipses, eclipseFailed } = fest;
+  const items = { eclipse: (eclipses || []).map((e) => ({ ...e, kind: "eclipse" })) };
+  for (const o of observances) (items[o.kind] ||= []).push(o);
+  const row = (o) => {
+    const fd = festivalDate(o.date);
+    const extra = [];
+    if (o.kind === "eclipse") {
+      if (o.obscuration) extra.push(esc(t("{pct}% of the Sun covered", { pct: Math.round(o.obscuration * 100) })));
+      extra.push(`${esc(t(o.visible.label))}: <strong>${fmtTime(o.visible.start, o.date)} – ${fmtTime(o.visible.end, o.date)}</strong>`);
+    }
+    const times = [...o.times.map((tt) => timeText(tt, o.date)), ...extra];
+    return `<li${o.date === ref ? ' class="today"' : ""}><span class="upcoming-date">${fd.label}</span><div>`
+      + `<div class="sd-title">${esc(specialTitle(o))}</div>`
+      + `<div class="upcoming-times">${times.map((x) => `<span class="sd-time">${x}</span>`).join("")}</div></div></li>`;
+  };
+  // A year heading wherever the year changes, since the list runs into the next year.
+  const list = (rows) => {
+    let html = "", year = 0;
+    for (const o of rows) {
+      const y = Number(o.date.slice(0, 4));
+      if (y !== year) { html += `<li class="sd-year">${y}</li>`; year = y; }
+      html += row(o);
+    }
+    return `<ul class="upcoming-list special-list">${html}</ul>`;
+  };
+  $("specialDays").innerHTML = SPECIAL_CARDS.map(([kind, title, hint]) => {
+    const rows = items[kind] || [];
+    let body;
+    if (kind === "eclipse") {
+      body = eclipseFailed ? `<p class="hint">${esc(t("Couldn't calculate eclipses."))}</p>`
+        : rows.length ? list(rows) : `<p class="hint">${esc(t("No eclipses can be seen from this place in these 366 days."))}</p>`;
+    } else {
+      body = (rows.length ? list(rows) : "") + (status ? `<p class="hint">${esc(status)}</p>` : "");
+    }
+    return `<div class="card special-card sd-${kind}"><h2>${esc(t(title))}</h2><p class="hint">${esc(t(hint))}</p>${body}</div>`;
+  }).join("");
+}
+
+// Draws the Panchanga-tab banners and the Festivals, Special Days and Shubha Muhurtham lists from `fest`.
 function drawFestivals() {
   if (!fest) return;
   const { c, ref, found, muhurthas, done, failed, cut } = fest;
@@ -532,6 +607,7 @@ function drawFestivals() {
   const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`
     + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra. They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house and moudhyam."))}</p>`
     + byMonth(education, "upcoming-list muhurtha-list", muhurthaRow) + "</div>" : "";
+  drawSpecialDays(timeText, status);
   $("muhurthaYear").innerHTML = byMonth(general, "upcoming-list muhurtha-list", muhurthaRow)
     + (status ? `<p class="hint">${esc(status)}</p>` : !general.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "")
     + extra;
@@ -575,7 +651,7 @@ function renderBhavaTable(c) {
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "festivals", "muhurtham", "chart"];
+const TABS = ["panchanga", "festivals", "special", "muhurtham", "chart"];
 
 function selectTab(name) {
   if (name === "dasha") name = "chart"; // the dasha now sits on the Birth Chart tab

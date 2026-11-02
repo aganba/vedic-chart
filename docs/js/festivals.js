@@ -84,14 +84,14 @@ const NAK_NAMES = ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ar
   "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati",
   "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana",
   "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"];
-const SIGN_NAMES = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya",
+export const SIGN_NAMES = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "Kanya",
   "Tula", "Vrischika", "Dhanu", "Makara", "Kumbha", "Meena"];
 
 const norm = (x) => ((x % 360) + 360) % 360;
-const sunLon = (jd) => planetLon(jd, SE.SUN)[0];
+export const sunLon = (jd) => planetLon(jd, SE.SUN)[0];
 const moonLon = (jd) => planetLon(jd, SE.MOON)[0];
-const elong = (jd) => norm(moonLon(jd) - sunLon(jd));
-const tithiAt = (jd) => Math.floor(elong(jd) / 12);
+export const elong = (jd) => norm(moonLon(jd) - sunLon(jd));
+export const tithiAt = (jd) => Math.floor(elong(jd) / 12);
 const nakAt = (jd) => Math.floor(moonLon(jd) / NAK_SPAN);
 const signAt = (jd) => Math.floor(sunLon(jd) / 30);
 
@@ -101,9 +101,11 @@ function tithiLabel(t) {
   return `${t < 15 ? "Shukla" : "Krishna"} ${TITHI_NAMES[t % 15]}`;
 }
 
-// `offset` is the UTC offset in hours, or a function giving the offset in force
-// at a UTC instant (ms) so days across a daylight-saving change use their own.
-export function festivalsFor(dateWall, lat, lon, offset) {
+// Helpers for the civil day starting at local midnight `dateWall` at a place,
+// shared by festivalsFor and the observances in specialdays.js. `offset` is
+// the UTC offset in hours, or a function giving the offset in force at a UTC
+// instant (ms) so days across a daylight-saving change use their own.
+export function dayFrame(dateWall, lat, lon, offset) {
   const offsetAt = typeof offset === "function" ? offset : () => offset;
   const wallOffset = (ms) => offsetAt(ms - offsetAt(ms) * 3600e3);
   const dayCache = new Map();
@@ -133,6 +135,10 @@ export function festivalsFor(dateWall, lat, lon, offset) {
       case "aparahna": return [d.sr + d.len * 3 / 5, d.sr + d.len * 4 / 5];
       case "pradosha": return [d.ss, d.ss + d.night / 5];
       case "nishita": return [d.ss + d.night * 7 / 15, d.ss + d.night * 8 / 15];
+      case "moonrise": { // the Moon may not rise at all between two sunrises
+        const r = swe.riseTrans(d.sr, SE.MOON, SE.CALC_RISE, lon, lat);
+        return r && r < d.nsr ? [r, r] : null;
+      }
       default: throw new Error(`unknown kaala ${name}`);
     }
   }
@@ -190,6 +196,14 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     return false;
   }
 
+  const tithiSpan = (jd) => spanOf(elong, 12, jd, 12.19);
+  return { dateWall, lat, lon, offsetAt, day, kaala, mid, masaAt, solarMonth, monthStarts, fmt, window,
+    spanOf, observedOn, tithiSpan };
+}
+
+// Festivals on the civil day starting at local midnight `dateWall`; see dayFrame.
+export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWall, lat, lon, offset)) {
+  const { day, kaala, mid, masaAt, solarMonth, monthStarts, fmt, window, spanOf, observedOn, tithiSpan } = frame;
   if (!day(0)) return []; // polar day/night: no sunrise frame
 
   const tithiHolds = (f) => (n, jd) => {
@@ -199,7 +213,6 @@ export function festivalsFor(dateWall, lat, lon, offset) {
     return m.masa === f.masa && !m.adhika;
   };
   const tithiObserved = (f, n) => observedOn(n, f, tithiHolds(f), elong, 12, 12.19);
-  const tithiSpan = (jd) => spanOf(elong, 12, jd, 12.19);
 
   const out = [];
   for (const f of TITHI_FESTIVALS) {
@@ -343,7 +356,7 @@ export function festivalsFor(dateWall, lat, lon, offset) {
 }
 
 
-const TAMIL_MONTHS = ["Chithirai", "Vaikasi", "Aani", "Aadi", "Avani", "Purattasi",
+export const TAMIL_MONTHS = ["Chithirai", "Vaikasi", "Aani", "Aadi", "Avani", "Purattasi",
   "Aippasi", "Karthigai", "Margazhi", "Thai", "Maasi", "Panguni"];
 
 // Tamil solar calendar date of the civil day starting at dateWall (local

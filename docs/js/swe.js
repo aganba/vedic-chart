@@ -13,7 +13,7 @@ export const SE = {
 export const EPHE_FILES = ["sepl_18.se1", "semo_18.se1", "sefstars.txt"];
 
 let M = null;
-let buf = 0; // scratch memory: 32 doubles + 256-byte error string
+let buf = 0; // scratch memory: 64 doubles + 256-byte error string
 
 // loadFile(name) -> Promise<Uint8Array> supplies ephemeris files (fetch in the
 // browser, fs in Node tests).
@@ -26,12 +26,12 @@ export async function initSwe(loadFile, moduleOptions = {}) {
   mod.stringToUTF8("/ephe", path, 16);
   mod._swe_set_ephe_path(path);
   mod._free(path);
-  buf = mod._malloc(32 * 8 + 256);
+  buf = mod._malloc(64 * 8 + 256);
   M = mod;
 }
 
 const f64 = (i) => M.HEAPF64[(buf >> 3) + i];
-const ERR = () => buf + 32 * 8;
+const ERR = () => buf + 64 * 8;
 
 export function setSidMode(mode) {
   M._swe_set_sid_mode(mode, 0, 0);
@@ -84,4 +84,36 @@ export function riseTrans(jd, planet, event, lon, lat) {
   M.HEAPF64[(geopos >> 3) + 2] = 0;
   const rc = M._swe_rise_trans(jd, planet, 0, SE.FLG_SWIEPH, event, geopos, 0, 0, tret, ERR());
   return rc === 0 ? f64(3) : null;
+}
+
+// Eclipse type and visibility flags returned by the eclipse searches.
+export const ECL = { TOTAL: 4, ANNULAR: 8, PARTIAL: 16, ANNULAR_TOTAL: 32, PENUMBRAL: 64, VISIBLE: 128 };
+
+// Next solar eclipse visible at the place after jd. tret: [max, 1st contact,
+// 2nd, 3rd, 4th contact, sunrise, sunset] (sunrise/sunset only when they fall
+// during the eclipse, else 0); attr[0] = magnitude, attr[2] = obscuration.
+// The flags give the eclipse type as seen from the place.
+export function solEclipseWhenLoc(jd, lon, lat) {
+  const geopos = buf, tret = buf + 3 * 8, attr = buf + 13 * 8;
+  M.HEAPF64.fill(0, buf >> 3, (buf >> 3) + 64); // the call leaves unused slots untouched
+  M.HEAPF64[geopos >> 3] = lon;
+  M.HEAPF64[(geopos >> 3) + 1] = lat;
+  const rc = M._swe_sol_eclipse_when_loc(jd, SE.FLG_SWIEPH, geopos, tret, attr, 0, ERR());
+  if (rc < 0) throw new Error("swe_sol_eclipse_when_loc failed");
+  const t = [], a = [];
+  for (let i = 0; i < 7; i++) t.push(f64(3 + i));
+  for (let i = 0; i < 3; i++) a.push(f64(13 + i));
+  return { flags: rc, tret: t, attr: a };
+}
+
+// Next lunar eclipse (anywhere) after jd. tret: [max, -, partial begin, partial
+// end, total begin, total end, penumbral begin, penumbral end], 0 where a phase
+// doesn't happen.
+export function lunEclipseWhen(jd) {
+  M.HEAPF64.fill(0, buf >> 3, (buf >> 3) + 64);
+  const rc = M._swe_lun_eclipse_when(jd, SE.FLG_SWIEPH, 0, buf, 0, ERR());
+  if (rc < 0) throw new Error("swe_lun_eclipse_when failed");
+  const t = [];
+  for (let i = 0; i < 8; i++) t.push(f64(i));
+  return { flags: rc, tret: t };
 }

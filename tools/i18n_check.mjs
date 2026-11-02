@@ -35,6 +35,7 @@ const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
 const { festivalsFor, tamilDate } = await import(new URL("../docs/js/festivals.js", import.meta.url));
 const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
+const { observancesFor, eclipsesBetween } = await import(new URL("../docs/js/specialdays.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 setLang("ta");
 const latin = new Set();
@@ -69,9 +70,26 @@ for (const [lat, lon] of [[13.0827, 80.2707], [28.6139, 77.209], [9.9312, 76.267
     }
   }
 }
+// Special Days: observance and eclipse labels; eclipse types and visibility
+// notes are interface phrases (t()), so they must be UI keys.
+const uiKey = (k) => { if (!ui.includes(JSON.stringify(k) + ":")) missing.push(`ui: ${k}`); };
+for (const [lat, lon] of [[13.0827, 80.2707], [51.5, -0.12], [47.6, -122.3], [-33.87, 151.21]]) {
+  const start = Date.UTC(2025, 0, 1);
+  for (let d = 0; d < 730; d++) {
+    for (const o of observancesFor(start + d * 86400e3, lat, lon, 5.5)) {
+      for (const tt of o.times) check(tt.label, "label");
+      if (o.month) check(o.month, "tamilMonth");
+      if (o.paksha) check(o.paksha, "paksha");
+    }
+  }
+  for (const e of eclipsesBetween(start, 3650, lat, lon, 0)) {
+    uiKey(e.type); uiKey(e.visible.label);
+    for (const tt of e.times) check(tt.label, "label");
+  }
+}
 for (const [k, v] of Object.entries(astro.AYANAMSAS)) check(v[0], "ayanamsa");
 for (const v of Object.values(astro.BHAVA_METHODS)) check(v, "bhava");
 missing.push(...[...latin].map((s) => `untranslated output: ${s}`));
 
 if (missing.length) { console.log("Missing Tamil text:\n  " + missing.join("\n  ")); process.exit(1); }
-console.log("all text has Tamil entries; two years of festivals, muhurthams and charts translate fully");
+console.log("all text has Tamil entries; two years of festivals, muhurthams, observances and charts and ten years of eclipses translate fully");

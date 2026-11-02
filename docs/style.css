@@ -12,6 +12,13 @@
   --sign: #a8957f;
   --input: #fff;
   --good: #2e7d32;
+  /* Special Days cards */
+  --sd-eclipse: #455a64;
+  --sd-amavasya: #303f9f;
+  --sd-pournami: #9a6700;
+  --sd-maasa: #00796b;
+  --sd-sankatahara: #c62828;
+  --sd-pradosham: #7b1fa2;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -28,6 +35,12 @@
     --sign: #7f6f60;
     --input: #1b1612;
     --good: #72c47a;
+    --sd-eclipse: #a9bac4;
+    --sd-amavasya: #9fa8ff;
+    --sd-pournami: #f2c14e;
+    --sd-maasa: #4dc4b6;
+    --sd-sankatahara: #f28b82;
+    --sd-pradosham: #d69ee8;
   }
 }
 
@@ -252,3 +265,24 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
   .upcoming-time + .upcoming-time::before { content: none; }
 }
 .upcoming-times strong { color: var(--ink); font-weight: 600; }
+
+/* Special Days tab: one card per kind of day, each in its own colour */
+.special-intro { margin: 0 0 12px; }
+/* columns rather than a grid, so a short card (often the eclipses) doesn't leave a gap beside a long one */
+.special-grid { columns: 2 380px; column-gap: 16px; }
+.special-grid > .card { break-inside: avoid; display: inline-block; width: 100%; }
+.special-card { --sd: var(--accent); border-left: 4px solid var(--sd); }
+.special-card h2, .special-card .sd-year { color: var(--sd); }
+.sd-eclipse { --sd: var(--sd-eclipse); }
+.sd-amavasya { --sd: var(--sd-amavasya); }
+.sd-pournami { --sd: var(--sd-pournami); }
+.sd-maasa { --sd: var(--sd-maasa); }
+.sd-sankatahara { --sd: var(--sd-sankatahara); }
+.sd-pradosham { --sd: var(--sd-pradosham); }
+.special-list { gap: 8px; }
+.special-list li { display: flex; gap: 6px; }
+.special-list li.sd-year { display: block; font-size: 13px; font-weight: 700; margin-top: 6px; }
+.special-list li.sd-year:first-child { margin-top: 0; }
+.special-list li.today .sd-title { font-weight: 700; }
+.sd-title { font-weight: 600; }
+.sd-time { display: block; }
