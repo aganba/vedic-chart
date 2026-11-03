@@ -101,19 +101,6 @@ function ingresses(jd0, jd1) {
   return [hi];
 }
 
-// Abhijit Muhurtha: the 8th of the 15 muhurthas of daytime, around local midday.
-// Returns { start, end } as local ISO times, or null where the Sun doesn't rise or set.
-export function abhijitFor(dateWall, lat, lon, offset) {
-  const offsetAt = typeof offset === "function" ? offset : () => offset;
-  const midnight = julFromWall(dateWall, offsetAt(dateWall - offsetAt(dateWall) * 3600e3));
-  const sr = swe.riseTrans(midnight, SE.SUN, SE.CALC_RISE, lon, lat);
-  const ss = sr && swe.riseTrans(sr, SE.SUN, SE.CALC_SET, lon, lat);
-  if (!sr || !ss) return null;
-  const part = (ss - sr) / 15;
-  const fmt = (jd) => localFromJul(jd, offsetAt((jd - 2440587.5) * 86400e3));
-  return { start: fmt(sr + 7 * part), end: fmt(sr + 8 * part) };
-}
-
 // `offset`: UTC offset in hours, or a function of the UTC instant (ms), as in festivalsFor.
 // Returns null, or the day's times with the events each suits:
 // { events: [names], windows: [{ start, end, events }] }.

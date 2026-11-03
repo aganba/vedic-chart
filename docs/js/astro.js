@@ -286,6 +286,9 @@ export function panchanga(jd, lat, lon, offset) {
       const part = table[civilWeekday] - 1;
       kalams[name] = { start: loc(daySunrise + part * eighth), end: loc(daySunrise + (part + 1) * eighth) };
     }
+    // Abhijit Muhurtha: the 8th of the 15 muhurthas of daytime, around local midday.
+    const muhurtha = (daySunset - daySunrise) / 15;
+    kalams.abhijit = { start: loc(daySunrise + 7 * muhurtha), end: loc(daySunrise + 8 * muhurtha) };
   }
 
   const nak = nakshatraOf(moonLon(jd));
@@ -304,13 +307,6 @@ export function panchanga(jd, lat, lon, offset) {
       next_lord: lordAt(n + 1) };
   }
 
-  // Nakshatra at sunrise on the entered civil date.
-  let sunriseNak = null;
-  if (daySunrise !== null) {
-    const [, snEnd] = endOf(moonLon, NAK_SPAN, daySunrise, 13.2);
-    sunriseNak = { ...nakshatraOf(moonLon(daySunrise)), at: loc(daySunrise), end: loc(snEnd) };
-  }
-
   return {
     samvatsara: SAMVATSARAS[(((lunarYear - 1987) % 60) + 60) % 60],
     masa: (sPrev === sNext ? "Adhika " : "") + MASAS[masa],
@@ -319,7 +315,6 @@ export function panchanga(jd, lat, lon, offset) {
       name: ti === 14 ? "Purnima" : ti === 29 ? "Amavasya" : TITHIS[ti % 15],
       number: ti + 1, end: loc(tiEnd), pct_left: round2(tiLeft * 100) },
     nakshatra: { ...nak, end: loc(nkEnd), pct_left: round2(nkLeft * 100) },
-    sunrise_nakshatra: sunriseNak,
     yoga: { name: YOGAS[yg], end: loc(ygEnd), pct_left: round2(ygLeft * 100) },
     karana: { name: karanaName(kr), end: loc(krEnd), pct_left: round2(krLeft * 100) },
     sunrise: loc(daySunrise), sunset: loc(daySunset), next_sunrise: loc(dayNextSunrise),

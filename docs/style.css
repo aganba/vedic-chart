@@ -245,10 +245,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 /* source line and the Abhijit Muhurtha note at the top of the Auspicious Days tab */
 .muhurtha-source { margin: 4px 0 10px; }
 .muhurtha-source a { color: var(--good); }
-.abhijit-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px;
-  border: 1px solid color-mix(in srgb, var(--good) 45%, transparent); background: color-mix(in srgb, var(--good) 10%, var(--card)); }
-.abhijit-note > strong { color: var(--good); }
-.abhijit-note p { margin: 4px 0 0; }
 .muhurtha-table .mt-date small.mt-festival { color: var(--accent); }
 .event-tag.ev-all { --ev: var(--accent); }
 /* muhurtham table: a row per day and set of events, a heading row per month */
@@ -310,6 +306,8 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .special-card .sd-year { color: var(--sd); }
 .sd-hint { margin-top: 0; }
 .eclipse-footnote { margin-top: 8px; }
+#panchangaNote { margin-bottom: 0; }
+#panchangaNote:empty { display: none; }
 .sd-eclipse { --sd: var(--sd-eclipse); }
 .sd-amavasya { --sd: var(--sd-amavasya); }
 .sd-pournami { --sd: var(--sd-pournami); }

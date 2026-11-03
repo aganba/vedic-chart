@@ -4,7 +4,7 @@ import { initSwe } from "./js/swe.js";
 import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
 import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
-import { EVENTS, abhijitFor, muhurthaFor } from "./js/muhurtha.js";
+import { EVENTS, muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 import { FOOTER, compass, getLang, monthLong, monthShort, savedLang, setLang, spanUnits, t, tr, tzNote,
@@ -405,9 +405,6 @@ function renderPanchanga(c) {
       t("{pct}% left · ends {t}", { pct: p.tithi.pct_left, t: fmtTime(p.tithi.end, ref) })],
     [t("Nakshatra"), nak(p.nakshatra), t("{pct}% left · ends {t} · lord {lord}",
       { pct: p.nakshatra.pct_left, t: fmtTime(p.nakshatra.end, ref), lord: tr(p.nakshatra.lord, "planet") })],
-    ...(p.sunrise_nakshatra ? [[t("Nakshatra at sunrise"), nak(p.sunrise_nakshatra),
-      t("at sunrise {t} · until {u} · lord {lord}", { t: fmtTime(p.sunrise_nakshatra.at, ref),
-        u: fmtTime(p.sunrise_nakshatra.end, ref), lord: tr(p.sunrise_nakshatra.lord, "planet") })]] : []),
     [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
     [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
     ...(p.hora ? [[t("Hora"), tr(p.hora.lord, "planet"),
@@ -420,9 +417,11 @@ function renderPanchanga(c) {
     items.push([t("Rahu Kalam"), `${fmtTime(p.rahu_kalam.start, ref)} – ${fmtTime(p.rahu_kalam.end, ref)}`, ""]);
     items.push([t("Yamaganda"), `${fmtTime(p.yamaganda.start, ref)} – ${fmtTime(p.yamaganda.end, ref)}`, ""]);
     items.push([t("Gulika Kalam"), `${fmtTime(p.gulika_kalam.start, ref)} – ${fmtTime(p.gulika_kalam.end, ref)}`, ""]);
+    items.push([`${t("Abhijit Muhurtha")}*`, `${fmtTime(p.abhijit.start, ref)} – ${fmtTime(p.abhijit.end, ref)}`, ""]);
   }
   $("panchanga").innerHTML = items.map(([k, v, s]) =>
     `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
+  $("panchangaNote").textContent = p.abhijit ? t("* Abhijit Muhurtha: a good time for all activities, according to Dr. B. V. Raman.") : "";
 }
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
@@ -645,11 +644,6 @@ function drawFestivals() {
     + eclipseFootnote(found.flatMap((u) => u.festivals))
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
   drawSpecialDays(timeText, status);
-  // Abhijit Muhurtha on the entered date, for the note at the top of the Auspicious Days tab.
-  let abhijit = null;
-  try { abhijit = abhijitFor(fest.midnight, c.input.lat, c.input.lon, fest.offset); } catch {}
-  $("abhijitTime").textContent = abhijit
-    ? t("On {date}: {start} – {end}.", { date: festivalDate(ref).label, start: hm(abhijit.start), end: hm(abhijit.end) }) : "";
   // Vijayadashami counts for every event; it gets its own row if the rules don't pick it.
   const vijaya = new Set(found.filter((u) => u.festivals.some((f) => f.name === VIJAYADASHAMI)).map((u) => u.date));
   const listed = new Set(muhurthas.map((u) => u.date));
