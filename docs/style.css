@@ -60,7 +60,6 @@ body {
 .topbar .lang-toggle { margin-left: auto; align-self: center; padding: 4px 12px; font-size: 14px; }
 /* Tamil words run longer: widen the date column and keep "today" in Tamil */
 :root[lang="ta"] .upcoming-date { min-width: 120px; }
-:root[lang="ta"] .muhurtha-list li.today .upcoming-date::after { content: "இன்று"; }
 main { max-width: 1100px; margin: 0 auto; padding: 16px; }
 .card {
   background: var(--card); border: 1px solid var(--line); border-radius: 12px;
@@ -230,15 +229,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 #festivalYear .upcoming-list li.today { font-weight: 700; }
 /* several festivals on one day: one per line, aligned after the date */
 #festivalYear .upcoming-list li { display: flex; gap: 6px; }
-.muhurtha-list { gap: 8px; container-type: inline-size; }
-.muhurtha-list li { display: flex; gap: 6px; }
-/* start and end times get the same width on every day and are right-aligned,
-   so the dashes and lagnas line up down the whole list */
-.muhurtha-list .upcoming-times { display: grid; grid-template-columns: minmax(5em, max-content) auto minmax(5em, max-content) 1fr; column-gap: 6px; row-gap: 2px; margin-top: 2px; }
-.muhurtha-list .win > strong:nth-child(odd) { text-align: right; }
-.muhurtha-list .win { display: contents; white-space: nowrap; }
-.muhurtha-list .win > * { white-space: nowrap; font-variant-numeric: tabular-nums; }
-.muhurtha-list .win > span { margin-left: 6px; }
 /* the rules behind the muhurtham list, folded away under the description */
 .muhurtha-rules { margin: 4px 0 16px; font-size: 13px; color: var(--muted); }
 .muhurtha-rules summary { cursor: pointer; font-weight: 600; color: var(--good); width: fit-content; }
@@ -246,23 +236,50 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .muhurtha-rules ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
 .muhurtha-rules a { color: inherit; }
 .muhurtha-rules p { margin: 8px 0 0; }
-/* the extra days for starting education, below the year's list */
-.muhurtha-extra { margin-top: 24px; padding-top: 14px; border-top: 1px solid var(--line); }
-.muhurtha-extra-title { margin: 0 0 4px; font-size: 15px; color: var(--good); }
-/* phones: the date goes above the day's details so the times have the full width */
-@container (max-width: 380px) {
-  .muhurtha-list li { flex-direction: column; gap: 2px; }
-  .muhurtha-list li.today .upcoming-date::after { display: inline; margin-left: 6px; }
-}
 /* muhurtham days are colour-coded green */
-.muhurtha-banner { border-color: var(--good); background: color-mix(in srgb, var(--good) 12%, var(--card)); }
-.muhurtha-banner .upcoming-title, .muhurtha-card h2, .muhurtha-card .year-month { color: var(--good); }
+.muhurtha-card h2 { color: var(--good); }
 .muhurtha-card { border-left: 4px solid var(--good); }
 /* festivals card matches the muhurtham card, in the festival accent colour */
 .festival-card h2 { color: var(--accent); }
 .festival-card { border-left: 4px solid var(--accent); }
-.muhurtha-list li.today .upcoming-date::after { content: "today"; display: block; font-size: 12px; font-weight: 600; }
-.muhurtha-list li.today > div > div:first-child { font-weight: 700; }
+/* source line and the Abhijit Muhurtha note at the top of the Auspicious Days tab */
+.muhurtha-source { margin: 4px 0 10px; }
+.muhurtha-source a { color: var(--good); }
+.abhijit-note { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  border: 1px solid color-mix(in srgb, var(--good) 45%, transparent); background: color-mix(in srgb, var(--good) 10%, var(--card)); }
+.abhijit-note > strong { color: var(--good); }
+.abhijit-note p { margin: 4px 0 0; }
+.muhurtha-table .mt-date small.mt-festival { color: var(--accent); }
+.event-tag.ev-all { --ev: var(--accent); }
+/* muhurtham table: a row per day and set of events, a heading row per month */
+.muhurtha-table { white-space: normal; }
+.muhurtha-table td, .muhurtha-table th { vertical-align: top; }
+.muhurtha-table tbody th { text-transform: none; letter-spacing: 0; }
+.muhurtha-table .month-row th { padding-top: 16px; font-size: 14px; color: var(--good); border-bottom: 1px solid var(--good); }
+.muhurtha-table .mt-date { font-size: 14px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.muhurtha-table .mt-date small { display: block; font-size: 12px; color: var(--good); }
+.muhurtha-table tr.today td, .muhurtha-table tr.today .mt-date { font-weight: 700; }
+.muhurtha-table tr:has(+ tr.more) td { border-bottom-style: dashed; }
+.mt-events { display: flex; flex-wrap: wrap; gap: 4px; }
+.mt-times { font-variant-numeric: tabular-nums; }
+.mt-time { display: block; white-space: nowrap; }
+.event-tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap;
+  color: var(--ev); background: color-mix(in srgb, var(--ev) 14%, var(--card)); border: 1px solid color-mix(in srgb, var(--ev) 45%, transparent); }
+.event-tag.ev0 { --ev: #1565c0; }
+.event-tag.ev1 { --ev: #00838f; }
+.event-tag.ev2 { --ev: #6d4c41; }
+.event-tag.ev3 { --ev: #8e24aa; }
+.event-tag.ev4 { --ev: #c62828; }
+.event-tag.ev5 { --ev: #2e7d32; }
+@media (prefers-color-scheme: dark) {
+  .event-tag.ev0 { --ev: #64b5f6; } .event-tag.ev1 { --ev: #4dd0e1; } .event-tag.ev2 { --ev: #bcaaa4; }
+  .event-tag.ev3 { --ev: #ce93d8; } .event-tag.ev4 { --ev: #ef9a9a; } .event-tag.ev5 { --ev: #81c784; }
+}
+/* phones: narrower cells so the three columns fit */
+@media (max-width: 520px) {
+  .muhurtha-table td, .muhurtha-table th { padding: 6px 5px; }
+  .mt-time { font-size: 13px; }
+}
 #upcoming .upcoming-list { gap: 8px; }
 #upcoming .upcoming-list li { display: flex; gap: 6px; }
 .upcoming-festival + .upcoming-festival { margin-top: 4px; }

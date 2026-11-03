@@ -4,7 +4,7 @@ import { initSwe } from "./js/swe.js";
 import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
 import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
-import { muhurthaFor } from "./js/muhurtha.js";
+import { EVENTS, abhijitFor, muhurthaFor } from "./js/muhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 import { FOOTER, compass, getLang, monthLong, monthShort, savedLang, setLang, spanUnits, t, tr, tzNote,
@@ -426,9 +426,9 @@ function renderPanchanga(c) {
 }
 
 // Festivals on the entered date (with timings) and in the next 7 days, as a
-// banner at the top of the Panchanga tab with the muhurtham days below it, and festivals for the year from the
-// entered date in the Festivals tab, and the year's shubha muhurtham days and
-// their time windows in the Shubha Muhurtham tab. The year is computed in small chunks after
+// banner at the top of the Panchanga tab, festivals for the year from the
+// entered date in the Festivals tab, and the year's muhurtham times and the
+// events they suit in the Auspicious Days tab. The year is computed in small chunks after
 // the main render so the page stays responsive; the banner fills in once the
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
@@ -464,6 +464,7 @@ function renderFestivals(c) {
   // a manually entered offset is used for every day.
   const zone = c.input.timezone;
   const offset = zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset;
+  state.offset = offset;
   try {
     state.eclipses = eclipsesBetween(midnight, YEAR_DAYS, c.input.lat, c.input.lon, offset);
   } catch {
@@ -587,7 +588,7 @@ function selectSpecialTab(kind, focus) {
   }
 }
 
-// Draws the Panchanga-tab banners and the Festivals, Special Days and Shubha Muhurtham lists from `fest`.
+// Draws the Panchanga-tab banners and the Festivals, Special Days and Auspicious Days lists from `fest`.
 function drawFestivals() {
   if (!fest) return;
   const { c, ref, found, muhurthas, done, failed, cut } = fest;
@@ -622,32 +623,7 @@ function drawFestivals() {
   $("festivals").innerHTML = today + `<div class="festival upcoming" id="upcoming">${upTitle}${upcoming}</div>`;
   $("festivals").hidden = false;
 
-  const muhurthaRow = ({ date, m }) => {
-    // One window per line; start, dash, end and lagna each line up in a column.
-    const wins = m.windows.map((w) => `<span class="win"><strong>${hm(w.start, date)}</strong><strong>–</strong>`
-      + `<strong>${hm(w.end, date)}</strong><span>${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span></span>`).join("");
-    return `<li${date === ref ? ' class="today"' : ""}><span class="upcoming-date">${festivalDate(date).label}</span><div>
-        <div>${esc(tr(m.paksha, "paksha"))} · ${esc(tr(m.tithi, "tithi"))} · ${esc(tr(m.nakshatra, "nakshatra"))} · ${esc(tr(m.yogam, "dayYoga"))}</div>
-        <div class="upcoming-times">${wins}</div></div></li>`;
-  };
-
-  // General muhurtham days, and the extra days for starting education.
-  const general = muhurthas.filter((u) => u.m.kind === "general");
-  const education = muhurthas.filter((u) => u.m.kind === "education");
-
-  // Muhurtham days from the entered date through the next UPCOMING_DAYS days.
-  const mTitle = `<div class="upcoming-title">${esc(t("Shubha Muhurtham (next {n} days)", { n: UPCOMING_DAYS }))}</div>`;
-  let mBody;
-  if (!bannerReady) mBody = failed ? note(t("Couldn't calculate muhurtham days.")) : note(t("Checking…"));
-  else {
-    const rows = general.filter((u) => u.date < cut).map(muhurthaRow);
-    mBody = rows.length ? `<ul class="upcoming-list muhurtha-list">${rows.join("")}</ul>`
-      : note(t("No muhurtham days in the next {n} days.", { n: UPCOMING_DAYS }));
-  }
-  $("muhurthaBanner").innerHTML = mTitle + mBody;
-  $("muhurthaBanner").hidden = false;
-
-  // Festivals and Shubha Muhurtham tabs: the year, month by month.
+  // Festivals tab: the year, month by month.
   const status = failed ? t("Couldn't calculate the remaining festivals.")
     : done < YEAR_DAYS ? t("Calculating…") : "";
   const byMonth = (items, ulClass, row) => {
@@ -668,15 +644,56 @@ function drawFestivals() {
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
     + eclipseFootnote(found.flatMap((u) => u.festivals))
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
-  // The year's list, then a note with the extra days for starting education.
-  const extra = education.length ? `<div class="muhurtha-extra"><h3 class="muhurtha-extra-title">${esc(t("More days for starting education"))}</h3>`
-    + `<p class="hint">${esc(t("Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra."))}</p>`
-    + `<details class="muhurtha-rules"><summary>${esc(t("Rules used"))}</summary><p>${esc(t("They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house, the lagna rule and moudhyam."))}</p></details>`
-    + byMonth(education, "upcoming-list muhurtha-list", muhurthaRow) + "</div>" : "";
   drawSpecialDays(timeText, status);
-  $("muhurthaYear").innerHTML = byMonth(general, "upcoming-list muhurtha-list", muhurthaRow)
-    + (status ? `<p class="hint">${esc(status)}</p>` : !general.length ? `<p class="hint">${esc(t("No shubha muhurtham days found."))}</p>` : "")
-    + extra;
+  // Abhijit Muhurtha on the entered date, for the note at the top of the Auspicious Days tab.
+  let abhijit = null;
+  try { abhijit = abhijitFor(fest.midnight, c.input.lat, c.input.lon, fest.offset); } catch {}
+  $("abhijitTime").textContent = abhijit
+    ? t("On {date}: {start} – {end}.", { date: festivalDate(ref).label, start: hm(abhijit.start), end: hm(abhijit.end) }) : "";
+  // Vijayadashami counts for every event; it gets its own row if the rules don't pick it.
+  const vijaya = new Set(found.filter((u) => u.festivals.some((f) => f.name === VIJAYADASHAMI)).map((u) => u.date));
+  const listed = new Set(muhurthas.map((u) => u.date));
+  const rows = [...muhurthas, ...[...vijaya].filter((d) => !listed.has(d)).map((date) => ({ date, m: null }))]
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  $("muhurthaYear").innerHTML = muhurthaTable(rows, ref, hm, vijaya)
+    + (status ? `<p class="hint">${esc(status)}</p>` : !rows.length ? `<p class="hint">${esc(t("No auspicious days found."))}</p>` : "");
+}
+
+// Auspicious Days tab: one table for the year, a heading row per month, and per
+// day a row for each set of events with the times that suit them.
+const EVENT_CLASS = Object.fromEntries(EVENTS.map(([name], i) => [name, `ev${i}`]));
+const VIJAYADASHAMI = "Vijayadashami / Dussehra";
+// `rows`: [{ date, m }], m null for a Vijayadashami the rules don't pick; `vijaya`: its dates.
+function muhurthaTable(rows, ref, hm, vijaya) {
+  if (!rows.length) return "";
+  let body = "", month = "";
+  for (const { date, m } of rows) {
+    const fd = festivalDate(date), key = `${fd.y}-${fd.m}`;
+    if (key !== month) {
+      body += `<tr class="month-row"><th colspan="3" scope="colgroup">${monthLong(fd.m - 1)} ${fd.y}</th></tr>`;
+      month = key;
+    }
+    // Windows grouped by the events they suit, in the order the groups first appear.
+    const groups = new Map();
+    if (!m) groups.set("", { all: true, events: [], times: [`<span class="mt-time">${esc(t("All day"))}</span>`] });
+    for (const w of m?.windows || []) {
+      const k = w.events.join("|");
+      if (!groups.has(k)) groups.set(k, { events: w.events, times: [] });
+      groups.get(k).times.push(`<span class="mt-time">${hm(w.start, date)} – ${hm(w.end, date)}</span>`);
+    }
+    const today = date === ref ? " today" : "";
+    const notes = (vijaya.has(date) ? `<small class="mt-festival">${esc(tr(VIJAYADASHAMI, "festival"))}</small>` : "")
+      + (today ? `<small>${esc(t("today"))}</small>` : "");
+    [...groups.values()].forEach((g, i) => {
+      const tags = g.all ? `<span class="event-tag ev-all">${esc(t("All events"))}</span>`
+        : g.events.map((e) => `<span class="event-tag ${EVENT_CLASS[e]}">${esc(t(e))}</span>`).join("");
+      body += `<tr class="${i ? "more" : "first"}${today}">`
+        + (i ? "" : `<th scope="rowgroup" rowspan="${groups.size}" class="mt-date">${fd.label}${notes}</th>`)
+        + `<td><div class="mt-events">${tags}</div></td><td class="mt-times">${g.times.join("")}</td></tr>`;
+    });
+  }
+  return `<div class="table-wrap"><table class="muhurtha-table"><thead><tr><th scope="col">${esc(t("Date"))}</th>`
+    + `<th scope="col">${esc(t("Good for"))}</th><th scope="col">${esc(t("Times"))}</th></tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
 
@@ -897,7 +914,7 @@ function applyStaticText() {
   $("datefmt").textContent = `(${dateFormatHint()})`;
   // Search-result title, description and canonical URL for the current language.
   document.title = t("Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
-  document.querySelector('meta[name="description"]').content = t("Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.");
+  document.querySelector('meta[name="description"]').content = t("Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.");
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) {
     canon = document.createElement("link");

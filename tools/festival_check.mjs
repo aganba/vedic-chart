@@ -9,7 +9,6 @@ const docs = fileURLToPath(new URL("../docs/", import.meta.url));
 const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
 const { festivalsFor, tamilDate } = await import(new URL("../docs/js/festivals.js", import.meta.url));
-const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 swe.setSidMode(swe.SE.SIDM_TRUE_CITRA);
 
@@ -123,40 +122,31 @@ for (const [date, month, day, year] of TAMIL_DATES) {
   console.log(`${ok ? "ok  " : "FAIL"} Tamil date ${date}: ${td ? `${td.month} ${td.day}, ${td.year}` : "none"}`);
 }
 
-// Shubha muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27 list for
-// Chennai (Vakya panchangam, harikesanallur.com) must all be found as general
-// muhurtham days, except twelve that break rules this list doesn't follow but
-// the app does: Raman's empty 7th house (4 June 2026, 26 February 2027), Raman's
-// no malefic in the lagna (24 and 25 June, 5 July and 29 November 2026, when
-// the malefics fill five signs and no lagna clear of them is free otherwise;
-// 12 July and 14 December 2026, when the only lagnas left hold the Sun with a
-// combust Mercury, which doesn't count as a benefic),
-// Venus combust (25 October 2026) and the panchanga yoga rule (29 May 2026,
-// 22 November 2026, 24 March 2027). Other days may be listed too, as panchangams
-// disagree on the finer rules. No day may break the weekday rule.
-const MUHURTHAM = "2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-05-18 2026-05-25 2026-05-28 2026-05-29 "
-  + "2026-06-04 2026-06-11 2026-06-17 2026-06-18 2026-06-24 2026-06-25 2026-07-05 2026-07-12 2026-08-23 2026-08-30 "
-  + "2026-08-31 2026-09-07 2026-10-25 2026-10-30 2026-11-01 2026-11-11 2026-11-13 2026-11-15 2026-11-16 2026-11-20 "
-  + "2026-11-22 2026-11-29 2026-12-04 2026-12-14 2027-01-20 2027-02-08 2027-02-10 2027-02-11 2027-02-26 2027-03-10 "
-  + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12";
+// Panchaka: the good (Rahita) and bad times of Drik Panchang's Panchaka Rahita
+// Muhurat for New Delhi on Tuesday 3 November 2026 (drikpanchang.com), as
+// [start, end, good], must get the same verdict from muhurtha.js's panchaka at
+// their midpoints; remainder 0 counts as good, as on Drik Panchang.
 {
-  const EXCEPT = new Set(["2026-06-04", "2026-10-25", "2027-02-26", "2026-05-29", "2026-11-22", "2027-03-24",
-    "2026-06-24", "2026-06-25", "2026-07-05", "2026-11-29", "2026-07-12", "2026-12-14"]);
-  const ref = new Set(MUHURTHAM.split(" ").filter((d) => !EXCEPT.has(d)));
-  let found = 0, days = 0, education = 0;
-  const missed = [];
-  for (let t = Date.parse("2026-04-14T00:00:00Z"); t <= Date.parse("2027-04-13T00:00:00Z"); t += 86400e3) {
-    const date = new Date(t).toISOString().slice(0, 10);
-    const m = muhurthaFor(t, ...CHENNAI, 5.5);
-    if (m?.kind === "general") days++;
-    if (m?.kind === "education") education++;
-    if ([2, 6].includes(new Date(t).getUTCDay()) && m) { bad++; console.log(`FAIL muhurtham on ${date}`); }
-    if (!ref.has(date)) continue;
-    if (m?.kind === "general") found++; else missed.push(date);
-  }
-  const ok = found === ref.size;
-  if (!ok) bad++;
-  console.log(`${ok ? "ok  " : "FAIL"} muhurtham 2026-27: ${days} days and ${education} extra education days, ${found}/${ref.size} published days found (${EXCEPT.size} more excepted)${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
+  const { panchaka } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
+  const PANCHAKA_DRIK = [["06:34", "07:41", false], ["07:41", "10:00", true], ["10:00", "11:54", false], ["11:54", "12:04", false],
+    ["12:04", "13:46", true], ["13:46", "15:13", false], ["15:13", "16:38", true], ["16:38", "18:14", true], ["18:14", "20:09", false],
+    ["20:09", "22:24", true], ["22:24", "24:44", false], ["24:44", "27:01", true], ["27:01", "27:26", false], ["27:26", "29:18", true],
+    ["29:18", "30:35", false]];
+  const [lat, lon] = DELHI, day = Date.UTC(2026, 10, 3);
+  const jdAt = (hhmm) => { const [h, m] = hhmm.split(":").map(Number); return astro.julFromWall(day + (h * 60 + m) * 60e3, 5.5); };
+  const norm = (x) => ((x % 360) + 360) % 360;
+  const sunrise = swe.riseTrans(jdAt("00:00"), swe.SE.SUN, swe.SE.CALC_RISE, lon, lat);
+  const nextSunrise = swe.riseTrans(sunrise + 0.5, swe.SE.SUN, swe.SE.CALC_RISE, lon, lat);
+  const wrong = PANCHAKA_DRIK.filter(([a, b, good]) => {
+    const jd = (jdAt(a) + jdAt(b)) / 2;
+    const sun = astro.planetLon(jd, swe.SE.SUN)[0], moon = astro.planetLon(jd, swe.SE.MOON)[0];
+    const vara = jd < nextSunrise ? 2 : 3; // Tuesday until the next sunrise
+    const r = panchaka(Math.floor(norm(moon - sun) / 12), vara, Math.floor(moon / astro.NAK_SPAN),
+      Math.floor(norm(astro.lagnaAndMc(jd, lat, lon)[0]) / 30));
+    return [0, 3, 5, 7].includes(r) !== good;
+  });
+  if (wrong.length) bad++;
+  console.log(`${wrong.length ? "FAIL" : "ok  "} panchaka: ${PANCHAKA_DRIK.length - wrong.length}/${PANCHAKA_DRIK.length} Drik Panchang times agree${wrong.length ? `; wrong ${wrong.map(([a, b]) => `${a}-${b}`).join(" ")}` : ""}`);
 }
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

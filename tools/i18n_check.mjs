@@ -49,8 +49,7 @@ for (const [lat, lon] of [[13.0827, 80.2707], [28.6139, 77.209], [9.9312, 76.267
       for (const tt of f.times) check(tt.label, "label");
     }
     const m = muhurthaFor(w, lat, lon, 5.5);
-    if (m) { check(m.paksha, "paksha"); check(m.tithi, "tithi"); check(m.nakshatra, "nakshatra"); check(m.yogam, "dayYoga");
-      for (const x of m.windows) check(x.lagna, "sign"); }
+    if (m) for (const e of m.events) if (!ui.includes(JSON.stringify(e) + ":")) missing.push(`ui: ${e}`);
     if (d % 15 === 0) {
       const td = tamilDate(w, lat, lon, 5.5);
       check(td.month, "tamilMonth"); check(td.year, "samvatsara");

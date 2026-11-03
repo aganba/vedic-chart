@@ -23,7 +23,7 @@ const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars && k in vars ?
 const UI = {
   "Vedic Calendar": "வேத நாட்காட்டி",
   "Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart": "வேத நாட்காட்டி – இலவச பஞ்சாங்கம், தமிழ்த் தேதி, முகூர்த்தம், ஜாதகம்",
-  "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.": "இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.",
+  "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.": "இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், பயணம், வாகனம், கல்வி, புதிய முயற்சிகளுக்கான சுப முகூர்த்த நேரங்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.",
   "Place": "இடம்",
   "Start typing a city or town": "ஊர் அல்லது நகரத்தின் பெயரை உள்ளிடவும்",
   "Search": "தேடு",
@@ -55,7 +55,7 @@ const UI = {
   "Vimshottari Dasha": "விம்சோத்தரி தசை",
   "Select a mahadasha to see its antardashas (bhuktis).": "ஒரு மகா தசையைத் தேர்ந்தெடுத்தால் அதன் புக்திகள் தெரியும்.",
   "Festivals": "பண்டிகைகள்",
-  "Shubha Muhurtham": "சுப முகூர்த்தம்",
+  "Auspicious Days": "சுப முகூர்த்தம்",
   // Special Days tab
   "Special Days": "விசேஷ நாட்கள்",
   "Eclipses and monthly observances from the entered date through the next 365 days, calculated for the place you entered, in local time.": "உள்ளிட்ட தேதி முதல் அடுத்த 365 நாட்களுக்கான கிரகணங்களும் மாதாந்திர விரத நாட்களும், நீங்கள் உள்ளிட்ட இடத்துக்கு உள்ளூர் நேரத்தில் கணக்கிடப்பட்டவை.",
@@ -126,47 +126,54 @@ const UI = {
   "Chart": "ஜாதகம்",
   // festivals and muhurtham
   "Coming up (next {n} days)": "வரவிருப்பவை (அடுத்த {n} நாட்கள்)",
-  "Shubha Muhurtham (next {n} days)": "சுப முகூர்த்தம் (அடுத்த {n} நாட்கள்)",
   "Checking…": "சரிபார்க்கிறது…",
   "Calculating…": "கணக்கிடுகிறது…",
   "Couldn't calculate upcoming festivals.": "வரவிருக்கும் பண்டிகைகளைக் கணக்கிட முடியவில்லை.",
   "No festivals in the next {n} days.": "அடுத்த {n} நாட்களில் பண்டிகைகள் இல்லை.",
-  "Couldn't calculate muhurtham days.": "முகூர்த்த நாட்களைக் கணக்கிட முடியவில்லை.",
-  "No muhurtham days in the next {n} days.": "அடுத்த {n} நாட்களில் முகூர்த்த நாட்கள் இல்லை.",
-  "No shubha muhurtham days found.": "சுப முகூர்த்த நாட்கள் எதுவும் இல்லை.",
+  "No auspicious days found.": "சுப முகூர்த்த நாட்கள் எதுவும் இல்லை.",
   "Couldn't calculate the remaining festivals.": "மீதமுள்ள பண்டிகைகளைக் கணக்கிட முடியவில்லை.",
   "No festivals found.": "பண்டிகைகள் எதுவும் இல்லை.",
-  "{lagna} lagna": "{lagna} லக்னம்",
-  "More days for starting education": "கல்வி தொடங்க கூடுதல் நாட்கள்",
-  "Days and times in the style of Tamil calendars, for marriage and other auspicious beginnings, calculated for the place you entered. Panchangams differ, and personal factors such as tarabala, chandrabala and chandrashtamam aren't considered, so confirm with your family astrologer.": "திருமணம் மற்றும் பிற சுப காரியங்களுக்கான தமிழ் நாட்காட்டி முறையிலான நாட்களும் நேரங்களும், நீங்கள் உள்ளிட்ட இடத்துக்குக் கணக்கிடப்பட்டவை. பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம்; தாராபலம், சந்திரபலம், சந்திராஷ்டமம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை, எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
-  "Weekday: not Tuesday or Saturday.": "கிழமை: செவ்வாய், சனி அல்ல.",
-  "Tithi: not Pratipada, Ashtami, Navami, Purnima, Amavasya or Theipirai Chaturdashi.": "திதி: பிரதமை, அஷ்டமி, நவமி, பௌர்ணமி, அமாவாசை, தேய்பிறை சதுர்த்தசி அல்ல.",
-  "Nakshatra: Ashwini, Rohini, Mrigashira, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha, Uttara Bhadrapada or Revati.": "நட்சத்திரம்: அஸ்வினி, ரோகிணி, மிருகசீரிஷம், புனர்பூசம், பூசம், உத்திரம், அஸ்தம், சித்திரை, சுவாதி, அனுஷம், மூலம், உத்திராடம், திருவோணம், அவிட்டம், சதயம், உத்திரட்டாதி அல்லது ரேவதி.",
-  "Tamil month: not Aadi, Purattasi or Margazhi, and not the first day of a month.": "தமிழ் மாதம்: ஆடி, புரட்டாசி, மார்கழி அல்ல; மாதப் பிறப்பு நாளும் அல்ல.",
-  "Not a Kari naal.": "கரி நாள் அல்ல.",
-  "Yogam (from the weekday and the nakshatra at sunrise): Amirtha or Siddha, not Marana or Prabalarishta.": "யோகம் (கிழமை, சூரிய உதய நட்சத்திரத்திலிருந்து): அமிர்த அல்லது சித்த யோகம்; மரண, பிரபலாரிஷ்ட யோகம் அல்ல.",
-  "Not an eclipse day, and neither Jupiter nor Venus combust (moudhyam).": "கிரகண நாள் அல்ல; குருவோ சுக்கிரனோ மௌட்யத்தில் (அஸ்தங்கம்) இல்லை.",
-  "Between an hour before sunrise (not before 5 am) and sunset.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து (காலை 5 மணிக்கு முன் அல்ல) சூரிய அஸ்தமனம் வரை.",
-  "Outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana.": "ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம் தவிர்த்து.",
-  "No planet in the 7th or 8th house from the lagna.": "லக்னத்திலிருந்து 7, 8-ஆம் வீடுகளில் கிரகம் இல்லை.",
-  "No Sun, Mars, Saturn, Rahu or Ketu in the lagna, unless Jupiter, Venus or an unafflicted Mercury (at least 14° from the Sun and not with the Sun, Mars or Saturn) is in the lagna too, a planet in the lagna is exalted, or the Sun or Moon is in the 11th house.": "லக்னத்தில் சூரியன், செவ்வாய், சனி, ராகு, கேது இல்லை; ஆனால் லக்னத்தில் குரு, சுக்கிரன் அல்லது பாதிப்பில்லாத புதனும் (சூரியனிடமிருந்து குறைந்தது 14° தொலைவில், சூரியன், செவ்வாய், சனியுடன் சேராமல்) இருந்தாலோ, லக்னத்தில் உள்ள ஒரு கிரகம் உச்சம் பெற்றிருந்தாலோ, சூரியனோ சந்திரனோ 11-ஆம் வீட்டில் இருந்தாலோ இது பொருந்தாது.",
-  "The lagna isn't in the first or last degree of its sign.": "லக்னம் ராசியின் முதல் அல்லது கடைசி பாகையில் இல்லை.",
+  "Events, by the Moon's nakshatra": "சந்திரன் நிற்கும் நட்சத்திரப்படி காரியங்கள்",
+  "Vehicles and travel: movable nakshatras (Punarvasu, Swati, Shravana, Dhanishta, Shatabhisha).": "வாகனம், பயணம்: சர நட்சத்திரங்கள் (புனர்பூசம், சுவாதி, திருவோணம், அவிட்டம், சதயம்).",
+  "Day-to-day matters: mixed nakshatras (Krittika, Vishakha).": "அன்றாடக் காரியங்கள்: மிஸ்ர நட்சத்திரங்கள் (கார்த்திகை, விசாகம்).",
+  "Learning music and arts: soft nakshatras (Mrigashira, Chitra, Anuradha, Revati).": "இசை, கலை கற்றல்: மிருது நட்சத்திரங்கள் (மிருகசீரிஷம், சித்திரை, அனுஷம், ரேவதி).",
+  "Sports, new projects and travel: light nakshatras (Ashwini, Pushya, Hasta, Abhijit).": "விளையாட்டு, புதிய முயற்சிகள், பயணம்: லகு (க்ஷிப்ர) நட்சத்திரங்கள் (அஸ்வினி, பூசம், அஸ்தம், அபிஜித்).",
+  "Sharp (Ardra, Ashlesha, Jyeshtha, Mula) and dreadful (Bharani, Magha, Purva Phalguni, Purva Ashadha, Purva Bhadrapada) nakshatras are avoided.": "தீக்ஷ்ண நட்சத்திரங்கள் (திருவாதிரை, ஆயில்யம், கேட்டை, மூலம்), உக்ர நட்சத்திரங்கள் (பரணி, மகம், பூரம், பூராடம், பூரட்டாதி) தவிர்க்கப்படுகின்றன.",
+  "Every time": "எல்லா நேரங்களுக்கும்",
+  "Tithi: not Navami or Chaturdashi.": "திதி: நவமி, சதுர்த்தசி அல்ல.",
+  "Panchanga yoga: not Atiganda, Shula, Ganda, Vyaghata, Vyatipata, Parigha or Vaidhriti.": "பஞ்சாங்க யோகம்: அதிகண்டம், சூலம், கண்டம், வியாகாதம், வியதீபாதம், பரிகம், வைதிருதி அல்ல.",
+  "Karana: not Vishti, Shakuni or Chatushpada.": "கரணம்: பத்திரை (விஷ்டி), சகுனி, சதுஷ்பாதம் அல்ல.",
+  "Lagna Thyajya: the lagna isn't in the first 3° of Mesha, Vrishabha, Kanya or Dhanu, the last 3° of Karka, Vrischika, Makara or Meena, or 13°30′–16°30′ of Mithuna, Simha, Tula or Kumbha.": "லக்ன தியாஜ்யம்: லக்னம் மேஷம், ரிஷபம், கன்னி, தனுசு ஆகியவற்றின் முதல் 3°, கடகம், விருச்சிகம், மகரம், மீனம் ஆகியவற்றின் கடைசி 3°, மிதுனம், சிம்மம், துலாம், கும்பம் ஆகியவற்றின் 13°30′–16°30′ ஆகிய பகுதிகளில் இல்லை.",
+  "Panchaka: the numbers of the tithi (1–30), weekday (Sunday = 1), nakshatra (Ashwini = 1) and lagna (Mesha = 1) add up to a remainder of 0, 3, 5 or 7 when divided by 9. The weekday runs from sunrise to sunrise.": "பஞ்சகம்: திதி (1–30), கிழமை (ஞாயிறு = 1), நட்சத்திரம் (அஸ்வினி = 1), லக்னம் (மேஷம் = 1) ஆகியவற்றின் எண்களைக் கூட்டி 9-ஆல் வகுத்தால் மீதி 0, 3, 5 அல்லது 7. கிழமை சூரிய உதயம் முதல் அடுத்த சூரிய உதயம் வரை.",
+  "Surya Sankramana: not within 16 ghatis (6 hours 24 minutes) of the Sun entering a sign.": "சூரிய சங்கிரமணம்: சூரியன் ராசி மாறும் நேரத்துக்கு முன்னும் பின்னும் 16 நாழிகைக்குள் (6 மணி 24 நிமிடம்) அல்ல.",
+  "Not in Rahu Kalam, Yamaganda or Gulika Kalam, and not on an eclipse day.": "ராகு காலம், எமகண்டம், குளிகை அல்ல; கிரகண நாளும் அல்ல.",
+  "The nakshatra types, tithi, yoga, karana, Lagna Thyajya, Panchaka and Surya Sankramana rules:": "நட்சத்திர வகைகள், திதி, யோகம், கரணம், லக்ன தியாஜ்யம், பஞ்சகம், சூரிய சங்கிரமண விதிகள்:",
+  "Bangalore Niranjan Babu, Selecting Auspicious Muhurthas (Raman and Rajeswari Research Foundation, 2024)": "பெங்களூர் நிரஞ்சன் பாபு, Selecting Auspicious Muhurthas (ராமன் ராஜேஸ்வரி ஆராய்ச்சி அறக்கட்டளை, 2024)",
+  "Good for": "ஏற்றவை",
+  "Times": "நேரங்கள்",
+  "today": "இன்று",
+  "Vehicles": "வாகனம்",
+  "Travel": "பயணம்",
+  "Day-to-day matters": "அன்றாடக் காரியங்கள்",
+  "Learning music and arts": "இசை, கலை கற்றல்",
+  "Sports": "விளையாட்டு",
+  "New projects": "புதிய முயற்சிகள்",
+  "Times that suit buying a vehicle, travel, day-to-day matters, learning music and arts, sports and new projects, calculated for the place you entered. Panchangams and astrologers differ on the rules, and personal factors such as tarabala and chandrabala aren't considered, so consult your family astrologer before fixing a date.": "வாகனம் வாங்க, பயணம், அன்றாட முக்கியக் காரியங்கள், இசை, கலை கற்றல், விளையாட்டு, புதிய முயற்சிகள் ஆகியவற்றுக்கு ஏற்ற நேரங்கள், நீங்கள் உள்ளிட்ட இடத்துக்குக் கணக்கிடப்பட்டவை. பஞ்சாங்கங்களும் ஜோதிடர்களும் விதிகளில் வேறுபடுவார்கள்; தாராபலம், சந்திரபலம் போன்ற தனிப்பட்ட அம்சங்களும் கணக்கில் கொள்ளப்படவில்லை, எனவே நாள் குறிக்கும் முன் உங்கள் குடும்ப ஜோதிடரை அணுகவும்.",
   "At least 20 minutes long.": "குறைந்தது 20 நிமிடம்.",
-  "Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.": "பஞ்சாங்க யோகம்: வியதீபாதம், வைதிருதி அல்ல; பரிகத்தின் முதல் பாதி அல்ல; விஷ்கம்பம், வஜ்ரம் ஆகியவற்றின் முதல் 3 நாழிகை (72 நிமிடம்), சூலத்தின் முதல் 5, கண்டம், அதிகண்டம் ஆகியவற்றின் முதல் 6, வியாகாதத்தின் முதல் 9 நாழிகை அல்ல.",
+  "Rules from": "விதிகளின் ஆதாரம்:",
+  "Bangalore Niranjan Babu's master class Selecting Auspicious Muhurthas": "பெங்களூர் நிரஞ்சன் பாபுவின் Selecting Auspicious Muhurthas முதன்மை வகுப்பு",
+  "(112th Raman Jayanti Master Class, Raman and Rajeswari Research Foundation, 1 September 2024, on YouTube), which follows Dr. B. V. Raman's book Muhurtha.": "(112-ஆவது ராமன் ஜெயந்தி முதன்மை வகுப்பு, ராமன் ராஜேஸ்வரி ஆராய்ச்சி அறக்கட்டளை, 1 செப்டம்பர் 2024, YouTube); இது டாக்டர் பி. வி. ராமனின் Muhurtha நூலைப் பின்பற்றுகிறது.",
+  "Abhijit Muhurtha": "அபிஜித் முகூர்த்தம்",
+  "The 8th of the 15 muhurthas of daytime, around local midday. In the question-and-answer session of the master class, Niranjan Babu says his father Dr. B. V. Raman advised it, even for a marriage, when no other good time can be found, as it is said to remove all doshas (sarva dosha ghna). Many panchangams, such as Drik Panchang, skip it on Wednesdays.": "பகலின் 15 முகூர்த்தங்களில் 8-ஆவது, உள்ளூர் நண்பகலைச் சுற்றி. முதன்மை வகுப்பின் கேள்வி-பதில் பகுதியில், வேறு நல்ல நேரம் கிடைக்காதபோது திருமணத்துக்கும் இதை அவரது தந்தை டாக்டர் பி. வி. ராமன் பரிந்துரைத்ததாக நிரஞ்சன் பாபு கூறுகிறார்; இது எல்லா தோஷங்களையும் நீக்கும் (சர்வ தோஷ க்னம்) என்பர். திருக் பஞ்சாங்கம் போன்ற பல பஞ்சாங்கங்கள் புதன்கிழமைகளில் இதைக் கொள்வதில்லை.",
+  "On {date}: {start} – {end}.": "{date}: {start} – {end}.",
+  "Between an hour before sunrise and an hour after sunset. This is a practical limit for these events, not one of Niranjan Babu's rules.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து சூரிய அஸ்தமனத்துக்கு ஒரு மணி நேரம் பின்பு வரை. இது இந்தக் காரியங்களுக்கான நடைமுறை வரம்பு; நிரஞ்சன் பாபுவின் விதி அல்ல.",
+  "Rahu Kalam, Yamaganda, Gulika Kalam and eclipses follow general panchangam practice; Niranjan Babu's master class doesn't mention them.": "ராகு காலம், எமகண்டம், குளிகை, கிரகணம் ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி; நிரஞ்சன் பாபுவின் முதன்மை வகுப்பில் இவை குறிப்பிடப்படவில்லை.",
+  "Vijayadashami is traditionally auspicious for every beginning, so it is always listed, for all events and all day, even when the rules above don't pick it.": "விஜயதசமி எல்லாத் தொடக்கங்களுக்கும் மரபாக நல்ல நாள்; எனவே மேலே உள்ள விதிகள் அதைத் தேர்ந்தெடுக்காவிட்டாலும், எல்லாக் காரியங்களுக்கும் நாள் முழுவதும் பட்டியலில் இடம்பெறும்.",
+  "All events": "எல்லாக் காரியங்களும்",
+  "All day": "நாள் முழுவதும்",
   "Rules used": "பயன்படுத்திய விதிகள்",
   "* A lunar eclipse falls on this day, and some panchangams move the Upakarma because of it. Check the date with your temple.": "* இந்த நாளில் சந்திர கிரகணம் நிகழ்கிறது; அதனால் சில பஞ்சாங்கங்கள் உபாகர்மாவை வேறு நாளுக்கு மாற்றுகின்றன. தேதியை உங்கள் கோவிலில் உறுதி செய்துகொள்ளவும்.",
-  "The day": "நாள்",
-  "The time": "நேரம்",
   "Sources": "ஆதாரங்கள்",
-  "Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice. The panchanga yoga rule follows classical muhurtha texts such as Muhurta Chintamani; many Tamil calendars don't apply it, so a few of their days aren't listed here.": "கிழமை, திதி, நட்சத்திரம், மாதம், கரி நாள், நேரம் ஆகியவை தமிழ் நாட்காட்டி வழக்கப்படி; ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம், 8-ஆம் வீடு, கிரகணம், மௌட்யம், லக்ன சந்தி ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி. பஞ்சாங்க யோக விதி முகூர்த்த சிந்தாமணி போன்ற பழைய முகூர்த்த நூல்களைப் பின்பற்றுகிறது; பல தமிழ் நாட்காட்டிகள் இதைப் பயன்படுத்துவதில்லை, அதனால் அவற்றின் சில நாட்கள் இங்கே இடம்பெறவில்லை.",
-  "The empty 7th house, the lagna rule and its exceptions, and the rules for the extra education days: B. V. Raman, Muhurtha or Electional Astrology, chapters 5, 9 and 11": "7-ஆம் வீடு காலியாக இருப்பது, லக்ன விதியும் அதன் விலக்குகளும், கல்வி தொடங்கக் கூடுதல் நாட்களுக்கான விதிகள்: பி. வி. ராமன், Muhurtha or Electional Astrology, அத்தியாயங்கள் 5, 9, 11",
-  "chapter 5 summary": "அத்தியாயம் 5 சுருக்கம்",
-  "chapter 9 summary": "அத்தியாயம் 9 சுருக்கம்",
-  "chapter 11 summary": "அத்தியாயம் 11 சுருக்கம்",
-  "Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:": "கிழமை, நட்சத்திர அடிப்படையில் அமிர்த, சித்த, மரண, பிரபலாரிஷ்ட யோகங்கள்:",
-  "Ungal Vazhkkai Vazhikatti": "உங்கள் வாழ்க்கை வழிகாட்டி",
-  "Vidyarambham and other starts of learning can also be held on these days, which miss the general rules, mostly by falling in Aadi, Purattasi or Margazhi or on Ardra.": "வித்யாரம்பம் போன்ற கல்வித் தொடக்கங்களை இந்த நாட்களிலும் செய்யலாம்; இவை பொது விதிகளுக்குப் பொருந்தாதவை (பெரும்பாலும் ஆடி, புரட்டாசி, மார்கழி மாதங்களில் அல்லது திருவாதிரையில் வருவதால்).",
-  "They follow B. V. Raman's rules for education: nakshatra Ashwini, Rohini, Mrigashira, Ardra, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha or Revati; the general tithis except Chaturthi and Chaturdashi; any month; and a lagna that isn't a fixed sign. The other day and time rules apply, except the empty 7th house, the lagna rule and moudhyam.": "இவை பி. வி. ராமனின் கல்வி விதிகளைப் பின்பற்றுகின்றன: நட்சத்திரம் அஸ்வினி, ரோகிணி, மிருகசீரிஷம், திருவாதிரை, புனர்பூசம், பூசம், உத்திரம், அஸ்தம், சித்திரை, சுவாதி, உத்திராடம், திருவோணம், அவிட்டம், சதயம் அல்லது ரேவதி; சதுர்த்தி, சதுர்த்தசி தவிர பொதுத் திதிகள்; எந்த மாதமும்; ஸ்திர ராசி அல்லாத லக்னம். 7-ஆம் வீடு, லக்ன விதி, மௌட்யம் தவிர பிற நாள், நேர விதிகள் பொருந்தும்.",
   // tables
   "Body": "கிரகம்",
   "Longitude|table": "பாகை", // "|context" keys show the part before "|" in English
@@ -220,24 +227,24 @@ const REFERENCES = `    <details class="references">
       <ul>
         <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
       </ul>
-      <h4>Shubha Muhurtham</h4>
+      <h4>Auspicious Days</h4>
       <ul>
-        <li>B. V. Raman, <cite>Muhurtha or Electional Astrology</cite>: the marriage, lagna and education rules (<a href="https://vedastro.org/blog/Muhurtha-Chapter-1-The-Importance-of-Muhurtha.html" target="_blank" rel="noopener">chapter summaries on VedAstro</a>).</li>
-        <li><a href="https://www.harikesanallur.com/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: the published muhurtham list the general days are checked against.</li>
-        <li><a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener">Ungal Vazhkkai Vazhikatti</a>: the Amirtha, Siddha and Marana yogam table.</li>
+        <li>Bangalore Niranjan Babu, <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener"><cite>Selecting Auspicious Muhurthas</cite></a> (Raman &amp; Rajeswari Research Foundation master class, 2024), following B. V. Raman's <cite>Muhurtha</cite>: the rules used.</li>
+        <li><a href="https://www.drikpanchang.com/muhurat/panchaka-rahita-muhurat.html" target="_blank" rel="noopener">Drik Panchang, Panchaka Rahita Muhurat</a>: the Panchaka times are checked against it.</li>
+        <li><a href="https://www.harikesanallur.com/subha-muhurtha-days/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: a published muhurtham list in the Tamil calendar style, for marriage and other auspicious beginnings.</li>
       </ul>
     </details>`;
 
 // Footer with links, per language.
 export const FOOTER = {
-  en: `<p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
+  en: `<p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
     ${REFERENCES}
     <p class="about"><strong>Your data stays with you.</strong> No sign-up and no cookies, and your birth date and time never leave your device. The site counts anonymous page views only. Places not in the built-in list are looked up on OpenStreetMap.</p>
     Calculations run on your device using the <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0).
     Place names from <a href="https://www.geonames.org/">GeoNames</a> (CC BY 4.0) and
     <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>.
     <a href="https://github.com/aganba/vedic-chart">Source code</a>.`,
-  ta: `<p class="about">இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், லக்னத்துடன் சுப முகூர்த்த நாட்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம். அச்சிட்ட பஞ்சாங்கம் கிடைக்காத இடங்களுக்காக உருவாக்கப்பட்டது: அனைத்தும் உங்கள் இருப்பிடத்துக்கும் உள்ளூர் நேரத்துக்கும் ஏற்பக் கணக்கிடப்படுகின்றன.</p>
+  ta: `<p class="about">இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், பயணம், வாகனம், கல்வி, புதிய முயற்சிகளுக்கான சுப முகூர்த்த நேரங்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம். அச்சிட்ட பஞ்சாங்கம் கிடைக்காத இடங்களுக்காக உருவாக்கப்பட்டது: அனைத்தும் உங்கள் இருப்பிடத்துக்கும் உள்ளூர் நேரத்துக்கும் ஏற்பக் கணக்கிடப்படுகின்றன.</p>
     ${REFERENCES}
     <p class="about"><strong>உங்கள் தகவல் உங்களிடமே.</strong> பதிவு தேவையில்லை, குக்கீகள் இல்லை; உங்கள் பிறந்த தேதியும் நேரமும் உங்கள் சாதனத்தை விட்டு வெளியே செல்வதில்லை. பக்கப் பார்வைகள் மட்டும் அடையாளமின்றி எண்ணப்படுகின்றன. உள்ளமைந்த பட்டியலில் இல்லாத இடங்கள் OpenStreetMap-இல் தேடப்படுகின்றன.</p>
     கணக்கீடுகள் அனைத்தும் <a href="https://www.astro.com/swisseph/">Swiss Ephemeris</a> (AGPL-3.0) கொண்டு உங்கள் சாதனத்திலேயே செய்யப்படுகின்றன.
@@ -302,8 +309,6 @@ const NS = {
       "அஷ்டமி", "நவமி", "தசமி", "ஏகாதசி", "துவாதசி", "திரயோதசி", "சதுர்த்தசி"]),
     Purnima: "பௌர்ணமி", Amavasya: "அமாவாசை",
   },
-  // muhurtham: the day's Tamil yogam
-  dayYoga: { "Amirtha yogam": "அமிர்த யோகம்", "Siddha yogam": "சித்த யோகம்" },
   paksha: { Shukla: "வளர்பிறை", Krishna: "தேய்பிறை", Valarpirai: "வளர்பிறை", Theipirai: "தேய்பிறை" },
   yoga: zip(["Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
     "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra",

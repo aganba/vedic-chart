@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-title" content="Vedic Calendar">
   <meta name="theme-color" content="#7a2e12">
   <title>Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart</title>
-  <meta name="description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.">
+  <meta name="description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.">
   <!-- app.js points the canonical link at https://aganba.github.io/vedic-chart/ (or ?lang=ta in Tamil), so
        shared links with birth details or ?tab= are folded into one page. -->
   <link rel="alternate" hreflang="en" href="https://aganba.github.io/vedic-chart/">
@@ -16,7 +16,7 @@
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Vedic Calendar">
   <meta property="og:title" content="Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham &amp; Birth Chart">
-  <meta property="og:description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.">
+  <meta property="og:description" content="Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.">
   <meta property="og:url" content="https://aganba.github.io/vedic-chart/">
   <meta property="og:image" content="https://aganba.github.io/vedic-chart/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -30,7 +30,7 @@
     "name": "Vedic Calendar",
     "url": "https://aganba.github.io/vedic-chart/",
     "image": "https://aganba.github.io/vedic-chart/og-image.png",
-    "description": "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha.",
+    "description": "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.",
     "applicationCategory": "LifestyleApplication",
     "operatingSystem": "Any",
     "inLanguage": ["en", "ta"],
@@ -120,7 +120,7 @@
         <button type="button" role="tab" id="tab-panchanga" aria-controls="panel-panchanga" aria-selected="true" data-i18n="Panchanga">Panchanga</button>
         <button type="button" role="tab" id="tab-festivals" aria-controls="panel-festivals" aria-selected="false" data-i18n="Festivals">Festivals</button>
         <button type="button" role="tab" id="tab-special" aria-controls="panel-special" aria-selected="false" data-i18n="Special Days">Special Days</button>
-        <button type="button" role="tab" id="tab-muhurtham" aria-controls="panel-muhurtham" aria-selected="false" data-i18n="Shubha Muhurtham">Shubha Muhurtham</button>
+        <button type="button" role="tab" id="tab-muhurtham" aria-controls="panel-muhurtham" aria-selected="false" data-i18n="Auspicious Days">Auspicious Days</button>
         <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false" data-i18n="Birth Chart">Birth Chart</button>
       </div>
 
@@ -132,7 +132,6 @@
           </div>
           <div class="banner-col">
             <div class="festival-banner" id="festivals" hidden></div>
-            <div class="festival-banner muhurtha-banner" id="muhurthaBanner" hidden></div>
           </div>
         </div>
       </div>
@@ -187,35 +186,40 @@
 
       <div role="tabpanel" id="panel-muhurtham" aria-labelledby="tab-muhurtham" hidden>
         <div class="card muhurtha-card">
-          <h2 data-i18n="Shubha Muhurtham">Shubha Muhurtham</h2>
-          <p class="hint" data-i18n="Days and times in the style of Tamil calendars, for marriage and other auspicious beginnings, calculated for the place you entered. Panchangams differ, and personal factors such as tarabala, chandrabala and chandrashtamam aren&#39;t considered, so confirm with your family astrologer.">Days and times in the style of Tamil calendars, for marriage and other auspicious beginnings, calculated for the place you entered. Panchangams differ, and personal factors such as tarabala, chandrabala and chandrashtamam aren't considered, so confirm with your family astrologer.</p>
+          <h2 data-i18n="Auspicious Days">Auspicious Days</h2>
+          <p class="hint" data-i18n="Times that suit buying a vehicle, travel, day-to-day matters, learning music and arts, sports and new projects, calculated for the place you entered. Panchangams and astrologers differ on the rules, and personal factors such as tarabala and chandrabala aren&#39;t considered, so consult your family astrologer before fixing a date.">Times that suit buying a vehicle, travel, day-to-day matters, learning music and arts, sports and new projects, calculated for the place you entered. Panchangams and astrologers differ on the rules, and personal factors such as tarabala and chandrabala aren't considered, so consult your family astrologer before fixing a date.</p>
+          <p class="hint muhurtha-source"><span data-i18n="Rules from">Rules from</span> <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener" data-i18n="Bangalore Niranjan Babu&#39;s master class Selecting Auspicious Muhurthas">Bangalore Niranjan Babu's master class Selecting Auspicious Muhurthas</a> <span data-i18n="(112th Raman Jayanti Master Class, Raman and Rajeswari Research Foundation, 1 September 2024, on YouTube), which follows Dr. B. V. Raman&#39;s book Muhurtha.">(112th Raman Jayanti Master Class, Raman and Rajeswari Research Foundation, 1 September 2024, on YouTube), which follows Dr. B. V. Raman's book Muhurtha.</span></p>
+          <div class="abhijit-note">
+            <strong data-i18n="Abhijit Muhurtha">Abhijit Muhurtha</strong>
+            <p><span data-i18n="The 8th of the 15 muhurthas of daytime, around local midday. In the question-and-answer session of the master class, Niranjan Babu says his father Dr. B. V. Raman advised it, even for a marriage, when no other good time can be found, as it is said to remove all doshas (sarva dosha ghna). Many panchangams, such as Drik Panchang, skip it on Wednesdays.">The 8th of the 15 muhurthas of daytime, around local midday. In the question-and-answer session of the master class, Niranjan Babu says his father Dr. B. V. Raman advised it, even for a marriage, when no other good time can be found, as it is said to remove all doshas (sarva dosha ghna). Many panchangams, such as Drik Panchang, skip it on Wednesdays.</span> <strong id="abhijitTime"></strong></p>
+          </div>
           <details class="muhurtha-rules">
             <summary data-i18n="Rules used">Rules used</summary>
-            <h3 data-i18n="The day">The day</h3>
+            <h3 data-i18n="Events, by the Moon&#39;s nakshatra">Events, by the Moon's nakshatra</h3>
             <ul>
-              <li data-i18n="Weekday: not Tuesday or Saturday.">Weekday: not Tuesday or Saturday.</li>
-              <li data-i18n="Tithi: not Pratipada, Ashtami, Navami, Purnima, Amavasya or Theipirai Chaturdashi.">Tithi: not Pratipada, Ashtami, Navami, Purnima, Amavasya or Theipirai Chaturdashi.</li>
-              <li data-i18n="Nakshatra: Ashwini, Rohini, Mrigashira, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha, Uttara Bhadrapada or Revati.">Nakshatra: Ashwini, Rohini, Mrigashira, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha, Uttara Bhadrapada or Revati.</li>
-              <li data-i18n="Tamil month: not Aadi, Purattasi or Margazhi, and not the first day of a month.">Tamil month: not Aadi, Purattasi or Margazhi, and not the first day of a month.</li>
-              <li data-i18n="Not a Kari naal.">Not a Kari naal.</li>
-              <li data-i18n="Yogam (from the weekday and the nakshatra at sunrise): Amirtha or Siddha, not Marana or Prabalarishta.">Yogam (from the weekday and the nakshatra at sunrise): Amirtha or Siddha, not Marana or Prabalarishta.</li>
-              <li data-i18n="Not an eclipse day, and neither Jupiter nor Venus combust (moudhyam).">Not an eclipse day, and neither Jupiter nor Venus combust (moudhyam).</li>
+              <li data-i18n="Vehicles and travel: movable nakshatras (Punarvasu, Swati, Shravana, Dhanishta, Shatabhisha).">Vehicles and travel: movable nakshatras (Punarvasu, Swati, Shravana, Dhanishta, Shatabhisha).</li>
+              <li data-i18n="Day-to-day matters: mixed nakshatras (Krittika, Vishakha).">Day-to-day matters: mixed nakshatras (Krittika, Vishakha).</li>
+              <li data-i18n="Learning music and arts: soft nakshatras (Mrigashira, Chitra, Anuradha, Revati).">Learning music and arts: soft nakshatras (Mrigashira, Chitra, Anuradha, Revati).</li>
+              <li data-i18n="Sports, new projects and travel: light nakshatras (Ashwini, Pushya, Hasta, Abhijit).">Sports, new projects and travel: light nakshatras (Ashwini, Pushya, Hasta, Abhijit).</li>
+              <li data-i18n="Sharp (Ardra, Ashlesha, Jyeshtha, Mula) and dreadful (Bharani, Magha, Purva Phalguni, Purva Ashadha, Purva Bhadrapada) nakshatras are avoided.">Sharp (Ardra, Ashlesha, Jyeshtha, Mula) and dreadful (Bharani, Magha, Purva Phalguni, Purva Ashadha, Purva Bhadrapada) nakshatras are avoided.</li>
             </ul>
-            <h3 data-i18n="The time">The time</h3>
+            <h3 data-i18n="Every time">Every time</h3>
             <ul>
-              <li data-i18n="Between an hour before sunrise (not before 5 am) and sunset.">Between an hour before sunrise (not before 5 am) and sunset.</li>
-              <li data-i18n="Outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana.">Outside Rahu Kalam, Yamaganda, Gulika Kalam and Vishti karana.</li>
-              <li data-i18n="Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.">Panchanga yoga: not Vyatipata or Vaidhriti, not the first half of Parigha, and not the first 3 ghatis (72 minutes) of Vishkambha or Vajra, 5 of Shula, 6 of Ganda or Atiganda, or 9 of Vyaghata.</li>
-              <li data-i18n="No planet in the 7th or 8th house from the lagna.">No planet in the 7th or 8th house from the lagna.</li>
-              <li data-i18n="No Sun, Mars, Saturn, Rahu or Ketu in the lagna, unless Jupiter, Venus or an unafflicted Mercury (at least 14° from the Sun and not with the Sun, Mars or Saturn) is in the lagna too, a planet in the lagna is exalted, or the Sun or Moon is in the 11th house.">No Sun, Mars, Saturn, Rahu or Ketu in the lagna, unless Jupiter, Venus or an unafflicted Mercury (at least 14° from the Sun and not with the Sun, Mars or Saturn) is in the lagna too, a planet in the lagna is exalted, or the Sun or Moon is in the 11th house.</li>
-              <li data-i18n="The lagna isn&#39;t in the first or last degree of its sign.">The lagna isn't in the first or last degree of its sign.</li>
+              <li data-i18n="Tithi: not Navami or Chaturdashi.">Tithi: not Navami or Chaturdashi.</li>
+              <li data-i18n="Panchanga yoga: not Atiganda, Shula, Ganda, Vyaghata, Vyatipata, Parigha or Vaidhriti.">Panchanga yoga: not Atiganda, Shula, Ganda, Vyaghata, Vyatipata, Parigha or Vaidhriti.</li>
+              <li data-i18n="Karana: not Vishti, Shakuni or Chatushpada.">Karana: not Vishti, Shakuni or Chatushpada.</li>
+              <li data-i18n="Lagna Thyajya: the lagna isn&#39;t in the first 3° of Mesha, Vrishabha, Kanya or Dhanu, the last 3° of Karka, Vrischika, Makara or Meena, or 13°30′–16°30′ of Mithuna, Simha, Tula or Kumbha.">Lagna Thyajya: the lagna isn't in the first 3° of Mesha, Vrishabha, Kanya or Dhanu, the last 3° of Karka, Vrischika, Makara or Meena, or 13°30′–16°30′ of Mithuna, Simha, Tula or Kumbha.</li>
+              <li data-i18n="Panchaka: the numbers of the tithi (1–30), weekday (Sunday = 1), nakshatra (Ashwini = 1) and lagna (Mesha = 1) add up to a remainder of 0, 3, 5 or 7 when divided by 9. The weekday runs from sunrise to sunrise.">Panchaka: the numbers of the tithi (1–30), weekday (Sunday = 1), nakshatra (Ashwini = 1) and lagna (Mesha = 1) add up to a remainder of 0, 3, 5 or 7 when divided by 9. The weekday runs from sunrise to sunrise.</li>
+              <li data-i18n="Surya Sankramana: not within 16 ghatis (6 hours 24 minutes) of the Sun entering a sign.">Surya Sankramana: not within 16 ghatis (6 hours 24 minutes) of the Sun entering a sign.</li>
+              <li data-i18n="Not in Rahu Kalam, Yamaganda or Gulika Kalam, and not on an eclipse day.">Not in Rahu Kalam, Yamaganda or Gulika Kalam, and not on an eclipse day.</li>
               <li data-i18n="At least 20 minutes long.">At least 20 minutes long.</li>
+              <li data-i18n="Between an hour before sunrise and an hour after sunset. This is a practical limit for these events, not one of Niranjan Babu&#39;s rules.">Between an hour before sunrise and an hour after sunset. This is a practical limit for these events, not one of Niranjan Babu's rules.</li>
+              <li data-i18n="Vijayadashami is traditionally auspicious for every beginning, so it is always listed, for all events and all day, even when the rules above don&#39;t pick it.">Vijayadashami is traditionally auspicious for every beginning, so it is always listed, for all events and all day, even when the rules above don't pick it.</li>
             </ul>
             <h3 data-i18n="Sources">Sources</h3>
             <ul>
-              <li data-i18n="Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice. The panchanga yoga rule follows classical muhurtha texts such as Muhurta Chintamani; many Tamil calendars don't apply it, so a few of their days aren't listed here.">Weekday, tithi, nakshatra, month, Kari naal and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses, moudhyam and lagna sandhi follow general panchangam practice. The panchanga yoga rule follows classical muhurtha texts such as Muhurta Chintamani; many Tamil calendars don't apply it, so a few of their days aren't listed here.</li>
-              <li><span data-i18n="The empty 7th house, the lagna rule and its exceptions, and the rules for the extra education days: B. V. Raman, Muhurtha or Electional Astrology, chapters 5, 9 and 11">The empty 7th house, the lagna rule and its exceptions, and the rules for the extra education days: B. V. Raman, Muhurtha or Electional Astrology, chapters 5, 9 and 11</span> (<a href="https://vedastro.org/blog/Muhurtha-Chapter-5-Special-Adverse-Yogas-and-their-Neutralisation.html" target="_blank" rel="noopener" data-i18n="chapter 5 summary">chapter 5 summary</a>, <a href="https://vedastro.org/blog/Muhurtha-Chapter-9-Marriage.html" target="_blank" rel="noopener" data-i18n="chapter 9 summary">chapter 9 summary</a>, <a href="https://vedastro.org/blog/Muhurtha-Chapter-11-Elections-Pertaining-to-Education.html" target="_blank" rel="noopener" data-i18n="chapter 11 summary">chapter 11 summary</a>)</li>
-              <li><span data-i18n="Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:">Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:</span> <a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener" data-i18n="Ungal Vazhkkai Vazhikatti">Ungal Vazhkkai Vazhikatti</a></li>
+              <li><span data-i18n="The nakshatra types, tithi, yoga, karana, Lagna Thyajya, Panchaka and Surya Sankramana rules:">The nakshatra types, tithi, yoga, karana, Lagna Thyajya, Panchaka and Surya Sankramana rules:</span> <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener" data-i18n="Bangalore Niranjan Babu, Selecting Auspicious Muhurthas (Raman and Rajeswari Research Foundation, 2024)">Bangalore Niranjan Babu, Selecting Auspicious Muhurthas (Raman and Rajeswari Research Foundation, 2024)</a></li>
+              <li data-i18n="Rahu Kalam, Yamaganda, Gulika Kalam and eclipses follow general panchangam practice; Niranjan Babu&#39;s master class doesn&#39;t mention them.">Rahu Kalam, Yamaganda, Gulika Kalam and eclipses follow general panchangam practice; Niranjan Babu's master class doesn't mention them.</li>
             </ul>
           </details>
           <div id="muhurthaYear"></div>
@@ -225,7 +229,7 @@
   </main>
 
   <footer class="site-footer" id="footer">
-    <p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, Shubha Muhurtham days with lagna, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
+    <p class="about">Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha. Made for places where printed panchangams aren't available: everything is calculated for your own location, in local time.</p>
     <details class="references">
       <summary>References</summary>
       <h4>Calculations</h4>
@@ -237,11 +241,11 @@
       <ul>
         <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
       </ul>
-      <h4>Shubha Muhurtham</h4>
+      <h4>Auspicious Days</h4>
       <ul>
-        <li>B. V. Raman, <cite>Muhurtha or Electional Astrology</cite>: the marriage, lagna and education rules (<a href="https://vedastro.org/blog/Muhurtha-Chapter-1-The-Importance-of-Muhurtha.html" target="_blank" rel="noopener">chapter summaries on VedAstro</a>).</li>
-        <li><a href="https://www.harikesanallur.com/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: the published muhurtham list the general days are checked against.</li>
-        <li><a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener">Ungal Vazhkkai Vazhikatti</a>: the Amirtha, Siddha and Marana yogam table.</li>
+        <li>Bangalore Niranjan Babu, <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener"><cite>Selecting Auspicious Muhurthas</cite></a> (Raman &amp; Rajeswari Research Foundation master class, 2024), following B. V. Raman's <cite>Muhurtha</cite>: the rules used.</li>
+        <li><a href="https://www.drikpanchang.com/muhurat/panchaka-rahita-muhurat.html" target="_blank" rel="noopener">Drik Panchang, Panchaka Rahita Muhurat</a>: the Panchaka times are checked against it.</li>
+        <li><a href="https://www.harikesanallur.com/subha-muhurtha-days/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: a published muhurtham list in the Tamil calendar style, for marriage and other auspicious beginnings.</li>
       </ul>
     </details>
     <p class="about"><strong>Your data stays with you.</strong> No sign-up and no cookies, and your birth date and time never leave your device. The site counts anonymous page views only. Places not in the built-in list are looked up on OpenStreetMap.</p>
