@@ -6,7 +6,8 @@
 // Each time is tagged with the events its nakshatra suits (slide 39):
 //  - movable (Punarvasu, Swati, Shravana, Dhanishta, Shatabhisha): vehicles, travel
 //  - mixed (Krittika, Vishakha): day-to-day matters
-//  - soft (Mrigashira, Chitra, Anuradha, Revati): learning music, dance and arts
+//  - soft (Mrigashira, Chitra, Anuradha, Revati): learning music, dance and arts,
+//    auspicious events
 //  - light (Ashwini, Pushya, Hasta, Abhijit): sports, new projects, travel
 // Sharp and dreadful nakshatras suit none of these.
 // Every time must also pass:
@@ -40,6 +41,7 @@ export const EVENTS = [
   ["Travel", [6, 14, 21, 22, 23, 0, 7, 12, "abhijit"]],
   ["Day-to-day matters", [2, 15]],
   ["Learning music and arts", [4, 13, 16, 26]],
+  ["Auspicious events", [4, 13, 16, 26]],
   ["Sports", [0, 7, 12, "abhijit"]],
   ["New projects", [0, 7, 12, "abhijit"]],
 ];

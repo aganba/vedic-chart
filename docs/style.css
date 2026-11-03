@@ -271,9 +271,10 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .event-tag.ev3 { --ev: #8e24aa; }
 .event-tag.ev4 { --ev: #c62828; }
 .event-tag.ev5 { --ev: #2e7d32; }
+.event-tag.ev6 { --ev: #ad1457; }
 @media (prefers-color-scheme: dark) {
   .event-tag.ev0 { --ev: #64b5f6; } .event-tag.ev1 { --ev: #4dd0e1; } .event-tag.ev2 { --ev: #bcaaa4; }
-  .event-tag.ev3 { --ev: #ce93d8; } .event-tag.ev4 { --ev: #ef9a9a; } .event-tag.ev5 { --ev: #81c784; }
+  .event-tag.ev3 { --ev: #ce93d8; } .event-tag.ev4 { --ev: #ef9a9a; } .event-tag.ev5 { --ev: #81c784; } .event-tag.ev6 { --ev: #f48fb1; }
 }
 /* phones: narrower cells so the three columns fit */
 @media (max-width: 520px) {
