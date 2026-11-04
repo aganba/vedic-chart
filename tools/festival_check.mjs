@@ -148,5 +148,30 @@ for (const [date, month, day, year] of TAMIL_DATES) {
   if (wrong.length) bad++;
   console.log(`${wrong.length ? "FAIL" : "ok  "} panchaka: ${PANCHAKA_DRIK.length - wrong.length}/${PANCHAKA_DRIK.length} Drik Panchang times agree${wrong.length ? `; wrong ${wrong.map(([a, b]) => `${a}-${b}`).join(" ")}` : ""}`);
 }
+// Tamil calendar muhurtham: the 47 days of Harikesanallur Venkatraman's 2026-27
+// list for Chennai (harikesanallur.com) must all be found. That list uses the
+// vakya panchangam and the app drik positions, so the app also finds some days
+// the list leaves out (22 in this year); more than 25 would mean a rule is missing.
+// No day may be a Tuesday or Saturday.
+{
+  const { tamilMuhurthaFor } = await import(new URL("../docs/js/tamilmuhurtha.js", import.meta.url));
+  const ref = new Set(("2026-04-20 2026-04-23 2026-04-30 2026-05-08 2026-05-13 2026-05-18 2026-05-25 2026-05-28 2026-05-29 "
+    + "2026-06-04 2026-06-11 2026-06-17 2026-06-18 2026-06-24 2026-06-25 2026-07-05 2026-07-12 2026-08-23 2026-08-30 "
+    + "2026-08-31 2026-09-07 2026-10-25 2026-10-30 2026-11-01 2026-11-11 2026-11-13 2026-11-15 2026-11-16 2026-11-20 "
+    + "2026-11-22 2026-11-29 2026-12-04 2026-12-14 2027-01-20 2027-02-08 2027-02-10 2027-02-11 2027-02-26 2027-03-10 "
+    + "2027-03-14 2027-03-17 2027-03-18 2027-03-24 2027-04-04 2027-04-08 2027-04-11 2027-04-12").split(" "));
+  const found = new Set(), extra = [];
+  for (let t = Date.parse("2026-04-14T00:00:00Z"); t <= Date.parse("2027-04-13T00:00:00Z"); t += 86400e3) {
+    const date = new Date(t).toISOString().slice(0, 10);
+    if (!tamilMuhurthaFor(t, ...CHENNAI, 5.5)) continue;
+    if ([2, 6].includes(new Date(t).getUTCDay())) { bad++; console.log(`FAIL Tamil muhurtham on ${date}`); }
+    if (ref.has(date)) found.add(date); else extra.push(date);
+  }
+  const missed = [...ref].filter((d) => !found.has(d));
+  const ok = !missed.length && extra.length <= 25;
+  if (!ok) bad++;
+  console.log(`${ok ? "ok  " : "FAIL"} Tamil muhurtham 2026-27: ${found.size}/${ref.size} Harikesanallur days found, ${extra.length} more`
+    + `${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
+}
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

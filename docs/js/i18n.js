@@ -164,7 +164,7 @@ const UI = {
   "Bangalore Niranjan Babu's master class Selecting Auspicious Muhurthas": "பெங்களூர் நிரஞ்சன் பாபுவின் Selecting Auspicious Muhurthas முதன்மை வகுப்பு",
   "(112th Raman Jayanti Master Class, Raman and Rajeswari Research Foundation, 1 September 2024, on YouTube), which follows Dr. B. V. Raman's book Muhurtha.": "(112-ஆவது ராமன் ஜெயந்தி முதன்மை வகுப்பு, ராமன் ராஜேஸ்வரி ஆராய்ச்சி அறக்கட்டளை, 1 செப்டம்பர் 2024, YouTube); இது டாக்டர் பி. வி. ராமனின் Muhurtha நூலைப் பின்பற்றுகிறது.",
   "Abhijit Muhurtha": "அபிஜித் முகூர்த்தம்",
-  "Between an hour before sunrise and an hour after sunset. This is a practical limit for these events, not one of Niranjan Babu's rules.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து சூரிய அஸ்தமனத்துக்கு ஒரு மணி நேரம் பின்பு வரை. இது இந்தக் காரியங்களுக்கான நடைமுறை வரம்பு; நிரஞ்சன் பாபுவின் விதி அல்ல.",
+  "Between an hour before sunrise and two hours after sunset. This is a practical limit for these events, not one of Niranjan Babu's rules.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து சூரிய அஸ்தமனத்துக்கு இரண்டு மணி நேரம் பின்பு வரை. இது இந்தக் காரியங்களுக்கான நடைமுறை வரம்பு; நிரஞ்சன் பாபுவின் விதி அல்ல.",
   "Rahu Kalam, Yamaganda, Gulika Kalam and eclipses follow general panchangam practice; Niranjan Babu's master class doesn't mention them.": "ராகு காலம், எமகண்டம், குளிகை, கிரகணம் ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி; நிரஞ்சன் பாபுவின் முதன்மை வகுப்பில் இவை குறிப்பிடப்படவில்லை.",
   "Vijayadashami is traditionally auspicious for every beginning, so it is always listed, for all events and all day, even when the rules above don't pick it.": "விஜயதசமி எல்லாத் தொடக்கங்களுக்கும் மரபாக நல்ல நாள்; எனவே மேலே உள்ள விதிகள் அதைத் தேர்ந்தெடுக்காவிட்டாலும், எல்லாக் காரியங்களுக்கும் நாள் முழுவதும் பட்டியலில் இடம்பெறும்.",
   "All events": "எல்லாக் காரியங்களும்",
@@ -172,6 +172,35 @@ const UI = {
   "Rules used": "பயன்படுத்திய விதிகள்",
   "* A lunar eclipse falls on this day, and some panchangams move the Upakarma because of it. Check the date with your temple.": "* இந்த நாளில் சந்திர கிரகணம் நிகழ்கிறது; அதனால் சில பஞ்சாங்கங்கள் உபாகர்மாவை வேறு நாளுக்கு மாற்றுகின்றன. தேதியை உங்கள் கோவிலில் உறுதி செய்துகொள்ளவும்.",
   "Sources": "ஆதாரங்கள்",
+  // Auspicious Days: Tamil calendar sub-tab
+  "Weekday: Sunday, Monday, Wednesday, Thursday or Friday; never Tuesday or Saturday.": "கிழமை: ஞாயிறு, திங்கள், புதன், வியாழன் அல்லது வெள்ளி; செவ்வாய், சனி ஒருபோதும் இல்லை.",
+  "Tamil month: not Aadi, Purattasi or Margazhi, and not the first day of any month.": "தமிழ் மாதம்: ஆடி, புரட்டாசி, மார்கழி அல்ல; எந்த மாதத்தின் முதல் நாளும் அல்ல.",
+  "Not a Kari naal: Chithirai 6, 15; Vaikasi 7, 16, 17; Aani 1, 6; Aadi 2, 10, 20; Avani 2, 9, 28; Purattasi 16, 29; Aippasi 6, 20; Karthigai 1, 10, 17; Margazhi 6, 9, 11; Thai 1, 2, 3, 11, 17; Maasi 15, 16, 17; Panguni 6, 15, 19.": "கரி நாள் அல்ல: சித்திரை 6, 15; வைகாசி 7, 16, 17; ஆனி 1, 6; ஆடி 2, 10, 20; ஆவணி 2, 9, 28; புரட்டாசி 16, 29; ஐப்பசி 6, 20; கார்த்திகை 1, 10, 17; மார்கழி 6, 9, 11; தை 1, 2, 3, 11, 17; மாசி 15, 16, 17; பங்குனி 6, 15, 19.",
+  "Yogam of the day (from the weekday and the nakshatra at sunrise): Amirtha or Siddha, not Marana or Prabalarishta.": "அன்றைய யோகம் (கிழமை, சூரிய உதய நட்சத்திரத்திலிருந்து): அமிர்த அல்லது சித்த யோகம்; மரண, பிரபலாரிஷ்ட யோகம் அல்ல.",
+  "Not an eclipse day (a solar or lunar eclipse anywhere that day).": "கிரகண நாள் அல்ல (அன்று உலகில் எங்கும் சூரிய அல்லது சந்திர கிரகணம் இல்லை).",
+  "Tithi: Dwitiya, Tritiya, Chaturthi, Panchami, Shashthi, Saptami, Dashami, Ekadashi, Dwadashi or Trayodashi of either paksha, or Valarpirai Chaturdashi. Never Pratipada, Ashtami, Navami, Purnima, Amavasya or Theipirai Chaturdashi.": "திதி: இரு பக்ஷங்களிலும் துவிதியை, திருதியை, சதுர்த்தி, பஞ்சமி, சஷ்டி, சப்தமி, தசமி, ஏகாதசி, துவாதசி, திரயோதசி, அல்லது வளர்பிறை சதுர்த்தசி. பிரதமை, அஷ்டமி, நவமி, பௌர்ணமி, அமாவாசை, தேய்பிறை சதுர்த்தசி ஒருபோதும் இல்லை.",
+  "Between an hour before sunrise (not before 5 am) and two hours after sunset.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து (காலை 5 மணிக்கு முன் அல்ல) சூரிய அஸ்தமனத்துக்கு இரண்டு மணி நேரம் பின்பு வரை.",
+  "Outside Rahu Kalam, Yamaganda and Gulika Kalam, and not in Vishti (Bhadra) karana.": "ராகு காலம், எமகண்டம், குளிகை தவிர்த்து; விஷ்டி (பத்திரை) கரணமும் அல்ல.",
+  "No planet, the Moon, Rahu and Ketu included, in the 8th house from the lagna.": "லக்னத்திலிருந்து 8-ஆம் வீட்டில் சந்திரன், ராகு, கேது உட்பட எந்தக் கிரகமும் இல்லை.",
+  "Panchanga yoga (Vyatipata, Vaidhriti and the like), moudhyam (Jupiter or Venus combust), and Dr. B. V. Raman's marriage rules (an empty 7th house, no malefic in the lagna): Harikesanallur's list doesn't apply them, so they would drop days it lists.": "பஞ்சாங்க யோகம் (வியதீபாதம், வைதிருதி போன்றவை), மௌட்யம் (குரு அல்லது சுக்கிரன் அஸ்தங்கம்), டாக்டர் பி. வி. ராமனின் திருமண விதிகள் (7-ஆம் வீடு காலி, லக்னத்தில் பாவ கிரகம் இல்லை): ஹரிகேசநல்லூர் பட்டியல் இவற்றைப் பின்பற்றுவதில்லை; பின்பற்றினால் அதில் உள்ள நாட்கள் விடுபடும்.",
+  "Personal factors: tarabala, chandrabala and chandrashtamam.": "தனிப்பட்ட அம்சங்கள்: தாராபலம், சந்திரபலம், சந்திராஷ்டமம்.",
+  "Every day": "ஒவ்வொரு நாளும்",
+  "Not applied": "பயன்படுத்தாதவை",
+  "Days from the entered date through the next six months (183 days), calculated for the place you entered, in local time.": "உள்ளிட்ட தேதி முதல் அடுத்த ஆறு மாதங்கள் (183 நாட்கள்) வரையிலான நாட்கள், நீங்கள் உள்ளிட்ட இடத்துக்கு உள்ளூர் நேரத்தில் கணக்கிடப்பட்டவை.",
+  "Couldn't calculate muhurtham days.": "முகூர்த்த நாட்களைக் கணக்கிட முடியவில்லை.",
+  "Days and times in the style of Tamil calendars, for marriage and other auspicious beginnings, calculated for the place you entered. Panchangams differ, and personal factors such as tarabala, chandrabala and chandrashtamam aren't considered, so confirm with your family astrologer.": "திருமணம் மற்றும் பிற சுப காரியங்களுக்கான தமிழ் நாட்காட்டி முறையிலான நாட்களும் நேரங்களும், நீங்கள் உள்ளிட்ட இடத்துக்குக் கணக்கிடப்பட்டவை. பஞ்சாங்கங்களிடையே வேறுபாடு இருக்கலாம்; தாராபலம், சந்திரபலம், சந்திராஷ்டமம் போன்ற தனிப்பட்ட அம்சங்கள் கணக்கில் கொள்ளப்படவில்லை, எனவே உங்கள் குடும்ப ஜோதிடரிடம் உறுதி செய்துகொள்ளவும்.",
+  "Nakshatra: Ashwini, Rohini, Mrigashira, Punarvasu, Pushya, Uttara Phalguni, Hasta, Chitra, Swati, Anuradha, Mula, Uttara Ashadha, Shravana, Dhanishta, Shatabhisha, Uttara Bhadrapada or Revati.": "நட்சத்திரம்: அஸ்வினி, ரோகிணி, மிருகசீரிஷம், புனர்பூசம், பூசம், உத்திரம், அஸ்தம், சித்திரை, சுவாதி, அனுஷம், மூலம், உத்திராடம், திருவோணம், அவிட்டம், சதயம், உத்திரட்டாதி அல்லது ரேவதி.",
+  "The lagna isn't in the first or last degree of its sign.": "லக்னம் ராசியின் முதல் அல்லது கடைசி பாகையில் இல்லை.",
+  "{lagna} lagna": "{lagna} லக்னம்",
+  "Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:": "கிழமை, நட்சத்திர அடிப்படையில் அமிர்த, சித்த, மரண, பிரபலாரிஷ்ட யோகங்கள்:",
+  "Ungal Vazhkkai Vazhikatti": "உங்கள் வாழ்க்கை வழிகாட்டி",
+  "Dr. B. V. Raman's method": "டாக்டர் பி. வி. ராமன் முறை",
+  "Tamil calendar": "தமிழ் நாட்காட்டி",
+  "Checked against": "ஒப்பிட்டுச் சரிபார்த்தது:",
+  "Harikesanallur Venkatraman's muhurtham list": "ஹரிகேசநல்லூர் வெங்கட்ராமன் அவர்களின் முகூர்த்தப் பட்டியல்",
+  ", which is calculated with the vakya panchangam. This page uses modern (drik) planet positions, so it finds every day on that list for Chennai in 2026–27 but also some days the list leaves out, and its times can differ.": "; அது வாக்கிய பஞ்சாங்கப்படி கணிக்கப்பட்டது. இந்தப் பக்கம் நவீன (திருக்கணித) கிரக நிலைகளைப் பயன்படுத்துகிறது; எனவே 2026–27 சென்னைக்கான அந்தப் பட்டியலின் எல்லா நாட்களும் இங்கும் வருகின்றன, ஆனால் அதில் இல்லாத சில நாட்களும் வருகின்றன; நேரங்களும் மாறுபடலாம்.",
+  "Weekday, tithi, nakshatra, month, Kari naal, yogam and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses and lagna sandhi follow general panchangam practice.": "கிழமை, திதி, நட்சத்திரம், மாதம், கரி நாள், யோகம், நேரம் ஆகியவை தமிழ் நாட்காட்டி வழக்கப்படி; ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம், 8-ஆம் வீடு, கிரகணம், லக்ன சந்தி ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி.",
+  "Day": "நாள்",
   // tables
   "Body": "கிரகம்",
   "Longitude|table": "பாகை", // "|context" keys show the part before "|" in English
@@ -227,9 +256,10 @@ const REFERENCES = `    <details class="references">
       </ul>
       <h4>Auspicious Days</h4>
       <ul>
-        <li>Bangalore Niranjan Babu, <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener"><cite>Selecting Auspicious Muhurthas</cite></a> (Raman &amp; Rajeswari Research Foundation master class, 2024), following B. V. Raman's <cite>Muhurtha</cite>: the rules used.</li>
+        <li>Bangalore Niranjan Babu, <a href="https://www.youtube.com/watch?v=OMcodmmokcU" target="_blank" rel="noopener"><cite>Selecting Auspicious Muhurthas</cite></a> (Raman &amp; Rajeswari Research Foundation master class, 2024), following B. V. Raman's <cite>Muhurtha</cite>: the rules of the Dr. B. V. Raman's method sub-tab.</li>
         <li><a href="https://www.drikpanchang.com/muhurat/panchaka-rahita-muhurat.html" target="_blank" rel="noopener">Drik Panchang, Panchaka Rahita Muhurat</a>: the Panchaka times are checked against it.</li>
-        <li><a href="https://www.harikesanallur.com/subha-muhurtha-days/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: a published muhurtham list in the Tamil calendar style, for marriage and other auspicious beginnings.</li>
+        <li><a href="https://www.harikesanallur.com/subha-muhurtha-days/" target="_blank" rel="noopener">Harikesanallur Venkatraman</a>: the Tamil calendar muhurtham list the Tamil calendar sub-tab is checked against (it uses the vakya panchangam).</li>
+        <li><a href="https://ungalvazhkkai.seithisaral.in/how-to-predict-amitha-yoga-chitha-yoga-and-marana-yoga/" target="_blank" rel="noopener">Ungal Vazhkkai Vazhikatti</a>: the Amirtha, Siddha and Marana yogam table.</li>
       </ul>
     </details>`;
 
@@ -307,6 +337,7 @@ const NS = {
       "அஷ்டமி", "நவமி", "தசமி", "ஏகாதசி", "துவாதசி", "திரயோதசி", "சதுர்த்தசி"]),
     Purnima: "பௌர்ணமி", Amavasya: "அமாவாசை",
   },
+  dayYoga: { "Amirtha yogam": "அமிர்த யோகம்", "Siddha yogam": "சித்த யோகம்" },
   paksha: { Shukla: "வளர்பிறை", Krishna: "தேய்பிறை", Valarpirai: "வளர்பிறை", Theipirai: "தேய்பிறை" },
   yoga: zip(["Vishkambha", "Priti", "Ayushman", "Saubhagya", "Shobhana", "Atiganda",
     "Sukarma", "Dhriti", "Shula", "Ganda", "Vriddhi", "Dhruva", "Vyaghata", "Harshana", "Vajra",

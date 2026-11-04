@@ -19,6 +19,7 @@
   --sd-maasa: #00796b;
   --sd-sankatahara: #c62828;
   --sd-pradosham: #7b1fa2;
+  --mt-tamil: #a0153e;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -41,6 +42,7 @@
     --sd-maasa: #4dc4b6;
     --sd-sankatahara: #f28b82;
     --sd-pradosham: #d69ee8;
+    --mt-tamil: #ff8fa3;
   }
 }
 
@@ -231,29 +233,35 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 #festivalYear .upcoming-list li { display: flex; gap: 6px; }
 /* the rules behind the muhurtham list, folded away under the description */
 .muhurtha-rules { margin: 4px 0 16px; font-size: 13px; color: var(--muted); }
-.muhurtha-rules summary { cursor: pointer; font-weight: 600; color: var(--good); width: fit-content; }
+.muhurtha-rules summary { cursor: pointer; font-weight: 600; color: var(--sd, var(--good)); width: fit-content; }
 .muhurtha-rules h3 { margin: 12px 0 4px; font-size: 13px; color: var(--ink); }
 .muhurtha-rules ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
 .muhurtha-rules a { color: inherit; }
 .muhurtha-rules p { margin: 8px 0 0; }
-/* muhurtham days are colour-coded green */
-.muhurtha-card h2 { color: var(--good); }
-.muhurtha-card { border-left: 4px solid var(--good); }
+/* muhurtham cards: Raman's method in green, the Tamil calendar list in kumkum red;
+   the sub-tab pills above them take the same colours */
+.mt-raman { --sd: var(--good); }
+.mt-tamil { --sd: var(--mt-tamil); }
+.muhurtha-card { border-left: 4px solid var(--sd); }
 /* festivals card matches the muhurtham card, in the festival accent colour */
 .festival-card h2 { color: var(--accent); }
 .festival-card { border-left: 4px solid var(--accent); }
 /* source line and the Abhijit Muhurtha note at the top of the Auspicious Days tab */
 .muhurtha-source { margin: 4px 0 10px; }
-.muhurtha-source a { color: var(--good); }
+.muhurtha-source a { color: var(--sd); }
+.mt-caveat { margin: 0 0 10px; }
 .muhurtha-table .mt-date small.mt-festival { color: var(--accent); }
 .event-tag.ev-all { --ev: var(--accent); }
 /* muhurtham table: a row per day and set of events, a heading row per month */
 .muhurtha-table { white-space: normal; }
 .muhurtha-table td, .muhurtha-table th { vertical-align: top; }
 .muhurtha-table tbody th { text-transform: none; letter-spacing: 0; }
-.muhurtha-table .month-row th { padding-top: 16px; font-size: 14px; color: var(--good); border-bottom: 1px solid var(--good); }
+.muhurtha-table .month-row th { padding-top: 16px; font-size: 14px; color: var(--sd); border-bottom: 1px solid var(--sd); }
 .muhurtha-table .mt-date { font-size: 14px; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.muhurtha-table .mt-date small { display: block; font-size: 12px; color: var(--good); }
+.muhurtha-table .mt-date small { display: block; font-size: 12px; color: var(--sd); }
+/* Tamil calendar table: the day's panchangam, and each time with its lagna */
+.mt-day { font-size: 13px; }
+.mt-time .mt-lagna { margin-left: 6px; color: var(--muted); font-size: 13px; }
 .muhurtha-table tr.today td, .muhurtha-table tr.today .mt-date { font-weight: 700; }
 .muhurtha-table tr:has(+ tr.more) td { border-bottom-style: dashed; }
 .mt-events { display: flex; flex-wrap: wrap; gap: 4px; }

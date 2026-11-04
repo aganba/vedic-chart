@@ -27,7 +27,7 @@
 //  - Not in Rahu Kalam, Yamaganda or Gulika Kalam, and not on an eclipse day
 //    (general panchangam practice; the talk doesn't mention these).
 //  - At least 20 minutes long.
-//  - Between an hour before sunrise and an hour after sunset: a practical
+//  - Between an hour before sunrise and two hours after sunset: a practical
 //    limit for these events, not a rule from the talk.
 // Personal factors (tarabala, chandrabala) aren't applied.
 import * as swe from "./swe.js";
@@ -74,7 +74,7 @@ const PANCHAKA_OK = new Set([0, 3, 5, 7]);
 
 // Whether a solar or lunar eclipse happens (anywhere) between jd0 and jd1: a new
 // moon with the Sun within 18.5 degrees of a node, or a full moon within 12.5.
-function eclipseBetween(jd0, jd1) {
+export function eclipseBetween(jd0, jd1) {
   const el = (jd) => norm(planetLon(jd, SE.MOON)[0] - planetLon(jd, SE.SUN)[0]);
   const a = el(jd0), b = el(jd1);
   const newMoon = b < a, fullMoon = a < 180 && b >= 180;
@@ -114,8 +114,8 @@ export function muhurthaFor(dateWall, lat, lon, offset) {
   const ss = sr && swe.riseTrans(sr, SE.SUN, SE.CALC_SET, lon, lat);
   if (!sr || !ss || sr >= nextMidnight) return null;
   if (eclipseBetween(midnight, nextMidnight)) return null;
-  // A practical limit, not from the talk: an hour before sunrise to an hour after sunset.
-  const start = sr - 1 / 24, end = ss + 1 / 24;
+  // A practical limit, not from the talk: an hour before sunrise to two hours after sunset.
+  const start = sr - 1 / 24, end = ss + 2 / 24;
 
   const eighth = (ss - sr) / 8;
   const kalams = KALAMS.map((t) => [sr + (t[weekday] - 1) * eighth, sr + t[weekday] * eighth]);

@@ -35,6 +35,7 @@ const swe = await import(new URL("../docs/js/swe.js", import.meta.url));
 const astro = await import(new URL("../docs/js/astro.js", import.meta.url));
 const { festivalsFor, tamilDate } = await import(new URL("../docs/js/festivals.js", import.meta.url));
 const { muhurthaFor } = await import(new URL("../docs/js/muhurtha.js", import.meta.url));
+const { tamilMuhurthaFor } = await import(new URL("../docs/js/tamilmuhurtha.js", import.meta.url));
 const { observancesFor, eclipsesBetween } = await import(new URL("../docs/js/specialdays.js", import.meta.url));
 await swe.initSwe((f) => readFile(docs + "ephe/" + f));
 setLang("ta");
@@ -50,6 +51,9 @@ for (const [lat, lon] of [[13.0827, 80.2707], [28.6139, 77.209], [9.9312, 76.267
     }
     const m = muhurthaFor(w, lat, lon, 5.5);
     if (m) for (const e of m.events) if (!ui.includes(JSON.stringify(e) + ":")) missing.push(`ui: ${e}`);
+    const tm = d % 2 ? null : tamilMuhurthaFor(w, lat, lon, 5.5);
+    if (tm) { check(tm.paksha, "paksha"); check(tm.tithi, "tithi"); check(tm.nakshatra, "nakshatra"); check(tm.yogam, "dayYoga");
+      for (const x of tm.windows) check(x.lagna, "sign"); }
     if (d % 15 === 0) {
       const td = tamilDate(w, lat, lon, 5.5);
       check(td.month, "tamilMonth"); check(td.year, "samvatsara");

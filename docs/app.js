@@ -5,6 +5,7 @@ import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
 import { dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
 import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
 import { EVENTS, muhurthaFor } from "./js/muhurtha.js";
+import { tamilMuhurthaFor } from "./js/tamilmuhurtha.js";
 import { zoneAt, offsetFor, offsetAtUtc } from "./js/tz.js";
 import { loadPlaces, searchPlaces, geocodeOnline, reverseOnline } from "./js/places.js";
 import { FOOTER, compass, getLang, monthLong, monthShort, savedLang, setLang, spanUnits, t, tr, tzNote,
@@ -432,6 +433,7 @@ function renderPanchanga(c) {
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
 const YEAR_DAYS = 366; // the entered date and the 365 days after it
+const MUHURTHA_DAYS = 183; // muhurthams: the entered date and the 182 days after it (about six months)
 const CHUNK_DAYS = 8;
 // Results so far for the current chart; kept so a language switch can redraw
 // them without recalculating.
@@ -455,8 +457,9 @@ function renderFestivals(c) {
   const ref = c.input.local_time.slice(0, 10);
   const midnight = Math.floor(wallFromInputs(ref, "00:00") / 86400e3) * 86400e3;
   fest = {
-    c, ref, midnight, found: [], muhurthas: [], observances: [], eclipses: null, done: 0, failed: false,
+    c, ref, midnight, found: [], muhurthas: [], tamilMuhurthas: [], observances: [], eclipses: null, done: 0, failed: false,
     cut: isoFromWall(midnight + (UPCOMING_DAYS + 1) * 86400e3).slice(0, 10),
+    muhurthaCut: isoFromWall(midnight + MUHURTHA_DAYS * 86400e3).slice(0, 10),
   };
   const state = fest;
   // With a detected timezone each day gets the offset in force then (DST);
@@ -483,8 +486,12 @@ function renderFestivals(c) {
         const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset, frame);
         if (festivals.length) state.found.push({ date, festivals });
         for (const o of observancesFor(w, c.input.lat, c.input.lon, offset, frame)) state.observances.push({ date, ...o });
-        const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
-        if (m) state.muhurthas.push({ date, m });
+        if (state.done < MUHURTHA_DAYS) {
+          const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
+          if (m) state.muhurthas.push({ date, m });
+          const tm = tamilMuhurthaFor(w, c.input.lat, c.input.lon, offset);
+          if (tm) state.tamilMuhurthas.push({ date, m: tm });
+        }
       }
     } catch {
       state.failed = true;
@@ -644,13 +651,59 @@ function drawFestivals() {
     + eclipseFootnote(found.flatMap((u) => u.festivals))
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
   drawSpecialDays(timeText, status);
+  // Auspicious Days: the first MUHURTHA_DAYS days only.
+  const mStatus = failed ? t("Couldn't calculate muhurtham days.") : done < MUHURTHA_DAYS ? t("Calculating…") : "";
   // Vijayadashami counts for every event; it gets its own row if the rules don't pick it.
-  const vijaya = new Set(found.filter((u) => u.festivals.some((f) => f.name === VIJAYADASHAMI)).map((u) => u.date));
+  const vijaya = new Set(found.filter((u) => u.date < fest.muhurthaCut && u.festivals.some((f) => f.name === VIJAYADASHAMI)).map((u) => u.date));
   const listed = new Set(muhurthas.map((u) => u.date));
   const rows = [...muhurthas, ...[...vijaya].filter((d) => !listed.has(d)).map((date) => ({ date, m: null }))]
     .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
   $("muhurthaYear").innerHTML = muhurthaTable(rows, ref, hm, vijaya)
-    + (status ? `<p class="hint">${esc(status)}</p>` : !rows.length ? `<p class="hint">${esc(t("No auspicious days found."))}</p>` : "");
+    + (mStatus ? `<p class="hint">${esc(mStatus)}</p>` : !rows.length ? `<p class="hint">${esc(t("No auspicious days found."))}</p>` : "");
+  const tamil = fest.tamilMuhurthas;
+  $("tamilMuhurthaYear").innerHTML = tamilMuhurthaTable(tamil, ref, hm)
+    + (mStatus ? `<p class="hint">${esc(mStatus)}</p>` : !tamil.length ? `<p class="hint">${esc(t("No auspicious days found."))}</p>` : "");
+}
+
+// The month heading row of the muhurtham tables, when `date` starts a new month.
+function monthRow(date, state, cols) {
+  const fd = festivalDate(date), key = `${fd.y}-${fd.m}`;
+  if (key === state.month) return "";
+  state.month = key;
+  return `<tr class="month-row"><th colspan="${cols}" scope="colgroup">${monthLong(fd.m - 1)} ${fd.y}</th></tr>`;
+}
+
+// Tamil calendar sub-tab: a row per day with its panchangam and each time with its lagna.
+function tamilMuhurthaTable(rows, ref, hm) {
+  if (!rows.length) return "";
+  let body = "";
+  const months = { month: "" };
+  for (const { date, m } of rows) {
+    body += monthRow(date, months, 3);
+    const today = date === ref;
+    const day = [tr(m.paksha, "paksha"), tr(m.tithi, "tithi"), tr(m.nakshatra, "nakshatra"), tr(m.yogam, "dayYoga")].map(esc).join(" · ");
+    const times = m.windows.map((w) => `<span class="mt-time">${hm(w.start, date)} – ${hm(w.end, date)}`
+      + `<span class="mt-lagna">${esc(t("{lagna} lagna", { lagna: tr(w.lagna, "sign") }))}</span></span>`).join("");
+    body += `<tr class="first${today ? " today" : ""}"><th scope="row" class="mt-date">${festivalDate(date).label}`
+      + `${today ? `<small>${esc(t("today"))}</small>` : ""}</th><td class="mt-day">${day}</td><td class="mt-times">${times}</td></tr>`;
+  }
+  return `<div class="table-wrap"><table class="muhurtha-table"><thead><tr><th scope="col">${esc(t("Date"))}</th>`
+    + `<th scope="col">${esc(t("Day"))}</th><th scope="col">${esc(t("Times"))}</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+// Auspicious Days sub-tabs: Dr. B. V. Raman's method and the Tamil calendar list.
+const MUHURTHA_KEY = "vedic-chart-muhurtha-tab";
+const MUHURTHA_TABS = ["raman", "tamil"];
+function selectMuhurthaTab(kind, focus) {
+  if (!MUHURTHA_TABS.includes(kind)) kind = MUHURTHA_TABS[0];
+  try { localStorage.setItem(MUHURTHA_KEY, kind); } catch {}
+  for (const k of MUHURTHA_TABS) {
+    const b = $(`mttab-${k}`), on = k === kind;
+    b.setAttribute("aria-selected", String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+    $(`mtpanel-${k}`).hidden = !on;
+  }
 }
 
 // Auspicious Days tab: one table for the year, a heading row per month, and per
@@ -660,13 +713,11 @@ const VIJAYADASHAMI = "Vijayadashami / Dussehra";
 // `rows`: [{ date, m }], m null for a Vijayadashami the rules don't pick; `vijaya`: its dates.
 function muhurthaTable(rows, ref, hm, vijaya) {
   if (!rows.length) return "";
-  let body = "", month = "";
+  let body = "";
+  const months = { month: "" };
   for (const { date, m } of rows) {
-    const fd = festivalDate(date), key = `${fd.y}-${fd.m}`;
-    if (key !== month) {
-      body += `<tr class="month-row"><th colspan="3" scope="colgroup">${monthLong(fd.m - 1)} ${fd.y}</th></tr>`;
-      month = key;
-    }
+    const fd = festivalDate(date);
+    body += monthRow(date, months, 3);
     // Windows grouped by the events they suit, in the order the groups first appear.
     const groups = new Map();
     if (!m) groups.set("", { all: true, events: [], times: [`<span class="mt-time">${esc(t("All day"))}</span>`] });
@@ -979,6 +1030,21 @@ async function init() {
     const kinds = SPECIAL_CARDS.map(([k]) => k);
     selectSpecialTab(kinds[(kinds.indexOf(b.dataset.sd) + step + kinds.length) % kinds.length], true);
   });
+  $("muhurthaTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-mt]");
+    if (b) selectMuhurthaTab(b.dataset.mt);
+  });
+  $("muhurthaTabs").addEventListener("keydown", (e) => {
+    const b = e.target.closest("[data-mt]");
+    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+    if (!b || !step) return;
+    e.preventDefault();
+    const n = MUHURTHA_TABS.length;
+    selectMuhurthaTab(MUHURTHA_TABS[(MUHURTHA_TABS.indexOf(b.dataset.mt) + step + n) % n], true);
+  });
+  let savedMuhurtha;
+  try { savedMuhurtha = localStorage.getItem(MUHURTHA_KEY); } catch {}
+  selectMuhurthaTab(savedMuhurtha);
   window.addEventListener("resize", drawDashaLinks);
   let savedTab = "panchanga";
   try { savedTab = localStorage.getItem(TAB_KEY) || savedTab; } catch {}
