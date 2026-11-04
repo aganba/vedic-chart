@@ -196,7 +196,7 @@ const UI = {
   "Amirtha, Siddha, Marana and Prabalarishta yogam by weekday and nakshatra:": "கிழமை, நட்சத்திர அடிப்படையில் அமிர்த, சித்த, மரண, பிரபலாரிஷ்ட யோகங்கள்:",
   "Ungal Vazhkkai Vazhikatti": "உங்கள் வாழ்க்கை வழிகாட்டி",
   "Dr. B. V. Raman's method": "டாக்டர் பி. வி. ராமன் முறை",
-  "Tamil calendar": "தமிழ் நாட்காட்டி",
+  "Tamil calendar": "தமிழ் முறை",
   "Weekday, tithi, nakshatra, month, Kari naal, yogam and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses and lagna sandhi follow general panchangam practice.": "கிழமை, திதி, நட்சத்திரம், மாதம், கரி நாள், யோகம், நேரம் ஆகியவை தமிழ் நாட்காட்டி வழக்கப்படி; ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம், 8-ஆம் வீடு, கிரகணம், லக்ன சந்தி ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி.",
   "Day": "நாள்",
   // tables
