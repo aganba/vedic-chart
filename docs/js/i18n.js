@@ -256,6 +256,7 @@ const REFERENCES = `    <details class="references">
       <ul>
         <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
         <li><a href="https://www.temple.org/images/phocagallery/2026%20Calendar.pdf" target="_blank" rel="noopener">Shiva Murugan Temple, Concord, California, 2026 calendar</a>: festival and Special Days dates are compared with it for the San Francisco Bay Area.</li>
+        <li><a href="https://www.prokerala.com/festivals/" target="_blank" rel="noopener">Prokerala</a>: festival dates and nakshatra times are compared with it, such as Aadi Pooram.</li>
       </ul>
       <h4>Auspicious Days</h4>
       <ul>
@@ -395,6 +396,7 @@ const NS = {
   festival: {
     "Aadi Perukku": "ஆடிப்பெருக்கு",
     "Akshaya Tritiya": "அட்சய திருதியை",
+    "Aadi Pooram": "ஆடிப்பூரம்",
     "Arudra Darshan": "ஆருத்ரா தரிசனம்",
     "Bhai Dooj": "பாய் தூஜ் (யம துவிதியை)",
     "Bhogi": "போகி",

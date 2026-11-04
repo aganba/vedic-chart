@@ -28,7 +28,10 @@ const EXPECTED = [
   ["Panguni Uttiram", "2025-04-11", CHENNAI], ["Puthandu", "2025-04-14", CHENNAI], ["Vishu", "2025-04-14", KOCHI],
   ["Akshaya Tritiya", "2025-04-30", DELHI], ["Buddha Purnima", "2025-05-12", DELHI],
   ["Vaikasi Visakam", "2025-06-09", CHENNAI], ["Guru Purnima", "2025-07-10", DELHI],
-  ["Aadi Perukku", "2025-08-03", CHENNAI], ["Varalakshmi Vratam", "2025-08-08", CHENNAI],
+  ["Aadi Perukku", "2025-08-03", CHENNAI], ["Aadi Pooram", "2025-07-28", CHENNAI],
+  // Aadi Pooram 2026: Pooram comes twice in Aadi; the one after Aadi Amavasya is kept
+  // (Mylapore Kapaleeshwarar temple, Prokerala; Concord Shiva Murugan Temple calendar).
+  ["Aadi Pooram", "2026-08-14", CHENNAI], ["Aadi Pooram", "2026-08-14", CUPERTINO], ["Varalakshmi Vratam", "2025-08-08", CHENNAI],
   ["Raksha Bandhan", "2025-08-09", DELHI], ["Yajur Upakarma", "2025-08-09", CHENNAI], ["Gayatri Japam", "2025-08-10", CHENNAI],
   ["Sama Upakarma", "2025-08-26", CHENNAI], ["Soora Samharam", "2025-10-27", CHENNAI], ["Krishna Janmashtami", "2025-08-16", DELHI],
   ["Ganesh Chaturthi", "2025-08-27", MUMBAI], ["Onam", "2025-09-05", KOCHI],

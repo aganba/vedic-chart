@@ -11,6 +11,7 @@
 //  - nakshatra rules: a nakshatra in a Tamil (or Kerala) solar month. For the
 //    full-moon festivals (Thai Poosam, Maasi Magam, Karthigai Deepam, ...) the nakshatra day
 //    must belong to that month's Purnima, since the nakshatra can recur twice.
+//    Aadi Pooram must fall in the bright fortnight after the month's new moon.
 // Festivals are not observed in an adhika (leap) lunar month.
 // Some festivals have rules of their own, each matching Drik Panchang:
 //  - An Upakarma on a day with a lunar eclipse (local midnight to midnight,
@@ -89,6 +90,9 @@ const NAKSHATRA_FESTIVALS = [
   // sunrise. This matches Drik Panchang for Chennai 2024-2028 and the US in 2026.
   { name: "Karthigai Deepam", purnima: true, calendar: "tamil", sign: 7, nak: 2, kaala: "sunset", lamp: true, region: "Tamil Nadu" },
   { name: "Onam (Thiruvonam)", calendar: "kerala", sign: 4, nak: 21, kaala: "sunrise", region: "Kerala" },
+  // Aadi Pooram: Pooram in the Shukla paksha that follows Aadi Amavasya, so
+  // when Pooram comes twice in Aadi the later one is kept (14 August 2026).
+  { name: "Aadi Pooram", newMoon: true, calendar: "tamil", sign: 3, nak: 10, kaala: "sunrise", region: "Tamil Nadu" },
 ];
 
 const TITHI_NAMES = ["Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami",
@@ -335,7 +339,8 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
 
   for (const f of NAKSHATRA_FESTIVALS) {
     const holds = (n, jd) => nakAt(jd) === f.nak && solarMonth(n, f.calendar) === f.sign
-      && (!f.purnima || purnimaSign(jd) === f.sign);
+      && (!f.purnima || purnimaSign(jd) === f.sign)
+      && (!f.newMoon || (tithiAt(jd) < 15 && masaAt(jd).masa === (f.sign + 1) % 12));
     let at;
     if (f.kaala === "sunset") {
       const atSunset = (k) => day(k) && holds(k, day(k).ss);
