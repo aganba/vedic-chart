@@ -19,6 +19,18 @@ import { SIGN_NAMES, TAMIL_MONTHS, dayFrame, elong, sunLon, tithiAt } from "./fe
 
 const PRADOSHA_BEFORE_SUNSET = 1.5 / 24; // days
 
+// Sankatahara Chaturthi falls on the first day with Krishna Chaturthi at
+// moonrise. When it is at neither moonrise (it begins after one and ends
+// before the next), Drik Panchang takes the second day, the one Chaturthi
+// holds from sunrise, not the day it begins as the festival fallback does
+// (Cupertino 27 Nov 2026, Chennai 10 Oct 2025 and 24 Feb 2027).
+function sankataharaOn({ day, kaala }) {
+  const at = (n, name) => { const w = kaala(n, name); return !!w && tithiAt(w[0]) === 18; };
+  if (at(0, "moonrise")) return !at(-1, "moonrise");
+  if (at(-1, "moonrise") || at(1, "moonrise")) return false;
+  return at(0, "sunrise") && !at(-1, "sunrise") && !!day(0);
+}
+
 // Observances on the civil day starting at local midnight `dateWall`; see
 // festivals.dayFrame for `offset`. Returns [{ kind, month?, paksha?, weekday?, times }].
 export function observancesFor(dateWall, lat, lon, offset, frame = dayFrame(dateWall, lat, lon, offset)) {
@@ -39,9 +51,10 @@ export function observancesFor(dateWall, lat, lon, offset, frame = dayFrame(date
   const out = [];
   if (observed(29, "aparahna")) out.push({ kind: "amavasya", month, times: [spanIn(29, "Amavasya")] });
   if (observed(14, "sunset")) out.push({ kind: "pournami", month, times: [spanIn(14, "Purnima")] });
-  if (observed(18, "moonrise")) {
+  if (sankataharaOn(frame)) {
     const mr = kaala(0, "moonrise");
-    out.push({ kind: "sankatahara", weekday, times: [{ label: "Moonrise", at: fmt(mr[0]) }, spanIn(18, "Krishna Chaturthi")] });
+    out.push({ kind: "sankatahara", weekday, times: [...(mr ? [{ label: "Moonrise", at: fmt(mr[0]) }] : []),
+      spanIn(18, "Krishna Chaturthi")] });
   }
   for (const tithi of [12, 27]) {
     if (!observed(tithi, "sunset")) continue;
