@@ -119,6 +119,7 @@ const UI = {
   "Yamaganda": "எமகண்டம்",
   "Gulika Kalam": "குளிகை காலம்",
   "* Abhijit Muhurtha: a good time for all activities, according to Dr. B. V. Raman.": "* அபிஜித் முகூர்த்தம்: டாக்டர் பி. வி. ராமன் அவர்களின் கூற்றுப்படி, எல்லா செயல்களுக்கும் நல்ல நேரம்.",
+  "Abhijit Muhurtha, shown in the Panchanga tab every day, is a good time for all activities, according to Dr. B. V. Raman.": "பஞ்சாங்கப் பகுதியில் தினமும் காட்டப்படும் அபிஜித் முகூர்த்தம், டாக்டர் பி. வி. ராமன் அவர்களின் கூற்றுப்படி, எல்லா செயல்களுக்கும் நல்ல நேரம்.",
   "Hora": "ஓரை",
   "{from} – {to} · next {lord}": "{from} – {to} · அடுத்து {lord}",
   "Ayanamsa: {name} = {value}": "அயனாம்சம்: {name} = {value}",
