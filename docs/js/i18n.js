@@ -21,7 +21,7 @@ const fill = (s, vars) => s.replace(/\{(\w+)\}/g, (_, k) => (vars && k in vars ?
 // ---------- interface phrases (English template -> Tamil) ----------
 
 const UI = {
-  "Vedic Calendar": "வேத நாட்காட்டி",
+  "Vedic Calendar": "வேத பஞ்சாங்கம்",
   "Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart": "வேத நாட்காட்டி – இலவச பஞ்சாங்கம், தமிழ்த் தேதி, முகூர்த்தம், ஜாதகம்",
   "Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.": "இலவச வேத நாட்காட்டி செயலி: திதி, நட்சத்திரம், ராகு காலம், ஓரையுடன் தினசரி பஞ்சாங்கம், தமிழ்த் தேதி, பண்டிகை நாட்கள், பூஜை நேரங்கள், பயணம், வாகனம், கல்வி, புதிய முயற்சிகளுக்கான சுப முகூர்த்த நேரங்கள், விம்சோத்தரி தசையுடன் தென்னிந்திய ஜாதகம்.",
   "Place": "இடம்",
