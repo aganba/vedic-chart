@@ -58,9 +58,8 @@ const UI = {
   "Auspicious Days": "சுப முகூர்த்தம்",
   // Special Days tab
   "Special Days": "விசேஷ நாட்கள்",
-  "Eclipses and monthly observances from the entered date through the next 365 days, calculated for the place you entered, in local time.": "உள்ளிட்ட தேதி முதல் அடுத்த 365 நாட்களுக்கான கிரகணங்களும் மாதாந்திர விரத நாட்களும், நீங்கள் உள்ளிட்ட இடத்துக்கு உள்ளூர் நேரத்தில் கணக்கிடப்பட்டவை.",
+  "Eclipses and monthly observances from the entered date through the next 60 days, calculated for the place you entered, in local time.": "உள்ளிட்ட தேதி முதல் அடுத்த 60 நாட்களுக்கான கிரகணங்களும் மாதாந்திர விரத நாட்களும், நீங்கள் உள்ளிட்ட இடத்துக்கு உள்ளூர் நேரத்தில் கணக்கிடப்பட்டவை.",
   "Eclipses (grahanam)": "கிரகணங்கள்",
-  "Eclipses": "கிரகணங்கள்",
   "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon.": "இந்த இடத்தில் தெரியும் கிரகணங்கள் மட்டும் உள்ளூர் நேரத்துடன் தரப்பட்டுள்ளன; பஞ்சாங்கங்கள் கடைப்பிடிக்காத புறநிழல் (பெனும்பிரல்) சந்திர கிரகணங்கள் சேர்க்கப்படவில்லை. சூரியனோ சந்திரனோ அடிவானத்துக்குக் கீழே இருக்கும்போது கிரகணம் தெரியாது.",
   "Amavasya": "அமாவாசை",
   "The day Amavasya prevails in the afternoon (aparahna), when tarpanam is offered.": "தர்ப்பணம் செய்யும் அபராஹ்ண (பிற்பகல்) நேரத்தில் அமாவாசை இருக்கும் நாள்.",
@@ -94,7 +93,6 @@ const UI = {
   "Visible until moonset": "சந்திர அஸ்தமனம் வரை தெரியும்",
   "Visible from moonrise to moonset": "சந்திர உதயம் முதல் அஸ்தமனம் வரை தெரியும்",
   "Couldn't calculate eclipses.": "கிரகணங்களைக் கணக்கிட முடியவில்லை.",
-  "No eclipses can be seen from this place in these 366 days.": "இந்த 366 நாட்களில் இந்த இடத்தில் கிரகணம் எதுவும் தெரியாது.",
   // panchanga
   "Day": "நாள்",
   "{date} (calendar date)": "{date} (ஆங்கிலத் தேதி)",
@@ -132,6 +130,7 @@ const UI = {
   "No festivals in the next {n} days.": "அடுத்த {n} நாட்களில் பண்டிகைகள் இல்லை.",
   "No auspicious days found.": "சுப முகூர்த்த நாட்கள் எதுவும் இல்லை.",
   "Couldn't calculate the remaining festivals.": "மீதமுள்ள பண்டிகைகளைக் கணக்கிட முடியவில்லை.",
+  "Couldn't calculate the remaining special days.": "மீதமுள்ள சிறப்பு நாட்களைக் கணக்கிட முடியவில்லை.",
   "No festivals found.": "பண்டிகைகள் எதுவும் இல்லை.",
   "Events, by the Moon's nakshatra": "சந்திரன் நிற்கும் நட்சத்திரப்படி காரியங்கள்",
   "Vehicles and travel: movable nakshatras (Punarvasu, Swati, Shravana, Dhanishta, Shatabhisha).": "வாகனம், பயணம்: சர நட்சத்திரங்கள் (புனர்பூசம், சுவாதி, திருவோணம், அவிட்டம், சதயம்).",

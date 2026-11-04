@@ -304,7 +304,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 
 /* Special Days tab: one card per kind of day, each in its own colour */
 .special-intro { margin: 0 0 12px; }
-/* sub-tabs: one pill per kind of day in its own colour, tinted, and filled when selected */
+/* sub-tabs (Auspicious Days): one pill per kind, tinted, and filled when selected */
 .subtabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
 .subtabs button {
   color: var(--sd); background: color-mix(in srgb, var(--sd) 8%, transparent);
@@ -314,9 +314,9 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .subtabs button:hover { background: color-mix(in srgb, var(--sd) 16%, transparent); border-color: var(--sd); }
 .subtabs button[aria-selected="true"] { color: var(--card); background: var(--sd); border-color: var(--sd); }
 .subtabs button:focus-visible { outline: 2px solid var(--sd); outline-offset: 2px; }
-.sd-count { font-size: 12px; font-weight: 500; opacity: .8; margin-left: 2px; }
 .special-card { --sd: var(--accent); border-left: 4px solid var(--sd); }
 .special-card .sd-year { color: var(--sd); }
+.sd-heading { margin: 0 0 6px; font-size: 16px; color: var(--sd); }
 .sd-hint { margin-top: 0; }
 .eclipse-footnote { margin-top: 8px; }
 #panchangaNote { margin-bottom: 0; }

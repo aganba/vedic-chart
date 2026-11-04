@@ -489,6 +489,7 @@ function renderPanchanga(c) {
 // first 7 days are done.
 const UPCOMING_DAYS = 7;
 const YEAR_DAYS = 366; // the entered date and the 365 days after it
+const SPECIAL_DAYS = 61; // special days: the entered date and the 60 days after it
 const MUHURTHA_DAYS = 183; // muhurthams: the entered date and the 182 days after it (about six months)
 const CHUNK_DAYS = 8;
 // Results so far for the current chart; kept so a language switch can redraw
@@ -524,7 +525,7 @@ function renderFestivals(c) {
   const offset = zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset;
   state.offset = offset;
   try {
-    state.eclipses = eclipsesBetween(midnight, YEAR_DAYS, c.input.lat, c.input.lon, offset);
+    state.eclipses = eclipsesBetween(midnight, SPECIAL_DAYS, c.input.lat, c.input.lon, offset);
   } catch {
     state.eclipses = [];
     state.eclipseFailed = true;
@@ -541,7 +542,9 @@ function renderFestivals(c) {
         const frame = dayFrame(w, c.input.lat, c.input.lon, offset);
         const festivals = festivalsFor(w, c.input.lat, c.input.lon, offset, frame);
         if (festivals.length) state.found.push({ date, festivals });
-        for (const o of observancesFor(w, c.input.lat, c.input.lon, offset, frame)) state.observances.push({ date, ...o });
+        if (state.done < SPECIAL_DAYS) {
+          for (const o of observancesFor(w, c.input.lat, c.input.lon, offset, frame)) state.observances.push({ date, ...o });
+        }
         if (state.done < MUHURTHA_DAYS) {
           const m = muhurthaFor(w, c.input.lat, c.input.lon, offset);
           if (m) state.muhurthas.push({ date, m });
@@ -558,13 +561,10 @@ function renderFestivals(c) {
   setTimeout(step, 30);
 }
 
-// Special Days tab: one colour-coded card per kind of day, in this order, each
-// under its own sub-tab, which names it. The fourth field is the sub-tab label, if shorter than the title.
-const SPECIAL_KEY = "vedic-chart-special-tab";
-let specialTab = "eclipse";
-try { specialTab = localStorage.getItem(SPECIAL_KEY) || specialTab; } catch {}
+// Special Days tab: one colour-coded card per kind of day, in this order, all on
+// one page. The eclipse card is left out when no eclipse can be seen.
 const SPECIAL_CARDS = [
-  ["eclipse", "Eclipses (grahanam)", "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon.", "Eclipses"],
+  ["eclipse", "Eclipses (grahanam)", "Only eclipses that can be seen from this place are listed, with their local times; penumbral lunar eclipses, which panchangams don't observe, are left out. The eclipse can't be seen while the Sun or Moon is below the horizon."],
   ["amavasya", "Amavasya", "The day Amavasya prevails in the afternoon (aparahna), when tarpanam is offered."],
   ["pournami", "Pournami", "The day Purnima prevails at sunset, when the full moon rises."],
   ["maasa", "Maasa pirappu", "The first day of each Tamil month, with the moment the Sun enters the new sign."],
@@ -605,9 +605,9 @@ function drawSpecialDays(timeText, status) {
       + `<div class="sd-title">${esc(specialTitle(o))}</div>`
       + `<div class="upcoming-times">${times.map((x) => `<span class="sd-time">${x}</span>`).join("")}</div></div></li>`;
   };
-  // A year heading wherever the year changes, since the list runs into the next year.
+  // A year heading only where the list runs into the next year.
   const list = (rows) => {
-    let html = "", year = 0;
+    let html = "", year = Number(ref.slice(0, 4));
     for (const o of rows) {
       const y = Number(o.date.slice(0, 4));
       if (y !== year) { html += `<li class="sd-year">${y}</li>`; year = y; }
@@ -615,39 +615,19 @@ function drawSpecialDays(timeText, status) {
     }
     return `<ul class="upcoming-list special-list">${html}</ul>`;
   };
-  if (!SPECIAL_CARDS.some(([k]) => k === specialTab)) specialTab = SPECIAL_CARDS[0][0];
-  const tabs = SPECIAL_CARDS.map(([kind, title, , label]) => {
-    const on = kind === specialTab, n = (items[kind] || []).length;
-    return `<button type="button" role="tab" class="sd-${kind}" id="sdtab-${kind}" data-sd="${kind}" aria-controls="sdpanel-${kind}"`
-      + ` aria-selected="${on}" tabindex="${on ? 0 : -1}">${esc(t(label || title))}${n ? ` <span class="sd-count">${n}</span>` : ""}</button>`;
-  }).join("");
-  $("specialDays").innerHTML = `<div class="subtabs" role="tablist" aria-label="${esc(t("Special Days"))}">${tabs}</div>`
-    + SPECIAL_CARDS.map(([kind, , hint]) => {
+  $("specialDays").innerHTML = SPECIAL_CARDS.map(([kind, title, hint]) => {
     const rows = items[kind] || [];
     let body;
     if (kind === "eclipse") {
-      body = eclipseFailed ? `<p class="hint">${esc(t("Couldn't calculate eclipses."))}</p>`
-        : rows.length ? list(rows) : `<p class="hint">${esc(t("No eclipses can be seen from this place in these 366 days."))}</p>`;
+      if (!eclipseFailed && !rows.length) return "";
+      body = eclipseFailed ? `<p class="hint">${esc(t("Couldn't calculate eclipses."))}</p>` : list(rows);
     } else {
       body = (rows.length ? list(rows) : "") + (status ? `<p class="hint">${esc(status)}</p>` : "");
     }
-    return `<div class="card special-card sd-${kind}" role="tabpanel" id="sdpanel-${kind}" aria-labelledby="sdtab-${kind}"`
-      + `${kind === specialTab ? "" : " hidden"}><p class="hint sd-hint">${esc(t(hint))}</p>${body}</div>`;
+    return `<section class="card special-card sd-${kind}" aria-labelledby="sdhead-${kind}">`
+      + `<h3 class="sd-heading" id="sdhead-${kind}">${esc(t(title))}</h3>`
+      + `<p class="hint sd-hint">${esc(t(hint))}</p>${body}</section>`;
   }).join("");
-}
-
-// Shows one Special Days card; the list is redrawn as the year is computed, so
-// the choice is kept in specialTab as well as applied to the current DOM.
-function selectSpecialTab(kind, focus) {
-  specialTab = kind;
-  try { localStorage.setItem(SPECIAL_KEY, kind); } catch {}
-  for (const b of $("specialDays").querySelectorAll(".subtabs [data-sd]")) {
-    const on = b.dataset.sd === kind;
-    b.setAttribute("aria-selected", String(on));
-    b.tabIndex = on ? 0 : -1;
-    if (on && focus) b.focus();
-    $(`sdpanel-${b.dataset.sd}`).hidden = !on;
-  }
 }
 
 // Draws the Panchanga-tab banners and the Festivals, Special Days and Auspicious Days lists from `fest`.
@@ -706,7 +686,8 @@ function drawFestivals() {
       u.festivals.map((f) => `<div>${festivalNames([f])}</div>`).join("")}</div></li>`)
     + eclipseFootnote(found.flatMap((u) => u.festivals))
     + (status ? `<p class="hint">${esc(status)}</p>` : !found.length ? `<p class="hint">${esc(t("No festivals found."))}</p>` : "");
-  drawSpecialDays(timeText, status);
+  drawSpecialDays(timeText, failed ? t("Couldn't calculate the remaining special days.")
+    : done < SPECIAL_DAYS ? t("Calculating…") : "");
   // Auspicious Days: the first MUHURTHA_DAYS days only.
   const mStatus = failed ? t("Couldn't calculate muhurtham days.") : done < MUHURTHA_DAYS ? t("Calculating…") : "";
   // Vijayadashami counts for every event; it gets its own row if the rules don't pick it.
@@ -1081,18 +1062,6 @@ async function init() {
 
   $("now").addEventListener("click", resetToNow);
   for (const t of TABS) $(`tab-${t}`).addEventListener("click", () => selectTab(t));
-  $("specialDays").addEventListener("click", (e) => {
-    const b = e.target.closest(".subtabs [data-sd]");
-    if (b) selectSpecialTab(b.dataset.sd);
-  });
-  $("specialDays").addEventListener("keydown", (e) => {
-    const b = e.target.closest(".subtabs [data-sd]");
-    const step = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-    if (!b || !step) return;
-    e.preventDefault();
-    const kinds = SPECIAL_CARDS.map(([k]) => k);
-    selectSpecialTab(kinds[(kinds.indexOf(b.dataset.sd) + step + kinds.length) % kinds.length], true);
-  });
   $("muhurthaTabs").addEventListener("click", (e) => {
     const b = e.target.closest("[data-mt]");
     if (b) selectMuhurthaTab(b.dataset.mt);
