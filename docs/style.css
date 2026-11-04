@@ -249,7 +249,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 /* source line and the Abhijit Muhurtha note at the top of the Auspicious Days tab */
 .muhurtha-source { margin: 4px 0 10px; }
 .muhurtha-source a { color: var(--sd); }
-.mt-caveat { margin: 0 0 10px; }
 .muhurtha-table .mt-date small.mt-festival { color: var(--accent); }
 .event-tag.ev-all { --ev: var(--accent); }
 /* muhurtham table: a row per day and set of events, a heading row per month */

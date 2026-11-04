@@ -183,7 +183,7 @@ const UI = {
   "Between an hour before sunrise (not before 5 am) and two hours after sunset.": "சூரிய உதயத்துக்கு ஒரு மணி நேரம் முன்பிலிருந்து (காலை 5 மணிக்கு முன் அல்ல) சூரிய அஸ்தமனத்துக்கு இரண்டு மணி நேரம் பின்பு வரை.",
   "Outside Rahu Kalam, Yamaganda and Gulika Kalam, and not in Vishti (Bhadra) karana.": "ராகு காலம், எமகண்டம், குளிகை தவிர்த்து; விஷ்டி (பத்திரை) கரணமும் அல்ல.",
   "No planet, the Moon, Rahu and Ketu included, in the 8th house from the lagna.": "லக்னத்திலிருந்து 8-ஆம் வீட்டில் சந்திரன், ராகு, கேது உட்பட எந்தக் கிரகமும் இல்லை.",
-  "Panchanga yoga (Vyatipata, Vaidhriti and the like), moudhyam (Jupiter or Venus combust), and Dr. B. V. Raman's marriage rules (an empty 7th house, no malefic in the lagna): Harikesanallur's list doesn't apply them, so they would drop days it lists.": "பஞ்சாங்க யோகம் (வியதீபாதம், வைதிருதி போன்றவை), மௌட்யம் (குரு அல்லது சுக்கிரன் அஸ்தங்கம்), டாக்டர் பி. வி. ராமனின் திருமண விதிகள் (7-ஆம் வீடு காலி, லக்னத்தில் பாவ கிரகம் இல்லை): ஹரிகேசநல்லூர் பட்டியல் இவற்றைப் பின்பற்றுவதில்லை; பின்பற்றினால் அதில் உள்ள நாட்கள் விடுபடும்.",
+  "Panchanga yoga (Vyatipata, Vaidhriti and the like), moudhyam (Jupiter or Venus combust), and Dr. B. V. Raman's marriage rules (an empty 7th house, no malefic in the lagna).": "பஞ்சாங்க யோகம் (வியதீபாதம், வைதிருதி போன்றவை), மௌட்யம் (குரு அல்லது சுக்கிரன் அஸ்தங்கம்), டாக்டர் பி. வி. ராமனின் திருமண விதிகள் (7-ஆம் வீடு காலி, லக்னத்தில் பாவ கிரகம் இல்லை).",
   "Personal factors: tarabala, chandrabala and chandrashtamam.": "தனிப்பட்ட அம்சங்கள்: தாராபலம், சந்திரபலம், சந்திராஷ்டமம்.",
   "Every day": "ஒவ்வொரு நாளும்",
   "Not applied": "பயன்படுத்தாதவை",
@@ -197,9 +197,6 @@ const UI = {
   "Ungal Vazhkkai Vazhikatti": "உங்கள் வாழ்க்கை வழிகாட்டி",
   "Dr. B. V. Raman's method": "டாக்டர் பி. வி. ராமன் முறை",
   "Tamil calendar": "தமிழ் நாட்காட்டி",
-  "Checked against": "ஒப்பிட்டுச் சரிபார்த்தது:",
-  "Harikesanallur Venkatraman's muhurtham list": "ஹரிகேசநல்லூர் வெங்கட்ராமன் அவர்களின் முகூர்த்தப் பட்டியல்",
-  ", which is calculated with the vakya panchangam. This page uses modern (drik) planet positions, so it finds every day on that list for Chennai in 2026–27 but also some days the list leaves out, and its times can differ.": "; அது வாக்கிய பஞ்சாங்கப்படி கணிக்கப்பட்டது. இந்தப் பக்கம் நவீன (திருக்கணித) கிரக நிலைகளைப் பயன்படுத்துகிறது; எனவே 2026–27 சென்னைக்கான அந்தப் பட்டியலின் எல்லா நாட்களும் இங்கும் வருகின்றன, ஆனால் அதில் இல்லாத சில நாட்களும் வருகின்றன; நேரங்களும் மாறுபடலாம்.",
   "Weekday, tithi, nakshatra, month, Kari naal, yogam and time of day follow Tamil calendar practice; Rahu Kalam, Yamaganda, Gulika Kalam, Vishti karana, the 8th house, eclipses and lagna sandhi follow general panchangam practice.": "கிழமை, திதி, நட்சத்திரம், மாதம், கரி நாள், யோகம், நேரம் ஆகியவை தமிழ் நாட்காட்டி வழக்கப்படி; ராகு காலம், எமகண்டம், குளிகை, விஷ்டி கரணம், 8-ஆம் வீடு, கிரகணம், லக்ன சந்தி ஆகியவை பொதுவான பஞ்சாங்க வழக்கப்படி.",
   "Day": "நாள்",
   // tables
