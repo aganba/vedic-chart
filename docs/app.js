@@ -109,24 +109,10 @@ function showError(msg) {
 
 // ---------- defaults from this device ----------
 
-// The date picker displays dates in the browser's locale; describe that order,
-// e.g. "mm/dd/yyyy" (US) or "dd/mm/yyyy" (India, UK).
-function dateFormatHint() {
-  try {
-    const parts = new Intl.DateTimeFormat(undefined, { year: "numeric", month: "2-digit", day: "2-digit" })
-      .formatToParts(new Date(2001, 10, 22));
-    const names = { day: "dd", month: "mm", year: "yyyy" };
-    if (getLang() === "ta") Object.assign(names, { day: "நாள்", month: "மாதம்", year: "ஆண்டு" });
-    return parts.map((p) => names[p.type] || p.value).join("");
-  } catch {
-    return t("yyyy-mm-dd");
-  }
-}
-
 function setNow() {
   const d = new Date();
   const p = (n) => String(n).padStart(2, "0");
-  $("date").value = `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  setDate(`${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`);
   setTime(`${p(d.getHours())}:${p(d.getMinutes())}`);
 }
 
@@ -143,6 +129,76 @@ function initTimePicker() {
       refreshTimezone();
     });
   }
+}
+
+// The date pickers: month and day dropdowns and a year box that takes typing or
+// a pick from the suggestions. #date holds "YYYY-MM-DD" only while the three
+// make a real date within the bundled ephemeris (1800-2399); otherwise it is
+// empty, the fields are flagged and Calculate is disabled.
+const YEAR_MIN = 1800, YEAR_MAX = 2399;
+
+function labelMonths() {
+  const m = $("month"), v = m.value;
+  m.innerHTML = Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${esc(monthShort(i))}</option>`).join("");
+  m.value = v || "1";
+}
+
+function initDatePicker() {
+  labelMonths();
+  $("day").innerHTML = Array.from({ length: 31 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join("");
+  const now = new Date().getFullYear();
+  $("years").innerHTML = Array.from({ length: now + 51 - 1900 }, (_, i) => `<option value="${now + 50 - i}">`).join("");
+  for (const id of ["month", "day"]) $(id).addEventListener("change", () => syncDate(true));
+  // While typing, keep Calculate disabled but wait for four digits (or leaving
+  // the box) before showing a message.
+  $("year").addEventListener("input", () => {
+    $("year").value = $("year").value.replace(/\D/g, "").slice(0, 4);
+    syncDate($("year").value.length === 4);
+  });
+  $("year").addEventListener("change", () => syncDate(true));
+}
+
+// The problem with the entered date, or "" when it is valid.
+function dateProblem() {
+  const y = $("year").value.trim(), m = Number($("month").value), d = Number($("day").value);
+  if (!/^\d{4}$/.test(y)) return { msg: t("Enter the year as four digits."), field: "year" };
+  if (y < YEAR_MIN || y > YEAR_MAX) {
+    return { msg: t("Year must be between {min} and {max}.", { min: YEAR_MIN, max: YEAR_MAX }), field: "year" };
+  }
+  const n = new Date(Date.UTC(Number(y), m, 0)).getUTCDate();
+  if (d > n) return { msg: t("{month} {year} has only {n} days.", { month: monthLong(m - 1), year: y, n }), field: "day" };
+  return null;
+}
+
+let dateOk = false;
+function syncDate(showMsg) {
+  const prob = dateProblem();
+  const p = (n) => String(n).padStart(2, "0");
+  dateOk = !prob;
+  $("date").value = prob ? "" : `${$("year").value}-${p(Number($("month").value))}-${p(Number($("day").value))}`;
+  for (const id of ["year", "day"]) {
+    const bad = !!prob && prob.field === id && (showMsg || !$("dateerr").hidden);
+    $(id).classList.toggle("invalid", bad);
+    $(id).setAttribute("aria-invalid", bad);
+  }
+  if (!prob) $("dateerr").hidden = true;
+  else if (showMsg || !$("dateerr").hidden) {
+    $("dateerr").textContent = prob.msg;
+    $("dateerr").hidden = false;
+  }
+  if (!$("go").classList.contains("busy")) $("go").disabled = !dateOk;
+  if (dateOk) refreshTimezone();
+}
+
+// Sets the pickers and #date from "YYYY-MM-DD", flagging it if it isn't valid.
+function setDate(v) {
+  const m = String(v).trim().match(/^(\d{1,4})-(\d{1,2})-(\d{1,2})$/);
+  if (m) {
+    $("year").value = m[1];
+    $("month").value = String(Math.min(Math.max(Number(m[2]), 1), 12));
+    $("day").value = String(Math.min(Math.max(Number(m[3]), 1), 31));
+  } else $("year").value = "";
+  syncDate(true);
 }
 
 // Sets the pickers and #time from "HH:MM" (seconds, if given, are dropped).
@@ -904,6 +960,7 @@ async function calculate(e) {
   const params = {
     date: $("date").value, time: $("time").value, lat: $("lat").value, lon: $("lon").value,
   };
+  if (dateProblem()) return syncDate(true); // flagged beside the date fields
   if (!params.date || !params.time) return showError(t("Enter a date and time."));
   if (params.lat === "" || params.lon === "") return showError(t("Search for a place or enter latitude and longitude."));
   const lat = Number(params.lat), lon = Number(params.lon);
@@ -914,6 +971,7 @@ async function calculate(e) {
   }
 
   $("go").disabled = true;
+  $("go").classList.add("busy");
   try {
     await sweReady;
     const auto = offset == null;
@@ -943,7 +1001,8 @@ async function calculate(e) {
   } catch (err) {
     showError(err.message);
   } finally {
-    $("go").disabled = false;
+    $("go").classList.remove("busy");
+    $("go").disabled = !dateOk;
   }
 }
 
@@ -956,7 +1015,10 @@ function applyStaticText() {
   for (const n of document.querySelectorAll("[data-i18n-title]")) n.title = t(n.dataset.i18nTitle);
   for (const n of document.querySelectorAll("[data-i18n-aria]")) n.setAttribute("aria-label", t(n.dataset.i18nAria));
   $("footer").innerHTML = FOOTER[getLang()];
-  $("datefmt").textContent = `(${dateFormatHint()})`;
+  if ($("month").options.length) {
+    labelMonths();
+    if (!$("dateerr").hidden) syncDate(true); // re-word the message
+  }
   // Search-result title, description and canonical URL for the current language.
   document.title = t("Vedic Calendar – Free Panchangam, Tamil Calendar, Muhurtham & Birth Chart");
   document.querySelector('meta[name="description"]').content = t("Free Vedic calendar app: daily Panchangam with tithi, nakshatra, Rahu Kalam and hora, Tamil calendar dates, Hindu festival dates and puja times, auspicious days and times for travel, vehicles, learning and new projects, and South Indian birth charts with Vimshottari dasha.");
@@ -995,12 +1057,13 @@ async function init() {
   applyStaticText();
   $("lang").addEventListener("click", () => switchLanguage(getLang() === "ta" ? "en" : "ta"));
   initTimePicker();
+  initDatePicker();
   setTime("12:00"); // until the current time or a URL's time fills it in
   // URL parameters (?date=..&time=..&lat=..&lon=..) override the device defaults.
   const qs = new URLSearchParams(location.search);
   const fromUrl = qs.has("date");
   if (fromUrl) {
-    for (const f of FIELDS) if (qs.has(f)) f === "time" ? setTime(qs.get(f)) : ($(f).value = qs.get(f));
+    for (const f of FIELDS) if (qs.has(f)) f === "time" ? setTime(qs.get(f)) : f === "date" ? setDate(qs.get(f)) : ($(f).value = qs.get(f));
     offsetManual = qs.has("offset");
   }
 
@@ -1013,7 +1076,7 @@ async function init() {
     $("tzname").textContent = "";
     showTzNote("");
   });
-  for (const id of ["lat", "lon", "date"]) $(id).addEventListener("change", refreshTimezone);
+  for (const id of ["lat", "lon"]) $(id).addEventListener("change", refreshTimezone);
   document.addEventListener("click", (e) => { if (!e.target.closest(".place")) $("results").hidden = true; });
 
   $("now").addEventListener("click", resetToNow);

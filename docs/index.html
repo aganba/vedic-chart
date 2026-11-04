@@ -76,9 +76,19 @@
         </div>
         <ul id="results" class="results" hidden></ul>
       </div>
-      <div class="field">
-        <label for="date"><span data-i18n="Date">Date</span> <span class="muted" id="datefmt"></span></label>
-        <input id="date" type="date" required>
+      <div class="field date-field">
+        <label for="month" data-i18n="Date">Date</label>
+        <!-- Month and day pickers and a year box (typed, or picked from the
+             suggestions). app.js keeps #date as YYYY-MM-DD when the date is valid. -->
+        <div class="row date-row">
+          <select id="month" aria-label="Month" data-i18n-aria="Month"></select>
+          <select id="day" aria-label="Day" data-i18n-aria="Day"></select>
+          <input id="year" type="text" inputmode="numeric" maxlength="4" list="years" placeholder="yyyy" data-i18n-ph="yyyy"
+            aria-label="Year" data-i18n-aria="Year" aria-describedby="dateerr">
+          <datalist id="years"></datalist>
+        </div>
+        <input id="date" type="hidden">
+        <span id="dateerr" class="field-error" role="alert" hidden></span>
       </div>
       <div class="field time-field">
         <label for="hour"><span data-i18n="Time">Time</span> <span class="muted" data-i18n="(local)">(local)</span></label>

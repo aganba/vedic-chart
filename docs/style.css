@@ -79,6 +79,11 @@ h2 { margin: 0 0 12px; font-size: 16px; }
 .row input { flex: 1; min-width: 0; }
 .time-row { gap: 6px; }
 .time-row select { flex: 1; min-width: 0; padding-left: 8px; padding-right: 4px; }
+.date-row { gap: 6px; }
+.date-row select { flex: 1; min-width: 0; padding-left: 8px; padding-right: 4px; }
+.date-row #year { flex: 1.2; padding-left: 8px; padding-right: 6px; font-variant-numeric: tabular-nums; }
+.date-row .invalid { border-color: var(--lagna); outline: 2px solid var(--lagna); outline-offset: -1px; }
+.field-error { color: var(--lagna); font-size: 13px; }
 input, select, button {
   font: inherit; color: var(--ink); background: var(--input);
   border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-height: 40px;
@@ -93,6 +98,7 @@ button {
 }
 button.secondary { background: transparent; color: var(--accent); }
 button:disabled { opacity: 0.6; cursor: progress; }
+button:disabled:not(.busy) { cursor: not-allowed; }
 .actions { justify-content: flex-end; }
 .actions #go { flex: 1; }
 .place { position: relative; }
@@ -140,7 +146,7 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 @media (max-width: 760px) {
   .form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .field.wide { grid-column: 1 / -1; }
-  .field.time-field { grid-column: 1 / -1; } /* room for hour, minute and AM/PM */
+  .field.time-field, .field.date-field { grid-column: 1 / -1; } /* room for the three pickers */
   .actions { grid-column: 1 / -1; }
   .actions #go { flex: 1; }
   .charts { grid-template-columns: minmax(0, 1fr); }
