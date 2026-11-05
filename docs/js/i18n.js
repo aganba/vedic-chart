@@ -137,6 +137,8 @@ const UI = {
   "Ayanamsa: {name} = {value}": "அயனாம்சம்: {name} = {value}",
   "Chart": "ஜாதகம்",
   // festivals and muhurtham
+  "Today": "இன்று",
+  "On {date}": "{date} அன்று",
   "Coming up (next {n} days)": "வரவிருப்பவை (அடுத்த {n} நாட்கள்)",
   "Checking…": "சரிபார்க்கிறது…",
   "Calculating…": "கணக்கிடுகிறது…",

@@ -642,9 +642,12 @@ function drawFestivals() {
     `${esc(tr(tt.label, "label"))}: <strong>${tt.at ? hm(tt.at, day) : `${hm(tt.start, day)} – ${hm(tt.end, day)}`}</strong>`;
   const note = (msg) => `<div class="festival-note">${esc(msg)}</div>`;
 
-  // Today's festivals, then the next 7 days.
-  const today = list.map((f) => `
-    <div class="festival">
+  // The entered date's festivals under a "Today" (or "On <date>") tag, then the next 7 days.
+  const offsetNow = typeof fest.offset === "function" ? fest.offset(Date.now()) : fest.offset;
+  const isToday = isoFromWall(Date.now() + offsetNow * 3600e3).slice(0, 10) === ref;
+  const dayTag = `<div class="upcoming-title">${esc(isToday ? t("Today") : t("On {date}", { date: festivalDate(ref).label }))}</div>`;
+  const today = list.map((f, i) => `
+    <div class="festival">${i ? "" : dayTag}
       <div class="festival-name">${festivalNames([f])}</div>
       ${f.times.map((tt) => `<div class="festival-time">${timeText(tt)}</div>`).join("")}
       ${f.note ? `<div class="festival-note">${esc(tr(f.note, "note"))}</div>` : ""}
