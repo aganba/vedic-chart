@@ -334,3 +334,28 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .special-list li.today .sd-title { font-weight: 700; }
 .sd-title { font-weight: 600; }
 .sd-time { display: block; }
+
+/* Search tab: Festival | Tithi | Nakshatra pills, the fields for the chosen
+   one, and the results by month */
+.search-card { --sd: var(--accent); border-left: 4px solid var(--accent); }
+.search-card h2 { color: var(--accent); }
+.subtabs button[aria-checked="true"] { color: var(--card); background: var(--sd); border-color: var(--sd); }
+.q-fields { display: flex; flex-wrap: wrap; gap: 12px 14px; margin: 0 0 14px; }
+.q-fields .field { flex: 1 1 130px; max-width: 220px; }
+.q-fields .q-name-field { flex: 2 1 240px; max-width: 360px; }
+.q-fields .field[hidden] { display: none; }
+.q-place { margin: 0 0 12px; }
+.q-title { margin: 0 0 6px; font-size: 16px; color: var(--accent); }
+.q-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 14px; }
+.q-row { padding: 2px 0; }
+.q-name { font-weight: 600; }
+.q-span, .q-when { font-variant-numeric: tabular-nums; }
+.q-day { color: var(--ink); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.q-day:hover { color: var(--accent); text-decoration-color: var(--accent); }
+.q-day.q-main { font-weight: 700; }
+.q-when .q-day { margin-right: 8px; }
+.q-meta, .q-tamil { font-size: 13px; color: var(--muted); }
+.q-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.q-kshaya { font-style: italic; }
+.year-month.q-chosen { text-decoration: underline; text-underline-offset: 4px; }
+.q-status { margin-top: 10px; }

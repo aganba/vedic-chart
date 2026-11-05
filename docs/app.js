@@ -2,7 +2,8 @@
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
 import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
-import { dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
+import { FESTIVAL_NAMES, NAK_NAMES, TITHI_NAMES, dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
+import { occurrences, threeMonths } from "./js/search.js";
 import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
 import { EVENTS, muhurthaFor } from "./js/muhurtha.js";
 import { tamilMuhurthaFor } from "./js/tamilmuhurtha.js";
@@ -813,10 +814,273 @@ function renderBhavaTable(c) {
   $("bhavaLabel").textContent = `· ${tr(c.settings.bhava_label, "bhava")}`;
 }
 
+// ---------- search tab ----------
+
+// Festival: its dates in a Gregorian year. Tithi or nakshatra: every
+// occurrence in a Gregorian month and the months either side of it. Always for
+// the place of the last calculation; results update as the choices change.
+const SEARCH_KINDS = ["festival", "tithi", "nakshatra"];
+const SEARCH_PARAMS = ["search", "festival", "tithi", "nakshatra", "month", "year"];
+const SEARCH_YEARS = 20; // years either side of the current one
+const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+// Tithi names only; the results give both pakshas.
+const TITHI_CHOICES = [...TITHI_NAMES.map((name, i) => ({ name, indexes: [i, i + 15] })),
+  { name: "Purnima", indexes: [14] }, { name: "Amavasya", indexes: [29] }];
+const thisYear = new Date().getFullYear();
+const query = { kind: "festival", festival: "", tithi: "", nakshatra: "", month: new Date().getMonth() + 1, year: thisYear };
+let searchView = null; // what drawSearch shows
+let searchStale = true; // the choices or place changed while the tab was hidden
+// Festival scans of a whole year, by place and year, so another festival in
+// the same year shows at once.
+const festivalYears = new Map();
+
+function searchPlaceOf(c) {
+  const zone = c.input.timezone;
+  return { lat: c.input.lat, lon: c.input.lon, name: c.input.place || "",
+    offset: zone ? (ms) => offsetAtUtc(zone, ms) : c.input.utc_offset,
+    key: `${c.input.lat},${c.input.lon},${zone || c.input.utc_offset}` };
+}
+
+function options(list, chosen, placeholder) {
+  return (placeholder != null ? `<option value="">${esc(placeholder)}</option>` : "")
+    + list.map(([v, label]) => `<option value="${esc(v)}"${String(v) === String(chosen) ? " selected" : ""}>${esc(label)}</option>`).join("");
+}
+
+// Fills the drop-downs in the current language, keeping the choices.
+function fillSearchOptions() {
+  const byName = (a, b) => a[1].localeCompare(b[1], getLang());
+  $("qFestival").innerHTML = options(FESTIVAL_NAMES.map((n) => [slug(n), tr(n, "festival")]).sort(byName),
+    query.festival, t("Choose a festival"));
+  $("qTithi").innerHTML = options(TITHI_CHOICES.map((c) => [slug(c.name), tr(c.name, "tithi")]), query.tithi, t("Choose a tithi"));
+  $("qNakshatra").innerHTML = options(NAK_NAMES.map((n) => [slug(n), tr(n, "nakshatra")]), query.nakshatra, t("Choose a nakshatra"));
+  $("qMonth").innerHTML = options(Array.from({ length: 12 }, (_, i) => [i + 1, monthLong(i)]), query.month);
+  $("qYear").innerHTML = options(Array.from({ length: 2 * SEARCH_YEARS + 1 }, (_, i) => thisYear - SEARCH_YEARS + i)
+    .map((y) => [y, String(y)]), query.year);
+}
+
+function syncSearchForm() {
+  for (const b of $("qKinds").querySelectorAll("[data-kind]")) {
+    const on = b.dataset.kind === query.kind;
+    b.setAttribute("aria-checked", String(on));
+    b.tabIndex = on ? 0 : -1;
+  }
+  $("qFestivalField").hidden = query.kind !== "festival";
+  $("qTithiField").hidden = query.kind !== "tithi";
+  $("qNakshatraField").hidden = query.kind !== "nakshatra";
+  $("qMonthField").hidden = query.kind === "festival";
+}
+
+function initSearch(qs) {
+  if (SEARCH_KINDS.includes(qs.get("search"))) query.kind = qs.get("search");
+  const valid = {
+    festival: FESTIVAL_NAMES.map(slug), tithi: TITHI_CHOICES.map((c) => slug(c.name)), nakshatra: NAK_NAMES.map(slug),
+  };
+  for (const k of ["festival", "tithi", "nakshatra"]) if (valid[k].includes(qs.get(k))) query[k] = qs.get(k);
+  const month = Number(qs.get("month")), year = Number(qs.get("year"));
+  if (month >= 1 && month <= 12) query.month = month;
+  if (Math.abs(year - thisYear) <= SEARCH_YEARS) query.year = year;
+  fillSearchOptions();
+  syncSearchForm();
+
+  const setKind = (kind, focus) => {
+    query.kind = kind;
+    syncSearchForm();
+    if (focus) $("qKinds").querySelector(`[data-kind="${kind}"]`).focus();
+    searchChanged();
+  };
+  $("qKinds").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-kind]");
+    if (b && b.dataset.kind !== query.kind) setKind(b.dataset.kind);
+  });
+  $("qKinds").addEventListener("keydown", (e) => {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step || !e.target.closest("[data-kind]")) return;
+    e.preventDefault();
+    const n = SEARCH_KINDS.length;
+    setKind(SEARCH_KINDS[(SEARCH_KINDS.indexOf(query.kind) + step + n) % n], true);
+  });
+  const fields = { qFestival: "festival", qTithi: "tithi", qNakshatra: "nakshatra", qMonth: "month", qYear: "year" };
+  for (const [id, k] of Object.entries(fields)) {
+    $(id).addEventListener("change", () => {
+      query[k] = k === "month" || k === "year" ? Number($(id).value) : $(id).value;
+      searchChanged();
+    });
+  }
+  // A result date opens that day in the Panchanga tab (a plain link otherwise,
+  // so it can be opened in a new tab or copied).
+  $("qResults").addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-day]");
+    if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    setDate(a.dataset.day);
+    selectTab("panchanga");
+    calculate();
+    document.querySelector(".tabs").scrollIntoView({ block: "start", behavior: "smooth" });
+  });
+}
+
+function searchChanged() {
+  syncSearchUrl();
+  runSearch();
+}
+
+// While the Search tab is open the URL holds the search and the place, so it
+// can be bookmarked or shared; the parameters are dropped on leaving the tab.
+function syncSearchUrl() {
+  const qs = new URLSearchParams(location.search);
+  for (const k of SEARCH_PARAMS) qs.delete(k);
+  if (!$("panel-search").hidden) {
+    qs.set("tab", "search");
+    qs.set("search", query.kind);
+    if (query[query.kind]) qs.set(query.kind, query[query.kind]);
+    if (query.kind !== "festival") qs.set("month", query.month);
+    qs.set("year", query.year);
+    if (lastChart) {
+      qs.set("place", lastChart.input.place || "");
+      qs.set("lat", lastChart.input.lat);
+      qs.set("lon", lastChart.input.lon);
+      if (offsetManual) qs.set("offset", fmtOffset(lastChart.input.utc_offset));
+      else qs.delete("offset");
+    }
+  } else if (qs.get("tab") === "search") {
+    qs.delete("tab");
+    if (!qs.has("date")) for (const k of ["place", "lat", "lon", "offset"]) qs.delete(k);
+  }
+  const s = qs.toString();
+  history.replaceState(null, "", location.pathname + (s ? `?${s}` : "") + location.hash);
+}
+
+// The year's festivals at a place, scanned a few days at a time.
+function festivalYear(p, year) {
+  const key = `${p.key}|${year}`;
+  if (festivalYears.has(key)) return festivalYears.get(key);
+  for (const k of festivalYears.keys()) if (!k.startsWith(`${p.key}|`)) festivalYears.delete(k); // another place
+  const start = wallMs(year, 1, 1), days = Math.round((wallMs(year + 1, 1, 1) - start) / 86400e3);
+  const job = { found: [], done: 0, days, failed: false };
+  festivalYears.set(key, job);
+  const step = () => {
+    try {
+      const end = Math.min(job.done + CHUNK_DAYS, days);
+      for (; job.done < end; job.done++) {
+        const w = start + job.done * 86400e3;
+        const festivals = festivalsFor(w, p.lat, p.lon, p.offset);
+        if (festivals.length) job.found.push({ date: isoFromWall(w).slice(0, 10), w, festivals });
+      }
+    } catch {
+      job.failed = true;
+    }
+    if (searchView?.job === job) drawSearch();
+    if (!job.failed && job.done < days) setTimeout(step, 0);
+  };
+  setTimeout(step, 0);
+  return job;
+}
+
+function runSearch() {
+  const c = lastChart;
+  if (!c || $("panel-search").hidden) { searchStale = true; return; }
+  searchStale = false;
+  const q = { ...query }, p = searchPlaceOf(c);
+  searchView = { q, p };
+  if (!q[q.kind]) return drawSearch();
+  if (q.kind === "festival") {
+    searchView.name = FESTIVAL_NAMES.find((n) => slug(n) === q.festival);
+    searchView.job = festivalYear(p, q.year);
+    return drawSearch();
+  }
+  try {
+    const [from, to] = threeMonths(q.year, q.month);
+    const indexes = q.kind === "tithi" ? TITHI_CHOICES.find((x) => slug(x.name) === q.tithi).indexes
+      : [NAK_NAMES.findIndex((n) => slug(n) === q.nakshatra)];
+    searchView.rows = indexes.flatMap((i) => occurrences(q.kind, i, from, to, p.lat, p.lon, p.offset))
+      .sort((a, b) => (a.start < b.start ? -1 : 1));
+  } catch {
+    searchView.failed = true;
+  }
+  drawSearch();
+}
+
+// Link to the Panchanga tab for a day at the searched place.
+function dayHref(iso) {
+  const qs = new URLSearchParams();
+  const c = lastChart.input;
+  qs.set("place", c.place || "");
+  qs.set("date", iso);
+  qs.set("time", $("time").value || "12:00");
+  qs.set("lat", c.lat);
+  qs.set("lon", c.lon);
+  if (offsetManual) qs.set("offset", fmtOffset(c.utc_offset));
+  qs.set("tab", "panchanga");
+  if (getLang() === "ta") qs.set("lang", "ta");
+  return `?${qs}`;
+}
+
+// Rows under a heading per month; the searched month's heading is marked.
+function byMonthList(items, row, chosen) {
+  let html = "", month = "";
+  for (const u of items) {
+    const fd = festivalDate(u.date), key = `${fd.y}-${fd.m}`;
+    if (key !== month) {
+      html += `${month ? "</ul>" : ""}<h3 class="year-month${key === chosen ? " q-chosen" : ""}">${monthLong(fd.m - 1)} ${fd.y}</h3><ul class="q-list">`;
+      month = key;
+    }
+    html += row(u);
+  }
+  return month ? html + "</ul>" : html;
+}
+
+function drawSearch() {
+  const v = searchView;
+  if (!v) return;
+  const { q, p } = v;
+  const hint = (msg) => `<p class="hint q-status">${esc(msg)}</p>`;
+  const dayLink = (iso, main) =>
+    `<a href="${esc(dayHref(iso))}" data-day="${iso}" class="q-day${main ? " q-main" : ""}">${festivalDate(iso).label}</a>`;
+  const tamil = (td) => (td ? `<span class="q-tamil">${esc(t("Tamil date"))}: ${esc(tr(td.month, "tamilMonth"))} ${td.day}</span>` : "");
+  let body = "";
+  $("qPlace").textContent = t("Dates for {place}. To search another place, change it above and press Calculate.",
+    { place: p.name || `${p.lat}, ${p.lon}` });
+
+  if (!q[q.kind]) body = hint(t("Choose one from the list above."));
+  else if (q.kind === "festival") {
+    const { job, name } = v;
+    const rows = job.found.flatMap((day) => day.festivals.filter((f) => f.name === name).map((f) => ({ date: day.date, day, f })));
+    const list = byMonthList(rows, (u) => {
+      u.tamil = u.day.tamil ??= tamilDate(u.day.w, p.lat, p.lon, p.offset);
+      const times = u.f.times.map((tt) => `<span class="sd-time">${esc(tr(tt.label, "label"))}: <strong>${
+        tt.at ? fmtTime(tt.at, u.date) : `${fmtTime(tt.start, u.date)} – ${fmtTime(tt.end, u.date)}`}</strong></span>`).join("");
+      const notes = (u.f.note ? `<div class="festival-note">${esc(tr(u.f.note, "note"))}</div>` : "")
+        + (u.f.eclipse ? `<div class="festival-note">${esc(t(ECLIPSE_NOTE))}</div>` : "");
+      return `<li class="q-row"><div class="q-when">${dayLink(u.date, true)}${tamil(u.tamil)}</div>`
+        + `<div class="upcoming-times">${times}</div>${notes}</li>`;
+    });
+    const status = job.failed ? t("Couldn't calculate the dates.") : job.done < job.days ? t("Calculating…")
+      : !rows.length ? t("{name} doesn't fall in {year} at this place.", { name: tr(name, "festival"), year: q.year }) : "";
+    body = `<h3 class="q-title">${esc(tr(name, "festival"))} · ${q.year}</h3>`
+      + (rows.length ? `<p class="hint">${esc(t("Select a date to open it in the Panchanga tab."))}</p>` : "")
+      + list + (status ? hint(status) : "");
+  } else if (v.failed) body = hint(t("Couldn't calculate the dates."));
+  else {
+    const name = (o) => (q.kind === "nakshatra" ? tr(NAK_NAMES[o.index], "nakshatra")
+      : o.index === 14 ? tr("Purnima", "tithi") : o.index === 29 ? tr("Amavasya", "tithi")
+        : `${tr(o.index < 15 ? "Shukla" : "Krishna", "paksha")} ${tr(TITHI_NAMES[o.index % 15], "tithi")}`);
+    const at = (iso, o) => `${dayLink(iso.slice(0, 10), o.mainDays.includes(iso.slice(0, 10)))} ${fmtTime(iso, iso.slice(0, 10))}`;
+    const span = (o) => (o.start.slice(0, 10) === o.end.slice(0, 10)
+      ? `${dayLink(o.start.slice(0, 10), o.mainDays.length > 0)} ${fmtTime(o.start, o.date)} – ${fmtTime(o.end, o.date)}`
+      : `${at(o.start, o)} – ${at(o.end, o)}`);
+    body = `<p class="hint">${esc(t("Bold dates are the days it holds at sunrise. Select a date to open it in the Panchanga tab."))}</p>`
+      + byMonthList(v.rows, (o) => `<li class="q-row"><div class="q-name">${esc(name(o))}</div>`
+        + `<div class="q-span">${span(o)}</div><div class="q-meta">${tamil(o.tamil)}${
+          o.mainDays.length ? "" : `<span class="q-kshaya">${esc(t("Holds at no sunrise (kshaya)"))}</span>`}</div></li>`,
+      `${q.year}-${q.month}`);
+  }
+  $("qResults").innerHTML = body;
+}
+
 // ---------- tabs ----------
 
 const TAB_KEY = "vedic-chart-tab";
-const TABS = ["panchanga", "festivals", "special", "muhurtham", "chart"];
+const TABS = ["panchanga", "festivals", "special", "muhurtham", "chart", "search"];
 
 function selectTab(name) {
   if (name === "dasha") name = "chart"; // the dasha now sits on the Birth Chart tab
@@ -827,6 +1091,8 @@ function selectTab(name) {
   }
   try { localStorage.setItem(TAB_KEY, name); } catch {}
   if (name === "chart") drawDashaLinks();
+  if (name === "search" && searchStale) runSearch();
+  syncSearchUrl();
 }
 
 // ---------- vimshottari dasha ----------
@@ -964,6 +1230,7 @@ async function calculate(e) {
     const c = computeChart(wallFromInputs(params.date, params.time), offset, lat, lon, AYANAMSA, BHAVA);
     c.input.timezone = tzInfo.timezone;
     c.input.tz_note = tzInfo.note;
+    c.input.place = $("place").value;
     lastChart = c;
     if (auto) {
       $("offset").value = fmtOffset(c.input.utc_offset);
@@ -979,6 +1246,8 @@ async function calculate(e) {
     renderDasha(c);
     $("output").hidden = false;
     drawDashaLinks();
+    runSearch();
+    syncSearchUrl();
   } catch (err) {
     showError(err.message);
   } finally {
@@ -1030,6 +1299,8 @@ function switchLanguage(l) {
   renderBhavaTable(c);
   renderDasha(c, selectedMd);
   drawDashaLinks();
+  fillSearchOptions();
+  drawSearch();
 }
 
 async function init() {
@@ -1041,9 +1312,11 @@ async function init() {
   initDatePicker();
   setTime("12:00"); // until the current time or a URL's time fills it in
   // URL parameters (?date=..&time=..&lat=..&lon=..) override the device defaults.
+  // A Search tab bookmark carries the place (lat, lon) but no date: today is used.
   const qs = new URLSearchParams(location.search);
-  const fromUrl = qs.has("date");
+  const fromUrl = qs.has("date") || (qs.has("lat") && qs.has("lon"));
   if (fromUrl) {
+    if (!qs.has("date")) setNow();
     for (const f of FIELDS) if (qs.has(f)) f === "time" ? setTime(qs.get(f)) : f === "date" ? setDate(qs.get(f)) : ($(f).value = qs.get(f));
     offsetManual = qs.has("offset");
   }
@@ -1074,6 +1347,7 @@ async function init() {
     const n = MUHURTHA_TABS.length;
     selectMuhurthaTab(MUHURTHA_TABS[(MUHURTHA_TABS.indexOf(b.dataset.mt) + step + n) % n], true);
   });
+  initSearch(qs);
   let savedMuhurtha;
   try { savedMuhurtha = localStorage.getItem(MUHURTHA_KEY); } catch {}
   selectMuhurthaTab(savedMuhurtha);

@@ -78,6 +78,20 @@ const UI = {
   "{paksha} Pradosham": "{paksha} பிரதோஷம்",
   "Soma Pradosham": "சோம பிரதோஷம்",
   "Shani Pradosham": "சனி மகா பிரதோஷம்",
+  // Search tab
+  "Find a festival's dates in a year, or every tithi or nakshatra in a month and the months either side of it, calculated for the place you entered, in local time.": "ஓர் ஆண்டில் ஒரு பண்டிகை வரும் நாட்களையும், ஒரு மாதத்திலும் அதற்கு முந்தைய, அடுத்த மாதங்களிலும் ஒரு திதி அல்லது நட்சத்திரம் வரும் நேரங்களையும், நீங்கள் உள்ளிட்ட இடத்துக்கு உள்ளூர் நேரத்தில் கண்டறியலாம்.",
+  "Search for": "எதைத் தேட",
+  "Festival": "பண்டிகை",
+  "Choose a festival": "பண்டிகையைத் தேர்ந்தெடுக்கவும்",
+  "Choose a tithi": "திதியைத் தேர்ந்தெடுக்கவும்",
+  "Choose a nakshatra": "நட்சத்திரத்தைத் தேர்ந்தெடுக்கவும்",
+  "Choose one from the list above.": "மேலே உள்ள பட்டியலில் ஒன்றைத் தேர்ந்தெடுக்கவும்.",
+  "Dates for {place}. To search another place, change it above and press Calculate.": "{place} இடத்துக்கான தேதிகள். வேறு இடத்துக்குத் தேட, மேலே இடத்தை மாற்றி ‘கணி’ அழுத்தவும்.",
+  "Bold dates are the days it holds at sunrise. Select a date to open it in the Panchanga tab.": "தடித்த எழுத்தில் உள்ள தேதிகளில் சூரிய உதயத்தின்போது அது நிலவுகிறது. ஒரு தேதியைத் தேர்ந்தெடுத்தால் அந்த நாள் பஞ்சாங்கத் தாவலில் திறக்கும்.",
+  "Select a date to open it in the Panchanga tab.": "ஒரு தேதியைத் தேர்ந்தெடுத்தால் அந்த நாள் பஞ்சாங்கத் தாவலில் திறக்கும்.",
+  "Holds at no sunrise (kshaya)": "எந்தச் சூரிய உதயத்திலும் இல்லை (க்ஷயம்)",
+  "{name} doesn't fall in {year} at this place.": "இந்த இடத்தில் {year} ஆம் ஆண்டில் {name} வரவில்லை.",
+  "Couldn't calculate the dates.": "தேதிகளைக் கணக்கிட முடியவில்லை.",
   "Total solar eclipse": "முழு சூரிய கிரகணம்",
   "Annular solar eclipse": "வளைய சூரிய கிரகணம்",
   "Hybrid solar eclipse": "கலப்பு சூரிய கிரகணம்",
@@ -254,9 +268,9 @@ const REFERENCES = `    <details class="references">
       </ul>
       <h4>Panchangam and festivals</h4>
       <ul>
-        <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
+        <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad, and so are the tithi times and sunrise days in the Search tab.</li>
         <li><a href="https://www.temple.org/images/phocagallery/2026%20Calendar.pdf" target="_blank" rel="noopener">Shiva Murugan Temple, Concord, California, 2026 calendar</a>: festival and Special Days dates are compared with it for the San Francisco Bay Area.</li>
-        <li><a href="https://www.prokerala.com/festivals/" target="_blank" rel="noopener">Prokerala</a>: festival dates and nakshatra times are compared with it, such as Aadi Pooram.</li>
+        <li><a href="https://www.prokerala.com/festivals/" target="_blank" rel="noopener">Prokerala</a>: festival dates and nakshatra times are compared with it, such as Aadi Pooram, and so are the Search tab's tithi and nakshatra times, including tithis that hold at no sunrise (kshaya).</li>
       </ul>
       <h4>Auspicious Days</h4>
       <ul>

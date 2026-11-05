@@ -95,9 +95,14 @@ const NAKSHATRA_FESTIVALS = [
   { name: "Aadi Pooram", newMoon: true, calendar: "tamil", sign: 3, nak: 10, kaala: "sunrise", region: "Tamil Nadu" },
 ];
 
-const TITHI_NAMES = ["Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami",
+// Every festival festivalsFor can report, for the Search tab's list: the rule
+// tables above plus the ones with rules of their own below.
+export const FESTIVAL_NAMES = [...TITHI_FESTIVALS, ...LUNAR_NAKSHATRA_FESTIVALS, ...SOLAR_FESTIVALS, ...NAKSHATRA_FESTIVALS]
+  .map((f) => f.name).concat(["Gayatri Japam", "Holika Dahan", "Holi", "Raksha Bandhan", "Karadaiyan Nonbu", "Varalakshmi Vratam"]);
+
+export const TITHI_NAMES = ["Pratipada", "Dwitiya", "Tritiya", "Chaturthi", "Panchami", "Shashthi", "Saptami",
   "Ashtami", "Navami", "Dashami", "Ekadashi", "Dwadashi", "Trayodashi", "Chaturdashi"];
-const NAK_NAMES = ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu",
+export const NAK_NAMES = ["Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra", "Punarvasu",
   "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati",
   "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana",
   "Dhanishta", "Shatabhisha", "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"];
@@ -107,7 +112,7 @@ export const SIGN_NAMES = ["Mesha", "Vrishabha", "Mithuna", "Karka", "Simha", "K
 const norm = (x) => ((x % 360) + 360) % 360;
 const ARUNODAYA = 96 / 1440; // 4 ghatis before sunrise, in days
 export const sunLon = (jd) => planetLon(jd, SE.SUN)[0];
-const moonLon = (jd) => planetLon(jd, SE.MOON)[0];
+export const moonLon = (jd) => planetLon(jd, SE.MOON)[0];
 export const elong = (jd) => norm(moonLon(jd) - sunLon(jd));
 export const tithiAt = (jd) => Math.floor(elong(jd) / 12);
 const nakAt = (jd) => Math.floor(moonLon(jd) / NAK_SPAN);

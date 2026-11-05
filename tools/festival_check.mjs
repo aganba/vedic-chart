@@ -176,5 +176,27 @@ for (const [date, month, day, year] of TAMIL_DATES) {
   console.log(`${ok ? "ok  " : "FAIL"} Tamil muhurtham 2026-27: ${found.size}/${ref.size} Harikesanallur days found, ${extra.length} more`
     + `${missed.length ? `; missing ${missed.join(" ")}` : ""}`);
 }
+// Search tab: tithi and nakshatra spans with their sunrise (main) days, as
+// Drik Panchang and Prokerala list them for Chennai. Times within 3 minutes
+// (nakshatras differ slightly with the ayanamsa; the app uses True Chitra).
+{
+  const { occurrences } = await import(new URL("../docs/js/search.js", import.meta.url));
+  const near = (a, b) => Math.abs(Date.parse(a + "Z") - Date.parse(b + "Z")) <= 3 * 60e3;
+  // [kind, index, start, end, main days, source]
+  const SPANS = [
+    ["tithi", 25, "2026-07-10T08:16", "2026-07-11T05:22", [], "Prokerala: Krishna Ekadashi, tithi kshaya"],
+    ["tithi", 10, "2026-05-26T05:12", "2026-05-27T06:22", ["2026-05-26", "2026-05-27"], "Drik: Ekadashi upto full night"],
+    ["nakshatra", 1, "2026-07-09T14:56", "2026-07-10T13:15", ["2026-07-10"], "Prokerala: Bharani"],
+    ["nakshatra", 2, "2026-07-10T13:15", "2026-07-11T11:03", ["2026-07-11"], "Prokerala: Krittika"],
+  ];
+  for (const [kind, index, start, end, main, src] of SPANS) {
+    const day = Date.parse(start.slice(0, 10) + "T00:00:00Z");
+    const o = occurrences(kind, index, day - 2 * 86400e3, day + 3 * 86400e3, ...CHENNAI, 5.5)
+      .find((x) => near(x.start, start + ":00"));
+    const ok = !!o && near(o.end, end + ":00") && o.mainDays.join() === main.join();
+    if (!ok) bad++;
+    console.log(`${ok ? "ok  " : "FAIL"} search ${src} ${start} – ${end}${ok ? "" : `  (got ${o ? `${o.start} – ${o.end} main ${o.mainDays}` : "none"})`}`);
+  }
+}
 console.log(bad ? `${bad} problem(s) in total` : "all checks passed");
 process.exit(bad ? 1 : 0);

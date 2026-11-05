@@ -132,6 +132,7 @@
         <button type="button" role="tab" id="tab-special" aria-controls="panel-special" aria-selected="false" data-i18n="Special Days">Special Days</button>
         <button type="button" role="tab" id="tab-muhurtham" aria-controls="panel-muhurtham" aria-selected="false" data-i18n="Auspicious Days">Auspicious Days</button>
         <button type="button" role="tab" id="tab-chart" aria-controls="panel-chart" aria-selected="false" data-i18n="Birth Chart">Birth Chart</button>
+        <button type="button" role="tab" id="tab-search" aria-controls="panel-search" aria-selected="false" data-i18n="Search">Search</button>
       </div>
 
       <div role="tabpanel" id="panel-panchanga" aria-labelledby="tab-panchanga">
@@ -272,6 +273,42 @@
           <div id="tamilMuhurthaYear"></div>
         </div>
       </div>
+
+      <div role="tabpanel" id="panel-search" aria-labelledby="tab-search" hidden>
+        <div class="card search-card">
+          <h2 data-i18n="Search">Search</h2>
+          <p class="hint" data-i18n="Find a festival&#39;s dates in a year, or every tithi or nakshatra in a month and the months either side of it, calculated for the place you entered, in local time.">Find a festival's dates in a year, or every tithi or nakshatra in a month and the months either side of it, calculated for the place you entered, in local time.</p>
+          <div class="subtabs q-kinds" id="qKinds" role="radiogroup" aria-label="Search for" data-i18n-aria="Search for">
+            <button type="button" role="radio" data-kind="festival" aria-checked="true" tabindex="0" data-i18n="Festival">Festival</button>
+            <button type="button" role="radio" data-kind="tithi" aria-checked="false" tabindex="-1" data-i18n="Tithi">Tithi</button>
+            <button type="button" role="radio" data-kind="nakshatra" aria-checked="false" tabindex="-1" data-i18n="Nakshatra">Nakshatra</button>
+          </div>
+          <div class="q-fields">
+            <div class="field q-name-field" id="qFestivalField">
+              <label for="qFestival" data-i18n="Festival">Festival</label>
+              <select id="qFestival"></select>
+            </div>
+            <div class="field q-name-field" id="qTithiField" hidden>
+              <label for="qTithi" data-i18n="Tithi">Tithi</label>
+              <select id="qTithi"></select>
+            </div>
+            <div class="field q-name-field" id="qNakshatraField" hidden>
+              <label for="qNakshatra" data-i18n="Nakshatra">Nakshatra</label>
+              <select id="qNakshatra"></select>
+            </div>
+            <div class="field" id="qMonthField" hidden>
+              <label for="qMonth" data-i18n="Month">Month</label>
+              <select id="qMonth"></select>
+            </div>
+            <div class="field">
+              <label for="qYear" data-i18n="Year">Year</label>
+              <select id="qYear"></select>
+            </div>
+          </div>
+          <p class="hint q-place" id="qPlace"></p>
+          <div id="qResults" aria-live="polite"></div>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -286,9 +323,9 @@
       </ul>
       <h4>Panchangam and festivals</h4>
       <ul>
-        <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad.</li>
+        <li><a href="https://www.drikpanchang.com/" target="_blank" rel="noopener">Drik Panchang</a>: festival, Upakarma, Ekadashi and Tamil calendar dates are checked against it, for places in India and abroad, and so are the tithi times and sunrise days in the Search tab.</li>
         <li><a href="https://www.temple.org/images/phocagallery/2026%20Calendar.pdf" target="_blank" rel="noopener">Shiva Murugan Temple, Concord, California, 2026 calendar</a>: festival and Special Days dates are compared with it for the San Francisco Bay Area.</li>
-        <li><a href="https://www.prokerala.com/festivals/" target="_blank" rel="noopener">Prokerala</a>: festival dates and nakshatra times are compared with it, such as Aadi Pooram.</li>
+        <li><a href="https://www.prokerala.com/festivals/" target="_blank" rel="noopener">Prokerala</a>: festival dates and nakshatra times are compared with it, such as Aadi Pooram, and so are the Search tab's tithi and nakshatra times, including tithis that hold at no sunrise (kshaya).</li>
       </ul>
       <h4>Auspicious Days</h4>
       <ul>
