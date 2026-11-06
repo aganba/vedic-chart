@@ -357,5 +357,6 @@ tr.lagna td:first-child { color: var(--lagna); font-weight: 700; }
 .q-meta, .q-tamil { font-size: 13px; color: var(--muted); }
 .q-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .q-kshaya { font-style: italic; }
+.q-inner { font-size: 14px; }
 .year-month.q-chosen { text-decoration: underline; text-underline-offset: 4px; }
 .q-status { margin-top: 10px; }

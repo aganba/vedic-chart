@@ -1071,9 +1071,16 @@ function drawSearch() {
     const span = (o) => (o.start.slice(0, 10) === o.end.slice(0, 10)
       ? `${dayLink(o.start.slice(0, 10), o.mainDays.length > 0)} ${fmtTime(o.start, o.date)} – ${fmtTime(o.end, o.date)}`
       : `${at(o.start, o)} – ${at(o.end, o)}`);
+    // A day it holds at sunrise that is neither its start nor its end date (it
+    // begins just before midnight and ends just after the next one), shown
+    // bold on a line of its own so every main day appears in the row.
+    const inner = (o) => {
+      const days = o.mainDays.filter((d) => d !== o.start.slice(0, 10) && d !== o.end.slice(0, 10));
+      return days.length ? `<div class="q-inner">${esc(t("Holds at sunrise:"))} ${days.map((d) => dayLink(d, true)).join(", ")}</div>` : "";
+    };
     body = `<p class="hint">${esc(t("Bold dates are the days it holds at sunrise. Select a date to open it in the Panchanga tab."))}</p>`
       + byMonthList(v.rows, (o) => `<li class="q-row"><div class="q-name">${esc(name(o))}</div>`
-        + `<div class="q-span">${span(o)}</div><div class="q-meta">${tamil(o.tamil)}${
+        + `<div class="q-span">${span(o)}</div>${inner(o)}<div class="q-meta">${tamil(o.tamil)}${
           o.mainDays.length ? "" : `<span class="q-kshaya">${esc(t("Holds at no sunrise (kshaya)"))}</span>`}</div></li>`,
       `${q.year}-${q.month}`);
   }

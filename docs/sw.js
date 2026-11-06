@@ -1,7 +1,7 @@
 // Offline support, network first: every visit revalidates each file with the
 // server (cheap "304 Not Modified" when unchanged), so updates show up
 // immediately; the cached copy is used only when the network is unavailable.
-const CACHE = "vedic-chart-v68";
+const CACHE = "vedic-chart-v69";
 const CORE = [
   "./", "index.html", "style.css", "app.js", "manifest.webmanifest", "ganesha.svg", "favicon.svg", "favicon.ico",
   "js/swe.js", "js/astro.js", "js/shadbala.js", "js/dasha.js", "js/tz.js", "js/places.js", "js/festivals.js", "js/muhurtha.js", "js/tamilmuhurtha.js", "js/specialdays.js", "js/search.js", "js/i18n.js",

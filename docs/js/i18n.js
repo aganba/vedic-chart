@@ -90,6 +90,7 @@ const UI = {
   "Bold dates are the days it holds at sunrise. Select a date to open it in the Panchanga tab.": "தடித்த எழுத்தில் உள்ள தேதிகளில் சூரிய உதயத்தின்போது அது நிலவுகிறது. ஒரு தேதியைத் தேர்ந்தெடுத்தால் அந்த நாள் பஞ்சாங்கத் தாவலில் திறக்கும்.",
   "Select a date to open it in the Panchanga tab.": "ஒரு தேதியைத் தேர்ந்தெடுத்தால் அந்த நாள் பஞ்சாங்கத் தாவலில் திறக்கும்.",
   "Holds at no sunrise (kshaya)": "எந்தச் சூரிய உதயத்திலும் இல்லை (க்ஷயம்)",
+  "Holds at sunrise:": "சூரிய உதயத்தின்போது நிலவும் நாள்:",
   "{name} doesn't fall in {year} at this place.": "இந்த இடத்தில் {year} ஆம் ஆண்டில் {name} வரவில்லை.",
   "Couldn't calculate the dates.": "தேதிகளைக் கணக்கிட முடியவில்லை.",
   "Total solar eclipse": "முழு சூரிய கிரகணம்",
