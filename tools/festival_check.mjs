@@ -94,6 +94,20 @@ for (const [date, place, want] of [["2026-08-27", CUPERTINO, true], ["2026-08-28
   console.log(`${ok ? "ok  " : "FAIL"} Yajur Upakarma ${date} eclipse flag ${want}`);
 }
 
+// Karadaiyan Nonbu: the saradu is tied at the moment the Sun enters Meena
+// (True Chitrapaksha), so pin that moment, within a minute, in IST. Drik
+// Panchang's Lahiri times run 34-41 minutes later; the app keeps True Chitra
+// on purpose. 2026's moment falls after midnight, on the 14th's Vedic day.
+for (const [date, want] of [["2024-03-14", "2024-03-14T12:04:54"], ["2025-03-14", "2025-03-14T18:19:14"],
+  ["2026-03-14", "2026-03-15T00:31:37"], ["2027-03-15", "2027-03-15T06:28:38"], ["2028-03-14", "2028-03-14T12:43:34"]]) {
+  const [y, m, d] = date.split("-").map(Number);
+  const f = festivalsFor(astro.wallMs(y, m, d), CHENNAI[0], CHENNAI[1], 5.5).find((x) => x.name === "Karadaiyan Nonbu");
+  const at = f?.times[0]?.at;
+  const ok = !!at && Math.abs(Date.parse(at + "Z") - Date.parse(want + "Z")) <= 60e3;
+  if (!ok) bad++;
+  console.log(`${ok ? "ok  " : "FAIL"} Karadaiyan Nonbu ${date} saradu time ${want.slice(11, 16)}${ok ? "" : `  (got ${at ?? "none"})`}`);
+}
+
 // Every festival must occur at most once per lunar/solar year: scan each day of
 // 2025-2026 (Chennai and Delhi) and flag repeats less than 300 days apart.
 for (const [label, place] of [["Chennai", CHENNAI], ["Delhi", DELHI]]) {
