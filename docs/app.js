@@ -463,6 +463,7 @@ function renderPanchanga(c) {
       t("{pct}% left · ends {t}", { pct: p.tithi.pct_left, t: fmtTime(p.tithi.end, ref) })],
     [t("Nakshatra"), nak(p.nakshatra), t("{pct}% left · ends {t} · lord {lord}",
       { pct: p.nakshatra.pct_left, t: fmtTime(p.nakshatra.end, ref), lord: tr(p.nakshatra.lord, "planet") })],
+    ...(p.nakshatra_at_sunrise ? [[t("Nakshatra at sunrise"), tr(p.nakshatra_at_sunrise, "nakshatra"), ""]] : []),
     [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
     [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
     ...(p.hora ? [[t("Hora"), tr(p.hora.lord, "planet"),

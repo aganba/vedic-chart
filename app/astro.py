@@ -326,6 +326,8 @@ def panchanga(jd: float, lat: float, lon: float, offset: float) -> dict:
                   "name": "Purnima" if ti == 14 else "Amavasya" if ti == 29 else TITHIS[ti % 15],
                   "number": ti + 1, "end": loc(ti_end), "pct_left": round(ti_left * 100, 2)},
         "nakshatra": {**nak, "end": loc(nk_end), "pct_left": round(nk_left * 100, 2)},
+        # Nakshatra at the entered civil date's sunrise (the one shown on the card).
+        "nakshatra_at_sunrise": nakshatra_of(_moon(day_sunrise))["name"] if day_sunrise else None,
         "yoga": {"name": YOGAS[yg], "end": loc(yg_end), "pct_left": round(yg_left * 100, 2)},
         "karana": {"name": _karana_name(kr), "end": loc(kr_end), "pct_left": round(kr_left * 100, 2)},
         "sunrise": loc(day_sunrise), "sunset": loc(day_sunset), "next_sunrise": loc(day_next_sunrise),
