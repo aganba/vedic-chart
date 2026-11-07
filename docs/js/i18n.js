@@ -117,6 +117,7 @@ const UI = {
   "Tithi": "திதி",
   "{pct}% left · ends {t}": "{pct}% மீதம் · முடிவு {t}",
   "Nakshatra": "நட்சத்திரம்",
+  "Nakshatra at sunrise": "சூரிய உதயத்தில் நட்சத்திரம்",
   "{nak} pada {pada}": "{nak} {pada}-ஆம் பாதம்",
   "{pct}% left · ends {t} · lord {lord}": "{pct}% மீதம் · முடிவு {t} · அதிபதி {lord}",
   "Yoga": "யோகம்",

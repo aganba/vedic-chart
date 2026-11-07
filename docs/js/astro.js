@@ -315,6 +315,8 @@ export function panchanga(jd, lat, lon, offset) {
       name: ti === 14 ? "Purnima" : ti === 29 ? "Amavasya" : TITHIS[ti % 15],
       number: ti + 1, end: loc(tiEnd), pct_left: round2(tiLeft * 100) },
     nakshatra: { ...nak, end: loc(nkEnd), pct_left: round2(nkLeft * 100) },
+    // Nakshatra at the entered civil date's sunrise (the one shown on the card).
+    nakshatra_at_sunrise: daySunrise ? nakshatraOf(moonLon(daySunrise)).name : null,
     yoga: { name: YOGAS[yg], end: loc(ygEnd), pct_left: round2(ygLeft * 100) },
     karana: { name: karanaName(kr), end: loc(krEnd), pct_left: round2(krLeft * 100) },
     sunrise: loc(daySunrise), sunset: loc(daySunset), next_sunrise: loc(dayNextSunrise),
