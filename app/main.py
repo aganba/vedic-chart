@@ -127,7 +127,7 @@ STATIC = Path(__file__).resolve().parent.parent / "docs"
 def index():
     """index.html with version-stamped asset URLs, so browsers fetch fresh
     copies whenever app.js or style.css change."""
-    html = (STATIC / "index.html").read_text()
+    html = (STATIC / "index.html").read_text(encoding="utf-8")
     for name in ("app.js", "style.css"):
         version = int((STATIC / name).stat().st_mtime)
         html = html.replace(f'"{name}"', f'"{name}?v={version}"')

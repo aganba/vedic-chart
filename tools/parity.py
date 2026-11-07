@@ -40,7 +40,7 @@ def python_results():
 
 def js_results():
     proc = subprocess.run(["node", str(ROOT / "tools" / "parity.mjs")], input=json.dumps(CASES),
-                          capture_output=True, text=True, check=True)
+                          capture_output=True, text=True, encoding="utf-8", check=True)
     return json.loads(proc.stdout)
 
 
