@@ -461,9 +461,9 @@ function renderPanchanga(c) {
         : t("Vedic day runs sunrise to sunrise")],
     [t("Tithi"), `${tr(p.tithi.paksha, "paksha")} ${tr(p.tithi.name, "tithi")}`,
       t("{pct}% left · ends {t}", { pct: p.tithi.pct_left, t: fmtTime(p.tithi.end, ref) })],
-    [t("Nakshatra"), nak(p.nakshatra), t("{pct}% left · ends {t} · lord {lord}",
-      { pct: p.nakshatra.pct_left, t: fmtTime(p.nakshatra.end, ref), lord: tr(p.nakshatra.lord, "planet") })],
-    ...(p.nakshatra_at_sunrise ? [[t("Nakshatra at sunrise"), tr(p.nakshatra_at_sunrise, "nakshatra"), ""]] : []),
+    [t("Nakshatra"), nak(p.nakshatra), [t("{pct}% left · ends {t} · lord {lord}",
+      { pct: p.nakshatra.pct_left, t: fmtTime(p.nakshatra.end, ref), lord: tr(p.nakshatra.lord, "planet") }),
+      ...(p.nakshatra_at_sunrise ? [t("At sunrise: {nak}", { nak: tr(p.nakshatra_at_sunrise, "nakshatra") })] : [])]],
     [t("Yoga"), tr(p.yoga.name, "yoga"), t("ends {t}", { t: fmtTime(p.yoga.end, ref) })],
     [t("Karana"), tr(p.karana.name, "karana"), t("ends {t}", { t: fmtTime(p.karana.end, ref) })],
     ...(p.hora ? [[t("Hora"), tr(p.hora.lord, "planet"),
@@ -479,7 +479,7 @@ function renderPanchanga(c) {
     items.push([`${t("Abhijit Muhurtha")}*`, `${fmtTime(p.abhijit.start, ref)} – ${fmtTime(p.abhijit.end, ref)}`, ""]);
   }
   $("panchanga").innerHTML = items.map(([k, v, s]) =>
-    `<div><dt>${esc(k)}</dt><dd>${esc(v)}${s ? `<small>${esc(s)}</small>` : ""}</dd></div>`).join("");
+    `<div><dt>${esc(k)}</dt><dd>${esc(v)}${[s].flat().filter(Boolean).map((x) => `<small>${esc(x)}</small>`).join("")}</dd></div>`).join("");
   $("panchangaNote").textContent = p.abhijit ? t("* Abhijit Muhurtha: a good time for all activities, according to Dr. B. V. Raman.") : "";
 }
 
