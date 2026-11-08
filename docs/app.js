@@ -2,7 +2,7 @@
 // WebAssembly); the only network calls are optional OpenStreetMap place lookups.
 import { initSwe } from "./js/swe.js";
 import { computeChart, isoFromWall, wallMs } from "./js/astro.js";
-import { FESTIVAL_NAMES, NAK_NAMES, TITHI_NAMES, dayFrame, festivalsFor, tamilDate } from "./js/festivals.js";
+import { FESTIVAL_NAMES, NAK_NAMES, TITHI_NAMES, dayFrame, festivalBase, festivalsFor, tamilDate } from "./js/festivals.js";
 import { occurrences, threeMonths } from "./js/search.js";
 import { eclipsesBetween, observancesFor } from "./js/specialdays.js";
 import { EVENTS, muhurthaFor } from "./js/muhurtha.js";
@@ -1048,7 +1048,7 @@ function drawSearch() {
   if (!q[q.kind]) body = hint(t("Choose one from the list above."));
   else if (q.kind === "festival") {
     const { job, name } = v;
-    const rows = job.found.flatMap((day) => day.festivals.filter((f) => f.name === name).map((f) => ({ date: day.date, day, f })));
+    const rows = job.found.flatMap((day) => day.festivals.filter((f) => festivalBase(f.name) === name).map((f) => ({ date: day.date, day, f })));
     const list = byMonthList(rows, (u) => {
       u.tamil = u.day.tamil ??= tamilDate(u.day.w, p.lat, p.lon, p.offset);
       const times = u.f.times.map((tt) => `<span class="sd-time">${esc(tr(tt.label, "label"))}: <strong>${

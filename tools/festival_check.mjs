@@ -68,7 +68,8 @@ const names = (date, [lat, lon, offset = 5.5]) => {
   return festivalsFor(astro.wallMs(y, m, d), lat, lon, offset).map((f) => f.name);
 };
 // Whole-word match, so "Holi" doesn't match "Holika Dahan".
-const has = (list, fest) => list.some((n) => new RegExp(`(^|[ /(])${fest}($|[ /)])`).test(n));
+// A "(Smartha)" day is not the festival's main day; it is checked on its own below.
+const has = (list, fest) => list.some((n) => !n.endsWith("(Smartha)") && new RegExp(`(^|[ /(])${fest}($|[ /)])`).test(n));
 const shift = (date, n) => new Date(Date.parse(date + "T00:00:00Z") + n * 86400e3).toISOString().slice(0, 10);
 
 let bad = 0;
@@ -81,6 +82,26 @@ for (const [fest, date, place] of EXPECTED) {
   console.log(`${ok ? "ok  " : "FAIL"} ${fest.padEnd(22)} ${date}${ok ? "" : `  (on=${on} dayBefore=${early} dayAfter=${late})`}`);
 }
 console.log(`${EXPECTED.length - bad}/${EXPECTED.length} festival dates match`);
+
+// Vaikuntha Ekadashi: where Drik Panchang's page lists a separate Smartha day it
+// is shown, the day before the Vaishnava one, each labelled; otherwise one
+// unlabelled day is.
+{
+  const PLAIN = "Vaikuntha Ekadashi", SMARTHA = `${PLAIN} (Smartha)`, VAISHNAVA = `${PLAIN} (Vaishnava)`;
+  const LONDON_DAYS = ["2025-01-09"], NY_DAYS = ["2031-12-23"];
+  for (const [date, place] of [["2026-12-19", CUPERTINO], ["2028-01-07", CUPERTINO], ["2025-12-30", CHENNAI],
+    ...LONDON_DAYS.map((d) => [d, LONDON]), ...NY_DAYS.map((d) => [d, NEW_YORK])]) {
+    const ok = names(date, place).includes(SMARTHA) && names(shift(date, 1), place).includes(VAISHNAVA)
+      && !names(shift(date, 1), place).includes(SMARTHA) && !names(date, place).includes(VAISHNAVA);
+    if (!ok) bad++;
+    console.log(`${ok ? "ok  " : "FAIL"} ${SMARTHA} ${date}`);
+  }
+  for (const [date, place] of [["2026-12-20", CHENNAI], ["2028-12-27", CUPERTINO], ["2025-01-10", CHENNAI]]) {
+    const ok = !names(shift(date, -1), place).includes(SMARTHA) && names(date, place).includes(PLAIN);
+    if (!ok) bad++;
+    console.log(`${ok ? "ok  " : "FAIL"} no separate Smartha day for ${date}`);
+  }
+}
 
 // An Upakarma on a day with a lunar eclipse in the umbra is flagged: the 2026
 // eclipse is on the Yajur Upakarma day in the US and Chennai (28 August

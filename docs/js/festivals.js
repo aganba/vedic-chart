@@ -23,6 +23,9 @@
 //  - Vaikuntha Ekadashi follows the Vaishnava rule used by Tamil calendars and
 //    temples: the fast is on the first day Ekadashi has begun by arunodaya
 //    (96 minutes before sunrise), so a day with Dashami at dawn is passed over.
+//    Smarthas go by sunrise instead; when that gives the day before, as Drik
+//    lists for Cupertino in 2026, both days are shown, labelled Smartha and
+//    Vaishnava.
 import * as swe from "./swe.js";
 import { SE } from "./swe.js";
 import { NAK_SPAN, SAMVATSARAS, julFromWall, localFromJul, planetLon, solve } from "./astro.js";
@@ -61,6 +64,13 @@ const TITHI_FESTIVALS = [
   { name: "Soora Samharam (Skanda Sashti)", solar: 6, tithi: 5, kaala: "sunset", label: "Soora Samharam (evening, from sunset)",
     region: "Tamil Nadu" },
 ];
+
+// How the two days read when the Smartha and Vaishnava dates of an arunodaya
+// festival differ.
+const SMARTHA_DAY = { name: "Vaikuntha Ekadashi (Smartha)", note: "Vaishnavas observe it the next day." };
+const VAISHNAVA_DAY = { name: "Vaikuntha Ekadashi (Vaishnava)", note: "Smarthas observe it the day before." };
+// The festival a reported name belongs to, without its Smartha/Vaishnava label.
+export const festivalBase = (name) => name.replace(/ \((Smartha|Vaishnava)\)$/, "");
 
 // Nakshatra in an amanta lunar month, Shukla paksha, at sunrise (Upakarmas).
 const LUNAR_NAKSHATRA_FESTIVALS = [
@@ -258,8 +268,13 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
 
   const out = [];
   for (const f of TITHI_FESTIVALS) {
-    if (!tithiObserved(f, 0)) continue;
-    const w = kaala(0, f.kaala);
+    // The Smartha day of an arunodaya festival, when it is the day before the
+    // Vaishnava one; a month boundary can leave only one of the two.
+    const smartha = f.kaala === "arunodaya" ? { ...f, kaala: "sunrise" } : null;
+    const smarthaDay = smartha && !tithiObserved(f, 0) && tithiObserved(smartha, 0) && tithiObserved(f, 1);
+    const vaishnavaDay = smartha && tithiObserved(f, 0) && tithiObserved(smartha, -1);
+    if (!tithiObserved(f, 0) && !smarthaDay) continue;
+    const w = kaala(0, smarthaDay ? "sunrise" : f.kaala);
     // The tithi's own span: when it is kshaya (spans no kaala), the kaala falls
     // in another tithi, so look for it across the day instead.
     const d = day(0), end = day(1)?.sr ?? d.nsr;
@@ -269,7 +284,8 @@ export function festivalsFor(dateWall, lat, lon, offset, frame = dayFrame(dateWa
     const [ts, te] = tithiSpan(at);
     const times = [{ label: tithiLabel(f.tithi), start: fmt(ts), end: fmt(te) }];
     if (f.label) times.unshift(window(f.label, kaala(0, f.show || f.kaala)));
-    out.push({ name: f.name, region: f.region || null, note: f.note || null, times });
+    const split = smarthaDay ? SMARTHA_DAY : vaishnavaDay ? VAISHNAVA_DAY : null;
+    out.push({ name: split?.name || f.name, region: f.region || null, note: split?.note || f.note || null, times });
   }
 
   // Gayatri Japam: the day after Yajur Upakarma.

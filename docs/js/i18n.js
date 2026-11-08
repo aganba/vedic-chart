@@ -458,6 +458,8 @@ const NS = {
     "Ugadi / Gudi Padwa (lunar New Year)": "யுகாதி / குடி பட்வா (சாந்திரமான புத்தாண்டு)",
     "Vaikasi Visakam": "வைகாசி விசாகம்",
     "Vaikuntha Ekadashi": "வைகுண்ட ஏகாதசி",
+    "Vaikuntha Ekadashi (Smartha)": "வைகுண்ட ஏகாதசி (ஸ்மார்த்த)",
+    "Vaikuntha Ekadashi (Vaishnava)": "வைகுண்ட ஏகாதசி (வைஷ்ணவ)",
     "Varalakshmi Vratam": "வரலட்சுமி விரதம்",
     "Vasant Panchami": "வசந்த பஞ்சமி",
     "Vijayadashami / Dussehra": "விஜயதசமி / தசரா",
@@ -494,6 +496,8 @@ const NS = {
   },
   note: {
     "Deepavali in South India; abhyanga snanam before sunrise.": "தென்னிந்தியாவில் தீபாவளி; சூரிய உதயத்துக்கு முன் எண்ணெய்க் குளியல் (கங்கா ஸ்நானம்).",
+    "Vaishnavas observe it the next day.": "வைஷ்ணவர்கள் அடுத்த நாள் அனுசரிப்பார்கள்.",
+    "Smarthas observe it the day before.": "ஸ்மார்த்தர்கள் முந்தைய நாள் அனுசரிப்பார்கள்.",
     "Lit outside Bhadra (Vishti karana).": "பத்திரை (விஷ்டி கரணம்) இல்லாத நேரத்தில் ஏற்றப்படுகிறது.",
     "Rakhi is tied outside Bhadra (Vishti karana).": "பத்திரை (விஷ்டி கரணம்) இல்லாத நேரத்தில் ராக்கி கட்டப்படுகிறது.",
     "The nonbu kayiru (sacred thread) is tied at the moment Maasi ends and Panguni begins.":
